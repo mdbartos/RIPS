@@ -13,6 +13,7 @@ import sys
 import pysal as ps
 import numpy as np
 from scipy import spatial
+import geopandas as gpd
 
 
 substations = '/home/akagi/Desktop/electricity_data/Substations.shp'
@@ -132,253 +133,89 @@ util_db['UTIL_INT'] = util_db.index
 #### IMPORT SUBSTATION TO UTILITY CORRESPONDENCE
 
 sub_to_util = pd.read_csv('/home/akagi/Desktop/sub_util_qgis.csv')
-#sub_to_util['SUB_INT'] = sub_to_util['UNIQUE_ID'].map(pd.Series(sub_db.set_index('UNIQUE_ID')['SUB_INT']))
 sub_to_util['UTIL_INT'] = sub_to_util['UTIL_ID'].map(pd.Series(util_db.index, index=util_db['UNIQUE_ID']))
 
-#### VECTORIZE POLYGON FUNCTION
+#### IMPORT UTILITY SERVICE AREAS
 
-class vectorize_polygon():
-    def __init__(self, shp, convert_crs=0):
-        print 'START: %s' % (str(datetime.now()))
-        print 'loading files...'        
+b = gpd.GeoDataFrame.from_file('/home/akagi/Desktop/electricity_data/Electric_Retail_Service_Ter.shp')
+
+#### LOOP THROUGH UTILITY SERVICE AREAS
+
+schema = {
+    'geometry': 'Polygon',
+    'properties': {'sub_id': 'int', 'util_id': 'int'},
+}
+
+with fiona.open('util_voronoi.shp', 'w', 'ESRI Shapefile', schema, crs=b.crs) as c:
+
+    op_db = pd.merge(sub_to_util, sub_db.rename(columns={'UNIQUE_ID':'SUB_ID'}), on='SUB_ID')[['UTIL_ID', 'SUB_ID', 'LONG_LON', 'LONG_LAT', 'UTIL_INT', 'SUB_INT']].set_index('UTIL_ID').sort_index().drop_duplicates(subset=['LONG_LON', 'LONG_LAT'])
+    
+    for u in sub_to_util['UTIL_ID'].astype(int).unique():
+        print u
+        util_poly = b.set_index('UNIQUE_ID')['geometry'].loc[u]
+        w_db = op_db.loc[u]
         
-        print 'getting geometry type info...'
-        
-        self.shapes={'shp':{}}
-
-
-        self.shapes['shp'].update({'file' : fiona.open(shp, 'r')})
-        self.shapes['shp'].update({'crs': self.shapes['shp']['file'].crs})
-        self.shapes['shp'].update({'types': self.geom_types(self.shapes['shp']['file']).dropna()}) 
-        self.shapes['shp'].update({'shp' : self.homogenize_inputs('shp', range(len(self.shapes['shp']['file'])))})
-        self.shapes['shp'].update({'poly' : self.poly_return('shp')})
-        
-        print 'END: %s' % (str(datetime.now()))
-
-
-    def file_chunks(self, l, n):
-        """ Yield successive n-sized chunks from l.
-        """
-        for i in xrange(0, len(l), n):
-            yield np.array(l[i:i+n])
-        
-    def homogenize_inputs(self, shp, chunk):
-        print 'homogenizing inputs for %s...' % (shp)
-        
-        d = {}
-        
-        bv = self.poly_vectorize(self.shapes[shp]['file'], chunk).dropna()
-        gtypes = self.shapes[shp]['types'].loc[bv.index]
-
-        poly = bv.loc[gtypes=='Polygon'] 
-        mpoly = bv.loc[gtypes=='MultiPolygon'] 
-
-        apoly = poly.apply(lambda x: list(chain(*x)))
-        a_mpoly = mpoly.apply(lambda x: list(chain(*x)))
-        
-        #### HOMOGENIZE POLYGONS
-
-        if len(poly) > 0:
-            polyarrays = pd.Series(apoly.apply(lambda x: np.array(x)))
-            p_x_arrays = polyarrays.apply(lambda x: np.array(x)[:,0])
-            p_y_arrays = polyarrays.apply(lambda x: np.array(x)[:,1])
-            p_trans_arrays = pd.concat([p_x_arrays, p_y_arrays], axis=1)
-
-            d['p_geom'] = pd.Series(zip(p_trans_arrays[0], p_trans_arrays[1]), index=p_trans_arrays.index).apply(np.column_stack)
-            d['p_geom'] = d['p_geom'][d['p_geom'].apply(lambda x: x.shape[0]>=4)]
-
-        #### HOMOGENIZE MULTIPOLYGONS
-        
-        if len(mpoly) > 0:            
-            mpolydims = a_mpoly.apply(lambda x: np.array(x).ndim)
-
-            ##ndim==1
-
-            if (mpolydims==1).any():
-                m_x_arrays_1 = a_mpoly[mpolydims==1].apply(pd.Series).stack().apply(lambda x: np.array(x)[:,0])
-                m_y_arrays_1 = a_mpoly[mpolydims==1].apply(pd.Series).stack().apply(lambda x: np.array(x)[:,1])
-
-                mp = pd.concat([m_x_arrays_1, m_y_arrays_1], axis=1)
-
-                m_geom_1_s = pd.Series(zip(mp[0], mp[1])).apply(np.column_stack)
-
-                empty_s = pd.Series(range(len(mp)), index=mp.index)
-                empty_s = empty_s.reset_index()
-                empty_s[0] = m_geom_1_s
-                empty_s = empty_s[empty_s[0].apply(lambda x: x.shape[0]>=4)]
-
-                d['m_geom_1'] = empty_s.groupby('level_0').apply(lambda x: tuple(list(x[0])))
-
-            ##ndim==3
-
-            if (mpolydims==3).any():
-                m_arrays_3 = a_mpoly[mpolydims==3].apply(pd.Series).stack().apply(lambda x: np.array(x)[:,[0,1]])
-                m_arrays_3 = m_arrays_3[m_arrays_3.apply(lambda x: x.shape[0]>=4)]
-
-                d['m_geom_3'] = m_arrays_3.reset_index().groupby('level_0').apply(lambda x: tuple(list(x[0])))
-        
-        returndf = pd.concat(d.values()).sort_index()
-        return returndf
-
-        
-    def convert_crs(self, shp, crsfrom, crsto, chunk):
-        print 'converting coordinate reference system of %s...' % (shp)
-        
-        crsfrom = Proj(crsfrom, preserve_units=True)
-        crsto = Proj(crsto, preserve_units=True)
-        
-        d = {}
-        
-        bv = self.poly_vectorize(self.shapes[shp]['file'], chunk).dropna()
-        gtypes = self.shapes[shp]['types'].loc[bv.index]
-
-        poly = bv.loc[gtypes=='Polygon'] 
-        mpoly = bv.loc[gtypes=='MultiPolygon'] 
-
-        apoly = poly.apply(lambda x: list(chain(*x)))
-        a_mpoly = mpoly.apply(lambda x: list(chain(*x)))
-        
-        #### CONVERT POLYGONS
-        
-        if len(poly) > 0:
-            polyarrays = pd.Series(apoly.apply(lambda x: np.array(x)))
-            p_x_arrays = polyarrays.apply(lambda x: np.array(x)[:,0])
-            p_y_arrays = polyarrays.apply(lambda x: np.array(x)[:,1])
-            p_trans_arrays = pd.concat([p_x_arrays, p_y_arrays], axis=1).apply(lambda x: transform(crsfrom, crsto, x[0], x[1]), axis=1)
-        
-            d['p_trans_geom'] = p_trans_arrays.apply(np.array).apply(np.column_stack)
-            d['p_trans_geom'] = d['p_trans_geom'][d['p_trans_geom'].apply(lambda x: x.shape[0]>=4)]
-        
-        #### CONVERT MULTIPOLYGONS
-        
-        if len(mpoly) > 0:
-            mpolydims = a_mpoly.apply(lambda x: np.array(x).ndim)
-        
-            ##ndim==1
+        if (len(w_db.shape) > 1) and (w_db.shape[0] > 2):
             
-            if (mpolydims==1).any():
-                m_x_arrays_1 = a_mpoly[mpolydims==1].apply(pd.Series).stack().apply(lambda x: np.array(x)[:,0])
-                m_y_arrays_1 = a_mpoly[mpolydims==1].apply(pd.Series).stack().apply(lambda x: np.array(x)[:,1])
-                mp = pd.concat([m_x_arrays_1, m_y_arrays_1], axis=1)
-                m_x_flat_arrays_1 = pd.Series([j[:,0] for j in [np.column_stack(i) for i in np.column_stack([mp[0].values, mp[1].values])]])
-                m_y_flat_arrays_1 = pd.Series([j[:,0] for j in [np.column_stack(i) for i in np.column_stack([mp[0].values, mp[1].values])]])
-                m_trans_arrays_1 = pd.concat([m_x_flat_arrays_1, m_y_flat_arrays_1], axis=1).apply(lambda x: transform(crsfrom, crsto, x[0], x[1]), axis=1)
-                m_trans_geom_1_s = m_trans_arrays_1.apply(np.array).apply(np.column_stack)
-                empty_s = pd.Series(range(len(mp)), index=mp.index).reset_index()
-                empty_s[0] = m_trans_geom_1_s
-                empty_s = empty_s[empty_s[0].apply(lambda x: x.shape[0]>=4)]
-
-                d['m_trans_geom_1'] = empty_s.groupby('level_0').apply(lambda x: tuple(list(x[0])))
-        
-            ##ndim==3
-            if (mpolydims==3).any():
-                m_trans_arrays_3 = a_mpoly[mpolydims==3].apply(pd.Series).stack().apply(lambda x: np.array(x)[:,[0,1]]).apply(lambda x: transform(crsfrom, crsto, x[:,0], x[:,1]))
-
-                m_trans_geom_3 = m_trans_arrays_3.apply(np.array).apply(np.column_stack)
-                m_trans_geom_3 = m_trans_geom_3[m_trans_geom_3.apply(lambda x: x.shape[0]>=4)]
-                m_trans_geom_3_u = m_trans_geom_3.unstack()
-
-                d['m_trans_geom_3'] = pd.Series(zip(m_trans_geom_3_u[0], m_trans_geom_3_u[1]), index=m_trans_geom_3_u.index)
-        
-        return pd.concat(d.values()).sort_index()
-    
-    
-    def poly_vectorize(self, shpfile, chunk):
-        s = pd.Series(chunk, index=chunk)
-        
-        def return_coords(x):
-            try:
-                return shpfile[x]['geometry']['coordinates']
-            except:
-                return np.nan
+            w_db = w_db.set_index('SUB_INT').sort_index()
             
-        return s.apply(return_coords)
-    
-    def handle_topo_err(self, k):
-        if k.is_valid:
-            return k
+            vor = spatial.Voronoi(w_db[['LONG_LON', 'LONG_LAT']].values)
+
+            reg, vert = voronoi_finite_polygons_2d(vor,1)
+
+
+            v_poly = pd.Series(reg).apply(lambda x: geometry.Polygon(vert[x])).apply(lambda x: util_poly.intersection(x))
+            
+            for rec in range(len(v_poly)):
+                if not v_poly[rec].is_empty:
+                    c.write({
+                        'geometry': geometry.mapping(v_poly[rec]),
+                        'properties': {'sub_id': int(w_db.iloc[rec]['SUB_ID']), 'util_id': int(u)},
+                    })
+
+        elif (len(w_db.shape) > 1) and (w_db.shape[0] == 2):
+
+            w_db = w_db.set_index('SUB_INT').sort_index()
+            subs = list(w_db.index)
+            slope = -1/((w_db.loc[subs[0]]['LONG_LAT'] - w_db.loc[subs[1]]['LONG_LAT'])/(w_db.loc[subs[0]]['LONG_LON'] - w_db.loc[subs[1]]['LONG_LON']))
+
+            mid_x = (w_db.loc[subs[0]]['LONG_LON'] + w_db.loc[subs[1]]['LONG_LON'])/2
+            mid_y = (w_db.loc[subs[0]]['LONG_LAT'] + w_db.loc[subs[1]]['LONG_LAT'])/2
+            xc = np.linspace(util_poly.bounds[0], util_poly.bounds[2])
+            yc = slope*(xc - mid_x) + mid_y
+
+            result = list(ops.polygonize(ops.linemerge(list(util_poly.boundary.union(geometry.LineString(np.column_stack([xc, yc])))))))
+
+            if result[0].contains(geometry.Point(w_db.loc[subs[0]][['LONG_LON', 'LONG_LAT']].values)):
+                c.write({
+                    'geometry': geometry.mapping(result[0]),
+                    'properties': {'sub_id': int(subs[0]), 'util_id': int(u)},
+                })
+
+                c.write({
+                    'geometry': geometry.mapping(result[1]),
+                    'properties': {'sub_id': int(subs[1]), 'util_id': int(u)},
+                })
+
+            else:
+                c.write({
+                    'geometry': geometry.mapping(result[0]),
+                    'properties': {'sub_id': int(subs[1]), 'util_id': int(u)},
+                })
+
+                c.write({
+                    'geometry': geometry.mapping(result[1]),
+                    'properties': {'sub_id': int(subs[0]), 'util_id': int(u)},
+                })
+
+
         else:
-            return k.boundary.convex_hull
-   
-    def handle_empty(self, k):
-        if k.is_empty:
-            return np.nan
-        elif type(k) != geometry.polygon.Polygon:
-            return np.nan
-        else:
-            return k
+            c.write({
+                'geometry': geometry.mapping(util_poly),
+                'properties': {'sub_id': int(w_db['SUB_ID']), 'util_id': int(u)},
+            })
 
-    def try_union(self, k):
-        try:
-    	    return ops.cascaded_union(k)
-        except:
-            try:
-    	        u = k[0]
-    	        for z in range(len(k))[1:]:
-    	            u = u.union(k[z])
-    	        return u
-            except:
-                return geometry.Polygon(np.vstack(pd.Series(k).apply(lambda x: x.boundary.coords).apply(np.array))).convex_hull
 
-    def poly_return(self, shp):
-        print 'creating polygons for %s...' % (shp)
-        poly_df = pd.Series(index=self.shapes[shp]['shp'].index)
-
-        geomtypes = self.shapes[shp]['types'].loc[poly_df.index]
-        
-#        print 'making p'
-        if (geomtypes=='Polygon').any():
-            p = self.shapes[shp]['shp'].loc[geomtypes=='Polygon'].apply(lambda x: geometry.Polygon(x))#.apply(self.handle_empty) 
-    #        print 'setting polydf with p'
-            poly_df.loc[p.index] = p.copy()
-        
-#        print 'making mp'
-        if (geomtypes=='MultiPolygon').any():
-            mp = self.shapes[shp]['shp'].loc[geomtypes == 'MultiPolygon'].apply(lambda x: (pd.Series(list(x)))).stack().apply(geometry.Polygon)
-	    
-	    if mp.apply(lambda x: not x.is_valid).any():
-	        mp = mp.apply(self.handle_topo_err).apply(self.handle_empty).dropna()
-		
-	    mp = mp.reset_index().groupby('level_0').apply(lambda x: list(x[0])).apply(self.try_union)
-            
-    #        print 'setting poly df with mp'
-            poly_df.loc[mp.index] = mp.copy()
-
-#        print 'making nullgeom'
-        nullgeom = poly_df[poly_df.isnull()].index
-
-#        print 'dropping nullgeom from polydf'
-        poly_df = poly_df.drop(nullgeom)
-        
-#        print 'dropping nullgeom from selp.shapes.shp'
-        self.shapes[shp]['shp'] = self.shapes[shp]['shp'].drop(nullgeom)
-        
-        return poly_df
-            
-    def geom_types(self, shp):
-        s = pd.Series(range(len(shp)))
-        def return_geom(x):
-            try:
-                return shp[x]['geometry']['type']
-            except:
-                return np.nan
-        return s.apply(return_geom)
-      
-#### WORK AREA
-
-b = vectorize_polygon('/home/akagi/Desktop/electricity_data/Electric_Retail_Service_Ter.shp')
-
-b.shapes['shp']['poly'][~b.shapes['shp']['poly'].apply(lambda x: x.is_valid)] = b.shapes['shp']['poly'][~b.shapes['shp']['poly'].apply(lambda x: x.is_valid)].apply(lambda x: x.buffer(0))
-
-op_db = pd.merge(sub_to_util.set_index('UTIL_ID').loc[869].reset_index(), sub_db.rename(columns={'UNIQUE_ID':'SUB_ID'}), on='SUB_ID')[['UTIL_ID', 'SUB_ID', 'LONG_LON', 'LONG_LAT', 'UTIL_INT', 'SUB_INT']].set_index('SUB_INT').sort_index()
-
-vor = spatial.Voronoi(op_db[['LONG_LON', 'LONG_LAT']].values)
-
-reg, vert = voronoi_finite_polygons_2d(vor,1)
-
-srp_poly = b.shapes['shp']['poly'][344]
-
-v_poly = pd.Series(reg).apply(lambda x: geometry.Polygon(vert[x])).apply(lambda x: srp_poly.intersection(x))
 
 #### PLOTTING
 
