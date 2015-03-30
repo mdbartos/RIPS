@@ -5,6 +5,7 @@ from rasterio.warp import reproject
 import pandas as pd
 import geopandas as gpd
 
+#### FOR ICLUS, BEST PROJECTION IS EPSG 5070: NAD83/CONUS ALBERS
 vor = '/home/akagi/util_voronoi.shp'
 pop_dens = '/home/akagi/Desktop/rastercopy.tif'
 
