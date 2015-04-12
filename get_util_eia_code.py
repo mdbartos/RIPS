@@ -41,7 +41,7 @@ for i in d.keys():
     elif len(d[i]) == 1:
         ds.update({i : d[i]})
 
-from fuzzywuzzy import fuzz, process:
+from fuzzywuzzy import fuzz, process
 
 #### FIND BEST MATCH FOR OVERLAPPING UTILITY SERVICE AREAS
 dm_r = {}
