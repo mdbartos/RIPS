@@ -86,16 +86,28 @@ for u in unique_u:
         else:
             continue
 
-util = {
-'aps' : 803,
-'srp' : 16572,
-'ldwp' : 11208
-        }
-util_2006 = {
-'aps' : 116,
-'srp' : 244,
-'ldwp' : 194
-}
+id_2006 = pd.read_csv('/home/akagi/Documents/EIA_form_data/wecc_form_714/form714-database_2006_2013/form714-database/Respondent IDs.csv') 
+id_2006 = id_2006.drop_duplicates('eia_code').set_index('eia_code').sort_index()
+
+ui = pd.DataFrame.from_dict(unique_u_ids, orient='index')
+ui = ui.loc[ui['code'] != '*'].drop_duplicates('code')
+ui['code'] = ui['code'].astype(int)
+ui = ui.set_index('code')
+
+eia_to_r = pd.concat([ui, id_2006], axis=1).dropna()
+
+# util = {
+# 'aps' : 803,
+# 'srp' : 16572,
+# 'ldwp' : 11208
+#         }
+# util_2006 = {
+# 'aps' : 116,
+# 'srp' : 244,
+# 'ldwp' : 194
+# }
+
+resp_ids = '/home/akagi/Documents/EIA_form_data/wecc_form_714/form714-database_2006_2013/form714-database/Respondent IDs.csv'
 
 df_path_d = {}
 
@@ -126,8 +138,7 @@ df_d = {}
 def build_df(u):
         print u
         df = pd.DataFrame()
-        for y in df_path_d[u].keys():
-            sub_df = pd.DataFrame()
+        for y in sorted(df_path_d[u].keys()):
             print y
             if y < 2006:
                 f = open(df_path_d[u][y], 'r')
@@ -214,18 +225,21 @@ def build_df(u):
                             entry_df.index = dt_ix
                             df = df.append(entry_df)
 
-                # elif y == 2006:
-                #     f = pd.read_csv('%s/%s' % (basepath, path_d[y]))
-                #     f = f.loc[f['respondent_id'] == util_2006[u], [u'plan_date', u'hour01', u'hour02', u'hour03', u'hour04', u'hour05', u'hour06', u'hour07', u'hour08', u'hour09', u'hour10', u'hour11', u'hour12', u'hour13', u'hour14', u'hour15', u'hour16', u'hour17', u'hour18', u'hour19', u'hour20', u'hour21', u'hour22', u'hour23', u'hour24']]
-                #     f['plan_date'] = f['plan_date'].str.split().apply(lambda x: x[0]).apply(lambda x: datetime.datetime.strptime(x, '%m/%d/%Y'))
-                #     f = f.set_index('plan_date').stack().reset_index().rename(columns={'level_1':'hour', 0:'load'})
-                #     f['hour'] = f['hour'].str.replace('hour','').astype(int)-1
-                #     f['date'] = f.apply(lambda x: datetime.datetime(x['plan_date'].year, x['plan_date'].month, x['plan_date'].day, x['hour']), axis=1)
-                #     f = pd.DataFrame(f.set_index('date')['load'])
-                #     df = pd.concat([df, f], axis=0)
+                elif y == 2006:
+                    f = pd.read_csv('%s/%s' % (basepath, path_d[y]))
+                    if u in eia_to_r.index.values:
+                        f = f.loc[f['respondent_id'] == eia_to_r.loc[u, 'respondent_id'], [u'plan_date', u'hour01', u'hour02', u'hour03', u'hour04', u'hour05', u'hour06', u'hour07', u'hour08', u'hour09', u'hour10', u'hour11', u'hour12', u'hour13', u'hour14', u'hour15', u'hour16', u'hour17', u'hour18', u'hour19', u'hour20', u'hour21', u'hour22', u'hour23', u'hour24']]
+                        f['plan_date'] = f['plan_date'].str.split().apply(lambda x: x[0]).apply(lambda x: datetime.datetime.strptime(x, '%m/%d/%Y'))
+                        f = f.set_index('plan_date').stack().reset_index().rename(columns={'level_1':'hour', 0:'load'})
+                        f['hour'] = f['hour'].str.replace('hour','').astype(int)-1
+                        f['date'] = f.apply(lambda x: datetime.datetime(x['plan_date'].year, x['plan_date'].month, x['plan_date'].day, x['hour']), axis=1)
+                        f = pd.DataFrame(f.set_index('date')['load'])
+                        df = pd.concat([df, f], axis=0)
             
             df['year'] = [i.year for i in df.index]
             df_d.update({u : df})
 
-for x in unique_u[35:]:
+build_paths()
+
+for x in unique_u:
     build_df(x)
