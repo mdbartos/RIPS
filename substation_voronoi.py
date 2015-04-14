@@ -14,6 +14,7 @@ import pysal as ps
 import numpy as np
 from scipy import spatial
 import geopandas as gpd
+from geopandas import tools
 
 
 substations = '/home/akagi/Desktop/electricity_data/Substations.shp'
@@ -21,14 +22,6 @@ substations_db = '/home/akagi/Desktop/electricity_data/Substations.dbf'
 
 utility = '/home/akagi/Desktop/electricity_data/Electric_Retail_Service_Ter.shp'
 utility_db = '/home/akagi/Desktop/electricity_data/Electric_Retail_Service_Ter.dbf'
-
-#### FUNCTION TO IMPORT DBF
-
-def open_dbf(fn):
-    dbf = ps.open(fn)
-    dbpass = {col: dbf.by_col(col) for col in dbf.header}
-    return_df = pd.DataFrame(dbpass)
-    return return_df
 
 #### FINITE VORONOI REGIONS 
 
@@ -115,132 +108,37 @@ def voronoi_finite_polygons_2d(vor, radius=None):
 
     return new_regions, np.asarray(new_vertices)
 
-#### IMPORT SUBSTATION POINTS
-
-sub = fiona.open(substations)
-sub_db = open_dbf(substations_db)
-
-sub_db['LONG_LAT'] = pd.Series(sub_db.index).apply(lambda x: sub[x]['geometry']['coordinates'][1])
-sub_db['LONG_LON'] = pd.Series(sub_db.index).apply(lambda x: sub[x]['geometry']['coordinates'][0])
-sub_db['SUB_INT'] = sub_db.index
-
-#### IMPORT UTILITY REGIONS
-
-util = fiona.open(utility)
-util_db = open_dbf(utility_db)
-util_db['UTIL_INT'] = util_db.index
-
-#### IMPORT SUBSTATION TO UTILITY CORRESPONDENCE
-
-sub_to_util = pd.read_csv('/home/akagi/Desktop/sub_util_qgis.csv')
-sub_to_util['UTIL_INT'] = sub_to_util['UTIL_ID'].map(pd.Series(util_db.index, index=util_db['UNIQUE_ID']))
-
-#### IMPORT UTILITY SERVICE AREAS
 
 b = gpd.GeoDataFrame.from_file('/home/akagi/Desktop/electricity_data/Electric_Retail_Service_Ter.shp')
 
 #### LOOP THROUGH UTILITY SERVICE AREAS
+sub = gpd.read_file(substations)
+util = gpd.read_file(utility)
 
-schema = {
-    'geometry': 'Polygon',
-    'properties': {'sub_id': 'int', 'util_id': 'int'},
-}
+invalid_util = util[~util['geometry'].apply(lambda x: x.is_valid)]
+util.loc[invalid_util.index, 'geometry'] = util.loc[invalid_util.index, 'geometry'].apply(lambda x: x.buffer(0))
 
-with fiona.open('util_voronoi.shp', 'w', 'ESRI Shapefile', schema, crs=b.crs) as c:
+sub_util = tools.sjoin(sub, util, op='within', how='left')
 
-    op_db = pd.merge(sub_to_util, sub_db.rename(columns={'UNIQUE_ID':'SUB_ID'}), on='SUB_ID')[['UTIL_ID', 'SUB_ID', 'LONG_LON', 'LONG_LAT', 'UTIL_INT', 'SUB_INT']].set_index('UTIL_ID').sort_index().drop_duplicates(subset=['LONG_LON', 'LONG_LAT'])
-    
-    for u in sub_to_util['UTIL_ID'].astype(int).unique():
-        print u
-        util_poly = b.set_index('UNIQUE_ID')['geometry'].loc[u]
-        w_db = op_db.loc[u]
-        
-        if (len(w_db.shape) > 1) and (w_db.shape[0] > 2):
-            
-            w_db = w_db.set_index('SUB_INT').sort_index()
-            
-            vor = spatial.Voronoi(w_db[['LONG_LON', 'LONG_LAT']].values)
+sub_xy = np.vstack(sub['geometry'].apply(lambda u: np.concatenate(u.xy)).values)
 
-            reg, vert = voronoi_finite_polygons_2d(vor,1)
+#util_poly = b.set_index('UNIQUE_ID')['geometry']
+vor = spatial.Voronoi(sub_xy)
+reg, vert = voronoi_finite_polygons_2d(vor,1)
 
+v_poly = gpd.GeoSeries(pd.Series(reg).apply(lambda x: geometry.Polygon(vert[x])))
 
-            v_poly = pd.Series(reg).apply(lambda x: geometry.Polygon(vert[x])).apply(lambda x: util_poly.intersection(x))
-            
-            for rec in range(len(v_poly)):
-                if not v_poly[rec].is_empty:
-                    c.write({
-                        'geometry': geometry.mapping(v_poly[rec]),
-                        'properties': {'sub_id': int(w_db.iloc[rec]['SUB_ID']), 'util_id': int(u)},
-                    })
+v_gdf = gpd.GeoDataFrame(pd.concat([sub.drop('geometry', axis=1), v_poly], axis=1)).rename(columns={0:'geometry'})
+v_gdf.crs = sub.crs
 
-        elif (len(w_db.shape) > 1) and (w_db.shape[0] == 2):
+j = tools.sjoin(util, v_gdf, op='intersects')
+j['right_geom'] = j['UNIQUE_ID_right'].map(v_gdf.set_index('UNIQUE_ID')['geometry'])
+j = j.dropna(subset=['geometry', 'right_geom']).set_index('UNIQUE_ID_left')
 
-            w_db = w_db.set_index('SUB_INT').sort_index()
-            subs = list(w_db.index)
-            slope = -1/((w_db.loc[subs[0]]['LONG_LAT'] - w_db.loc[subs[1]]['LONG_LAT'])/(w_db.loc[subs[0]]['LONG_LON'] - w_db.loc[subs[1]]['LONG_LON']))
+## BE CAREFUL WITH THIS: SLOW
+j_inter = j.apply(lambda x: x['geometry'].intersection(x['right_geom']), axis=1)
 
-            mid_x = (w_db.loc[subs[0]]['LONG_LON'] + w_db.loc[subs[1]]['LONG_LON'])/2
-            mid_y = (w_db.loc[subs[0]]['LONG_LAT'] + w_db.loc[subs[1]]['LONG_LAT'])/2
-            xc = np.linspace(util_poly.bounds[0], util_poly.bounds[2])
-            yc = slope*(xc - mid_x) + mid_y
+## OUTFILE
+outdf = gpd.GeoDataFrame(pd.concat([j[['UNIQUE_ID_right', 'SUMMERPEAK', 'WINTERPEAK']].reset_index(), j_inter.reset_index()[0]], axis=1), crs=sub.crs).rename(columns={0:'geometry', 'UNIQUE_ID_left':'UTIL_ID', 'UNIQUE_ID_right':'SUB_ID'})
 
-            result = list(ops.polygonize(ops.linemerge(list(util_poly.boundary.union(geometry.LineString(np.column_stack([xc, yc])))))))
-
-            if result[0].contains(geometry.Point(w_db.loc[subs[0]][['LONG_LON', 'LONG_LAT']].values)):
-                c.write({
-                    'geometry': geometry.mapping(result[0]),
-                    'properties': {'sub_id': int(subs[0]), 'util_id': int(u)},
-                })
-
-                c.write({
-                    'geometry': geometry.mapping(result[1]),
-                    'properties': {'sub_id': int(subs[1]), 'util_id': int(u)},
-                })
-
-            else:
-                c.write({
-                    'geometry': geometry.mapping(result[0]),
-                    'properties': {'sub_id': int(subs[1]), 'util_id': int(u)},
-                })
-
-                c.write({
-                    'geometry': geometry.mapping(result[1]),
-                    'properties': {'sub_id': int(subs[0]), 'util_id': int(u)},
-                })
-
-
-        else:
-            c.write({
-                'geometry': geometry.mapping(util_poly),
-                'properties': {'sub_id': int(w_db['SUB_ID']), 'util_id': int(u)},
-            })
-
-
-
-#### PLOTTING
-
-plot(srp_poly.exterior.xy[0], srp_poly.exterior.xy[1])
-
-scatter(op_db['LONG_LON'], op_db['LONG_LAT'])
-
-for i in v_poly.index:
-    try:
-        p = v_poly[i].exterior.xy
-        plot(p[0], p[1])
-    except:
-        pass
-
-#### WRITE TO SHAPEFILE
-
-schema = {
-    'geometry': 'Polygon',
-    'properties': {'id': 'int'},
-}
-
-with fiona.open('srp_voronoi.shp', 'w', 'ESRI Shapefile', schema, crs=b.shapes['shp']['crs']) as c:
-    ## If there are multiple geometries, put the "for" loop here
-    for rec in range(len(v_poly)):
-        c.write({
-            'geometry': geometry.mapping(v_poly[rec]),
-            'properties': {'id': int(op_db.iloc[rec]['SUB_ID'])},
-        })
+#outdf.to_file('voronoi_intersect.shp')
