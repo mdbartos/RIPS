@@ -1,19 +1,20 @@
+import datetime
 import numpy as np
 import pandas as pd
 import geopandas as gpd
 from geopandas import tools
 
-utility = '/home/akagi/Desktop/electricity_data/Electric_Retail_Service_Ter.shp'
+utility = '/home/kircheis/data/shp/Electric_Retail_Service_Ter.shp'
 util = gpd.read_file(utility) 
 
-urbarea = '/home/akagi/GIS/census/cb_2013_us_ua10_500k/cb_2013_us_ua10_500k.shp'
+urbarea = '/home/kircheis/data/census/cb_2013_us_ua10_500k/cb_2013_us_ua10_500k.shp'
 ua = gpd.read_file(urbarea)
 
 ua = ua.to_crs(util.crs)
 
 j = tools.sjoin(util, ua)
 
-grid = '/home/akagi/gridcells.shp'
+grid = '/home/kircheis/data/gridcells.shp'
 g = gpd.read_file(grid)
 coords = g.centroid.apply(lambda x: x.coords[0])
 coordstr = coords.apply(lambda x: 'data_%s_%s' % (x[1], x[0]))
@@ -26,3 +27,17 @@ ua_g.apply(lambda x: (x['geometry'].centroid).distance(x['grid_geom'].centroid),
 ua_g = ua_g.reset_index().loc[ua_g.reset_index().groupby('index').idxmin('dist')['FID'].values].set_index('index')
 
 j['grid_cell'] = j['index_right'].map(ua_g['coordstr'])
+
+eia_to_util = pd.read_csv('./crosswalk/util_eia_id.csv', index_col=0)
+
+j['eia_code'] = j['UNIQUE_ID'].map(eia_to_util['company_id'])
+
+j = j.dropna(subset=['eia_code']).set_index('eia_code').sort_index()
+
+## LADWP ID: 11208
+
+la1 = pd.read_csv('/home/kircheis/data/source_hist_forcings/data_33.5625_-117.9375', sep='\t', names=['year', 'month', 'day', 'prcp', 'tmax', 'tmin', 'wspd'])
+la1.index = pd.date_range(start=datetime.date(1949,1,1), end=datetime.date(2010,12,31), freq='D')
+
+la2 = pd.read_csv('/home/kircheis/data/source_hist_forcings/data_37.3125_-118.4375', sep='\t', names=['year', 'month', 'day', 'prcp', 'tmax', 'tmin', 'wspd'])
+la2.index = pd.date_range(start=datetime.date(1949,1,1), end=datetime.date(2010,12,31), freq='D')
