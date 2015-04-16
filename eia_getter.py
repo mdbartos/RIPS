@@ -236,10 +236,10 @@ def build_df(u):
                         f = pd.DataFrame(f.set_index('date')['load'])
                         df = pd.concat([df, f], axis=0)
             
-            df['year'] = [i.year for i in df.index]
-            df_d.update({u : df})
+        return df            
 
 build_paths()
 
 for x in unique_u:
-    build_df(x)
+    out_df = build_df(x)
+    out_df.to_csv(x)
