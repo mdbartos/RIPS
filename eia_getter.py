@@ -136,110 +136,115 @@ def build_paths():
 df_d = {}
 
 def build_df(u):
-        print u
-        df = pd.DataFrame()
-        for y in sorted(df_path_d[u].keys()):
-            print y
-            if y < 2006:
-                f = open(df_path_d[u][y], 'r')
-                r = f.readlines()
-                f.close()
-                #### DISCARD BINARY-ENCODED FILES
-                try:
-                    enc = r[0].decode()
-                except:
-                    enc = None
-                    pass
-                if enc:
-                    r = [g.replace('\t', '      ') for g in r if len(g) > 70]
-                    if not str.isdigit(r[0][0]):
-                        for line in range(len(r)):
-                            try:
-                                chk = int(''.join(r[line].rstrip().split()))
-                                if chk:
-                                    # print line, r[line]
-                                    r = r[line:]
-                                    break
-                            except:
-                                continue
-                    for i in range(0, len(r)-1, 2):
-                        # print i
-                        entry = [r[i], r[i+1]]
-                        mo = int(r[i][:2])
-                        day = int(r[i][2:4])
-                        yr = y
-    #                    yr = r[i][4:6]
-    #                    if yr[0] == '0':
-    #                        yr = int('20' + yr)
-    #                    else:
-    #                        yr = int('19' + yr)
+    print u
+    df = pd.DataFrame()
+    for y in sorted(df_path_d[u].keys()):
+        print y
+        if y < 2006:
+            f = open(df_path_d[u][y], 'r')
+            r = f.readlines()
+            f.close()
+            #### DISCARD BINARY-ENCODED FILES
+            try:
+                enc = r[0].decode()
+            except:
+                enc = None
+                pass
+            if enc:
+                r = [g.replace('\t', '      ') for g in r if len(g) > 70]
+                if not str.isdigit(r[0][0]):
+                    for line in range(len(r)):
+                        try:
+                            chk = int(''.join(r[line].rstrip().split()))
+                            if chk:
+                                # print line, r[line]
+                                r = r[line:]
+                                break
+                        except:
+                            continue
+                for i in range(0, len(r)-1, 2):
+                    # print i
+                    entry = [r[i], r[i+1]]
+                    mo = int(r[i][:2])
+                    day = int(r[i][2:4])
+                    yr = y
+#                    yr = r[i][4:6]
+#                    if yr[0] == '0':
+#                        yr = int('20' + yr)
+#                    else:
+#                        yr = int('19' + yr)
 
-                        if (len(entry[0].rstrip()) + len(entry[1].rstrip())) == 160:
+                    if (len(entry[0].rstrip()) + len(entry[1].rstrip())) == 160:
+                        try:
+                            am = [int(j) if j.strip() != '' else None for j in re.findall('.{5}', entry[0][20:].rstrip())]
+                            pm = [int(j) if j.strip() != '' else None for j in re.findall('.{5}', entry[1][20:].rstrip())]
+                            assert(len(am)==12)
+                            assert(len(pm)==12)
+                        except:
+                            am = [int(j) for j in entry[0][20:].rstrip().split()]
+                            pm = [int(j) for j in entry[1][20:].rstrip().split()]
+                            assert(len(am)==12)
+                            assert(len(pm)==12)
+                    else:
+                        try:
+                            am = [int(j) for j in entry[0][20:].rstrip().split()]
+                            pm = [int(j) for j in entry[1][20:].rstrip().split()]
+                            assert(len(am)==12)
+                            assert(len(pm)==12)
+                        except:
                             try:
                                 am = [int(j) if j.strip() != '' else None for j in re.findall('.{5}', entry[0][20:].rstrip())]
                                 pm = [int(j) if j.strip() != '' else None for j in re.findall('.{5}', entry[1][20:].rstrip())]
-                                assert(len(am)==12)
-                                assert(len(pm)==12)
+                                if len(am) < 12:
+                                    am_arr = np.array(am)
+                                    am = np.pad(am_arr, (0, (12 - np.array(am).shape[0])), mode='symmetric').tolist()
+                                if len(pm) < 12:
+                                    pm_arr = np.array(pm)
+                                    pm = np.pad(pm_arr, (0, (12 - np.array(pm).shape[0])), mode='symmetric').tolist()
+                                if len(am) > 12:
+                                    am = am[:12] 
+                                if len(pm) > 12:
+                                    pm = pm[:12]
                             except:
-                                am = [int(j) for j in entry[0][20:].rstrip().split()]
-                                pm = [int(j) for j in entry[1][20:].rstrip().split()]
-                                assert(len(am)==12)
-                                assert(len(pm)==12)
-                        else:
-                            try:
-                                am = [int(j) for j in entry[0][20:].rstrip().split()]
-                                pm = [int(j) for j in entry[1][20:].rstrip().split()]
-                                assert(len(am)==12)
-                                assert(len(pm)==12)
-                            except:
-                                try:
-                                    am = [int(j) if j.strip() != '' else None for j in re.findall('.{5}', entry[0][20:].rstrip())]
-                                    pm = [int(j) if j.strip() != '' else None for j in re.findall('.{5}', entry[1][20:].rstrip())]
-                                    if len(am) < 12:
-                                        am_arr = np.array(am)
-                                        am = np.pad(am_arr, (0, (12 - np.array(am).shape[0])), mode='symmetric').tolist()
-                                    if len(pm) < 12:
-                                        pm_arr = np.array(pm)
-                                        pm = np.pad(pm_arr, (0, (12 - np.array(pm).shape[0])), mode='symmetric').tolist()
-                                    if len(am) > 12:
-                                        am = am[:12] 
-                                    if len(pm) > 12:
-                                        pm = pm[:12]
-                                except:
-                                    print 'Cannot read line'
-                                    am = np.repeat(np.nan, 12).tolist()
-                                    pm = np.repeat(np.nan, 12).tolist()
+                                print 'Cannot read line'
+                                am = np.repeat(np.nan, 12).tolist()
+                                pm = np.repeat(np.nan, 12).tolist()
 
-                        ampm = am + pm
-                        entry_df = pd.DataFrame()
-                        try:
-                            dt_ix = pd.date_range(start=datetime.datetime(yr, mo, day, 0), end=datetime.datetime(yr, mo, day, 23), freq='H')
-                            entry_df['load'] = ampm
-        #                    print entry_df
-                            entry_df.index = dt_ix
-                            df = df.append(entry_df)
-                        except:
-                            entry_df['load'] = ampm
-                            yest = df.index.to_pydatetime()[-1]
-                            dt_ix = pd.date_range(start=(yest + datetime.timedelta(hours=1)), end=(yest + datetime.timedelta(hours=24)), freq='H') 
-                            entry_df.index = dt_ix
-                            df = df.append(entry_df)
+                    ampm = am + pm
+                    entry_df = pd.DataFrame()
+                    try:
+                        dt_ix = pd.date_range(start=datetime.datetime(yr, mo, day, 0), end=datetime.datetime(yr, mo, day, 23), freq='H')
+                        entry_df['load'] = ampm
+    #                    print entry_df
+                        entry_df.index = dt_ix
+                        df = df.append(entry_df)
+                    except:
+                        entry_df['load'] = ampm
+                        yest = df.index.to_pydatetime()[-1]
+                        dt_ix = pd.date_range(start=(yest + datetime.timedelta(hours=1)), end=(yest + datetime.timedelta(hours=24)), freq='H') 
+                        entry_df.index = dt_ix
+                        df = df.append(entry_df)
 
-                elif y == 2006:
-                    f = pd.read_csv('%s/%s' % (basepath, path_d[y]))
-                    if u in eia_to_r.index.values:
-                        f = f.loc[f['respondent_id'] == eia_to_r.loc[u, 'respondent_id'], [u'plan_date', u'hour01', u'hour02', u'hour03', u'hour04', u'hour05', u'hour06', u'hour07', u'hour08', u'hour09', u'hour10', u'hour11', u'hour12', u'hour13', u'hour14', u'hour15', u'hour16', u'hour17', u'hour18', u'hour19', u'hour20', u'hour21', u'hour22', u'hour23', u'hour24']]
-                        f['plan_date'] = f['plan_date'].str.split().apply(lambda x: x[0]).apply(lambda x: datetime.datetime.strptime(x, '%m/%d/%Y'))
-                        f = f.set_index('plan_date').stack().reset_index().rename(columns={'level_1':'hour', 0:'load'})
-                        f['hour'] = f['hour'].str.replace('hour','').astype(int)-1
-                        f['date'] = f.apply(lambda x: datetime.datetime(x['plan_date'].year, x['plan_date'].month, x['plan_date'].day, x['hour']), axis=1)
-                        f = pd.DataFrame(f.set_index('date')['load'])
-                        df = pd.concat([df, f], axis=0)
-            
-        return df            
+        elif y == 2006:
+            f = pd.read_csv('%s/%s' % (basepath, path_d[y]))
+            if u in unique_u_ids.keys():
+                if str.isdigit(unique_u_ids[u]['code']):
+                    eiacode = int(unique_u_ids[u]['code'])
+                    if eiacode in eia_to_r.index.values:
+                        if eia_to_r.loc[eiacode, 'respondent_id'] in f['respondent_id'].unique():
+                            f = f.loc[f['respondent_id'] == eia_to_r.loc[eiacode, 'respondent_id'], [u'plan_date', u'hour01', u'hour02', u'hour03', u'hour04', u'hour05', u'hour06', u'hour07', u'hour08', u'hour09', u'hour10', u'hour11', u'hour12', u'hour13', u'hour14', u'hour15', u'hour16', u'hour17', u'hour18', u'hour19', u'hour20', u'hour21', u'hour22', u'hour23', u'hour24']]
+                            f['plan_date'] = f['plan_date'].str.split().apply(lambda x: x[0]).apply(lambda x: datetime.datetime.strptime(x, '%m/%d/%Y'))
+                            f = f.set_index('plan_date').stack().reset_index().rename(columns={'level_1':'hour', 0:'load'})
+                            f['hour'] = f['hour'].str.replace('hour','').astype(int)-1
+                            f['date'] = f.apply(lambda x: datetime.datetime(x['plan_date'].year, x['plan_date'].month, x['plan_date'].day, x['hour']), axis=1)
+                            f = pd.DataFrame(f.set_index('date')['load'])
+                            df = pd.concat([df, f], axis=0)
+        
+    return df            
 
 build_paths()
 
+#### Southern California Edison part of CAISO in 2006-2013: resp id 125
 for x in unique_u:
     out_df = build_df(x)
     out_df.to_csv(x)
