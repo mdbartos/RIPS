@@ -3,19 +3,22 @@ import numpy as np
 import pandas as pd
 import geopandas as gpd
 from geopandas import tools
+import sys
+sys.path.append('/home/kircheis/github/RIPS')
+from rect_grid import rect_grid
 
 utility = '/home/kircheis/data/shp/Electric_Retail_Service_Ter.shp'
 util = gpd.read_file(utility) 
 
-urbarea = '/home/kircheis/data/census/cb_2013_us_ua10_500k/cb_2013_us_ua10_500k.shp'
+urbarea = '/home/kircheis/data/shp/census/cb_2013_us_ua10_500k/cb_2013_us_ua10_500k.shp'
 ua = gpd.read_file(urbarea)
 
 ua = ua.to_crs(util.crs)
 
 j = tools.sjoin(util, ua)
 
-grid = '/home/kircheis/data/gridcells.shp'
-g = gpd.read_file(grid)
+g = rect_grid((-130, 24, -65, 50), 0.125) 
+
 coords = g.centroid.apply(lambda x: x.coords[0])
 coordstr = coords.apply(lambda x: 'data_%s_%s' % (x[1], x[0]))
 g['coordstr'] = coordstr
