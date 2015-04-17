@@ -36,6 +36,12 @@ c_1990 = '/home/kircheis/data/shp/census/census_tracts_all/src_data/c_1990'
 df_1990 = combine_ct(c_1990)
 df_1990.to_file('census_tracts_1990.shp')
 
+#### 2000 CT BOUNDARIES
+
+c_2000 = '/home/kircheis/data/shp/census/census_tracts_all/src_data/c_2000'
+df_2000 = combine_ct(c_2000)
+df_2000.to_file('census_tracts_2000.shp')
+
 #### 2014 CT BOUNDARIES
 
 c_2014 = '/home/kircheis/data/shp/census/census_tracts_all/src_data/c_2014'
