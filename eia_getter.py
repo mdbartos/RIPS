@@ -247,4 +247,10 @@ build_paths()
 #### Southern California Edison part of CAISO in 2006-2013: resp id 125
 for x in unique_u:
     out_df = build_df(x)
-    out_df.to_csv(x)
+    if x in unique_u_ids.keys():
+        if str.isdigit(unique_u_ids[x]['code']):
+            out_df.to_csv('%s.csv' % unique_u_ids[x]['code'])
+        else:
+            out_df.to_csv(x)
+    else:
+        out_df.to_csv(x)
