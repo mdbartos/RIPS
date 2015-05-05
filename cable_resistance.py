@@ -211,7 +211,7 @@ def R_dc_T(R_dc, T_0, T_1, alpha_0):
 	R_dc : DC Resistance at temperature T_0 (ohm/m).
 	T_0 : Temperature to convert from (C).
 	T_1: Temperature to convert to (C).
-	'alpha_0' : Temperature coefficient of layer material at reference temperature T_0 (1/C)
+	alpha_0 : Temperature coefficient of layer material at reference temperature T_0 (1/C)
 	"""
 	R_dc_1 = R_dc*(1 + alpha_0*(T_1 - T_0))
 	return R_dc_1
