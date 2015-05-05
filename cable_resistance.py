@@ -59,6 +59,152 @@ def R_dc(T_c, n, n_props, T_0=20):
 		R_dc = R_layers.sum()
 	return R_dc
 
+def R_ac(R_dc, grouping=1, d_c=None, s=None, material='aluminum', shape='round',
+         winding='stranded', treatment='untreated', f=60, prox_method='IEC_287',
+		 pipe_correction=1):
+	"""
+	Compute AC Resistance of a conductor cable based on DC Resistance, accounting for
+	skin and proximity effects.
+	
+	R_dc : DC Resistance of conductor (ohm/m).
+	grouping : Number of parallel cables or cable cores (used for proximity effect).
+	d_c : Conductor diameter (m) -- used only for proximity effect.
+	s : Spacing between parallel conductor centers (m) -- used only for proximity effect.
+	material : conductor material (aluminum or copper).
+	shape : conductor cross-sectional shape (round or sector-shaped).
+	arrangement : cable arrangement (stranded, compact or segmental).
+	treatment : whether cable is dried/impregnated (treated or untreated).
+	f : frequency (Hz)
+	prox_method : which method to use when calculating proximity effect (IEC_287 or Arnold_1941).
+	pipe_correction : For pipe-type cables, this value should be 1.5-1.7.
+	
+	EXAMPLE USAGE:
+	From Example 7.3 in Anders, G.J., "Rating of Electric Power Cables". IEEE Press (1997).
+	"Compute the AC Resistance (at 90 C) of model cable No. 1 using the IEC 287 method (assume
+	 that the cable is not dried or impregnated. The conductor is stranded copper.
+	 The DC resistance at 90 C is 7.663e-5 ohm/m. The conductor diameter is 20.5 mm. Three
+	 conductors run parallel and the spacing between conductor centers is 71.6 mm.
+	 The frequency is 50 Hz.
+	 
+	>>> R_ac(7.663e-5, grouping=3, d_c=0.0205,s=0.0716, material='copper', f=50)
+	7.805533308599811e-05
+	>>> R_ac(7.663e-5, grouping=3, d_c=20.5,s=71.6, material='copper', f=50, prox_method='Arnold_1941')
+	7.806147003059088e-05
+	
+	"""
+
+	constants = {
+		'copper' : {
+			'round' : {
+				'stranded' : {
+					'treated' : {'k_s': 1, 'k_p' : 0.8},
+					'untreated' : {'k_s': 1, 'k_p' : 1}
+					},
+				'compact' : {
+					'treated' : {'k_s': 1, 'k_p' : 0.8},
+					'untreated' : {'k_s': 1, 'k_p' : 1}
+					},
+				'segmental' : {
+					'treated' : {'k_s': 0.435, 'k_p' : 0.37},
+					'untreated' : {'k_s': 0.435, 'k_p' : 0.37}
+					}
+				},
+			'sector-shaped' : {
+					'treated' : {'k_s': 1, 'k_p' : 0.8},
+					'untreated' : {'k_s': 1, 'k_p' : 1}
+					},
+				},
+		'aluminum' : {
+			'round' : {
+				'stranded' : {
+					'treated' : {'k_s': 1, 'k_p' : 0.8},
+					'untreated' : {'k_s': 1, 'k_p' : 1}
+					},
+				'four segment' : {
+					'treated' : {'k_s': 0.28, 'k_p' : 0.8},
+					'untreated' : {'k_s': 0.28, 'k_p' : 1}
+					},
+				'five segment' : {
+					'treated' : {'k_s': 0.19, 'k_p' : 0.8},
+					'untreated' : {'k_s': 0.19, 'k_p' : 1}
+					},
+				'six segment' : {
+					'treated' : {'k_s': 0.12, 'k_p' : 0.8},
+					'untreated' : {'k_s': 0.12, 'k_p' : 1}
+					},
+				}
+			}
+		}
+	
+	# Compute skin effects.
+	k_s = constants[material][shape][winding][treatment]['k_s']
+	x_s = (k_s*(10**-7)*8*math.pi*f/R_dc)**0.5
+	if x_s <= 2.8:
+		y_s = (x_s**4)/(192 + 0.8*x_s**4)
+	elif 2.8 < x_s <= 3.8:
+		y_s = -0.136 - 0.0177*x_s + 0.0563*x_s**2
+	else:
+		y_s = (x_s/2*(2**0.5)) - 11.0/15.0
+		
+	# Compute proximity effects.
+	if grouping > 1:
+		k_p = constants[material][shape][winding][treatment]['k_p']	
+		x_p = (k_p*(10**-7)*8*math.pi*f/R_dc)**0.5
+		a = (x_p**4)/(192 + 0.8*x_p**4)
+		y = d_c/s
+		
+		if x_p > 2.8:
+			prox_method = 'Arnold_1941'
+		
+		def IEC_287(grouping, a, y):
+			if grouping == 2:
+				y_p = 2.9*a*y
+			elif grouping == 3:
+				y_p = a*(y**2)*(0.312*y**2 + 1.18/(a + 0.27))
+			else:
+				y_p = 0
+				print('No valid grouping selected for calculation of proximity effects')
+			return y_p
+				
+		def Arnold_1941(x_p, grouping, y):
+			if x_p <= 2.8:
+				A = (0.042 + 0.012*x_p**4)/(1 + 0.0236*x_p**4)
+				B = 0
+				G = (11*x_p**4)/(704 + 20*x_p**4)
+				H = (1.0/3.0)*(1 + 0.0283*x_p**4)/(1 + 0.0042*x_p**4)
+					
+			elif 2.8 < x_p <= 3.8:
+				A = -0.223 + 0.237*x_p - 0.0154*x_p**2
+				B = 0
+				G = -1.04 + 0.72*x_p - 0.08*x_p**2
+				H = 0.095 + 0.119*x_p + 0.0384*x_p**2
+			else:
+				A = 0.75 - 1.128*(1/x_p)
+				B = 0.094 - 0.376*(1/x_p)
+				G = x_p/(4*(2**0.5)) - (1.0/8.0)
+				H = (2*x_p - 4.69)/(x_p - 1.16)
+				
+			if grouping == 2:
+				y_p = (G*y**2)/(1 - A*y**2 - B*y**4)
+			elif grouping == 3:
+				y_p = (G*3*y**2)/(2 - (5.0/12.0)*H*y**2)
+			else:
+				y_p = 0
+				print('No valid grouping selected for calculation of proximity effects')
+			return y_p
+			
+		if prox_method == 'IEC_287':
+			y_p = IEC_287(grouping, a, y)
+		elif prox_method == 'Arnold_1941':
+			y_p = Arnold_1941(x_p, grouping, y)
+		else:
+			y_p = 0
+			print('No valid method selected for calculation of proximity effects')
+	else:
+		y_p = 0	
+	R_ac = R_dc*(1 + pipe_correction*(y_s + y_p))
+	return R_ac
+
 def R_dc_T(R_dc, T_0, T_1, alpha_0):
 	"""
 	Convert DC Resistance at temperature T_0 to DC Resistance at temperature T_1.
