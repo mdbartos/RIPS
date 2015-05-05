@@ -18,6 +18,11 @@ def R_dc(T_c, n, n_props, T_0=20):
 	
 	EXAMPLE USAGE:
 	From Example 7.1 in Anders, G.J., "Rating of Electric Power Cables". IEEE Press (1997).
+	"Compute the resistance of the parallel combination of the skid wire and tape for model cable No. 3.
+	 The cable shield consists of a mylar tape intercalated with a 7/8 in bronze tape--1 in lay, and a
+	 single 0.1 in D-shaped bronze skid wire--1.5 in lay. The diameter over the tape is equal to 2.648 in.
+	 Operating temperature is 60 C."
+	 
 	>>> example_props = {
 		'A_t' : [0.169e-5, 0.101e-4],
 		'd_n' : [0.0672, 0.0651],
