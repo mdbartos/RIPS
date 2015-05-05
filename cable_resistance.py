@@ -26,7 +26,7 @@ def R_dc(T_c, n, n_props, T_0=20):
 		'alpha_0' : [0.003, 0.003]
 		} 
 		
-	>>> R_dc_stranded(60, 2, example_props)
+	>>> R_dc(60, 2, example_props)
 	0.019107042682762667
 	"""
 	
