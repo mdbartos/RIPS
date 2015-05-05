@@ -60,7 +60,7 @@ def R_dc(T_c, n, n_props, T_0=20):
 	return R_dc
 
 def R_ac(R_dc, grouping=1, d_c=None, s=None, material='aluminum', shape='round',
-         winding='stranded', treatment='untreated', f=60, prox_method='IEC_287',
+         arrangement='stranded', treatment='untreated', f=60, prox_method='IEC_287',
 		 pipe_correction=1):
 	"""
 	Compute AC Resistance of a conductor cable based on DC Resistance, accounting for
@@ -137,7 +137,7 @@ def R_ac(R_dc, grouping=1, d_c=None, s=None, material='aluminum', shape='round',
 		}
 	
 	# Compute skin effects.
-	k_s = constants[material][shape][winding][treatment]['k_s']
+	k_s = constants[material][shape][arrangement][treatment]['k_s']
 	x_s = (k_s*(10**-7)*8*math.pi*f/R_dc)**0.5
 	if x_s <= 2.8:
 		y_s = (x_s**4)/(192 + 0.8*x_s**4)
@@ -148,7 +148,7 @@ def R_ac(R_dc, grouping=1, d_c=None, s=None, material='aluminum', shape='round',
 		
 	# Compute proximity effects.
 	if grouping > 1:
-		k_p = constants[material][shape][winding][treatment]['k_p']	
+		k_p = constants[material][shape][arrangement][treatment]['k_p']	
 		x_p = (k_p*(10**-7)*8*math.pi*f/R_dc)**0.5
 		a = (x_p**4)/(192 + 0.8*x_p**4)
 		y = d_c/s
