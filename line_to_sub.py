@@ -27,8 +27,8 @@ end_node_query = tree.query(np.vstack(end.values))
 
 #### CREATE CROSSWALK TABLE
 
-crosswalk = pd.DataFrame(np.column_stack([t[['UNIQUE_ID', 'TOT_CAP_KV', 'NUM_LINES']].values, s.iloc[start_node_query[1]][['UNIQUE_ID', 'NAME']].values, start_node_query[0], s.iloc[end_node_query[1]][['UNIQUE_ID', 'NAME']].values, end_node_query[0]]), columns=['TRANS_ID', 'TOT_CAP_KV', 'NUM_LINES', 'SUB_1', 'NAME_1', 'ERR_1', 'SUB_2', 'NAME_2', 'ERR_2'])
+crosswalk = pd.DataFrame(np.column_stack([t[['UNIQUE_ID', 'TOT_CAP_KV', 'NUM_LINES', 'Shape_Leng']].values, s.iloc[start_node_query[1]][['UNIQUE_ID', 'NAME']].values, start_node_query[0], s.iloc[end_node_query[1]][['UNIQUE_ID', 'NAME']].values, end_node_query[0]]), columns=['TRANS_ID', 'TOT_CAP_KV', 'NUM_LINES', 'LENGTH', 'SUB_1', 'NAME_1', 'ERR_1', 'SUB_2', 'NAME_2', 'ERR_2'])
 
-crosswalk = crosswalk[['TRANS_ID', 'SUB_1', 'SUB_2', 'NAME_1', 'NAME_2',  'ERR_1', 'ERR_2', 'TOT_CAP_KV', 'NUM_LINES']]
+crosswalk = crosswalk[['TRANS_ID', 'SUB_1', 'SUB_2', 'NAME_1', 'NAME_2',  'ERR_1', 'ERR_2', 'TOT_CAP_KV', 'NUM_LINES', 'LENGTH']]
 
 # crosswalk.to_csv('edges.csv')
