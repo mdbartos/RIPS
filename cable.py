@@ -130,7 +130,7 @@ class cable():
         I = ((-self.Q_rad_in(I_sun, D, a_s) + self.Q_rad_out(e_s, D, sigma, T_line, T_amb) + self.Q_conv(htcoeff, D, T_line, T_amb))/R)**0.5
         return I
 
-    def T_c(self, I, T_amb, V, a_s=0.9, e_s=0.9, I_sun=900.0, temp_factor=1, wind_factor=1, n_iter=10):
+    def T_c(self, I, T_amb, V, a_s=0.5, e_s=0.5, I_sun=900.0, temp_factor=1, wind_factor=1, n_iter=10):
         sigma = 5.6703e-8  # Stefan-Boltzmann constant
 	D = self.D
 
