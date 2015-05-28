@@ -129,9 +129,14 @@ for i in G.edges():
     props = G[i[0]][i[1]]
     kv = props['tot_kv']/float(props['num_lines'])
     v_class = v_list[np.argmin(abs(v_list - 500.0))]
+    cname = cable_classes[v_class][0][0]
+    model = cable_classes[v_class][0][1]
     R = instance_cables[v_class].R.mean()
-    G[i[0]][i[1]]['R_unit'] = R
-    G[i[0]][i[1]]['R'] = R*props['length']
+    G.edge[i[0]][i[1]]['R_unit'] = R
+    G.edge[i[0]][i[1]]['R'] = R*props['length']
+    G.edge[i[0]][i[1]]['amp_75'] = instance_cables[v_class].models[model][cname]['amp_75']
+    G.edge[i[0]][i[1]]['tot_amp_75'] = G[i[0]][i[1]]['amp_75']*int(G[i[0]][i[1]]['num_lines'])
+    G.edge[i[0]][i[1]]['tot_MW_cap'] = (G[i[0]][i[1]]['tot_amp_75']/1000.0)*G[i[0]][i[1]]['tot_kv']
 
 
 #A = np.array([G.node[i]['I_net'] if 'I_net' in G.node[i].keys() else 0 for i in G.nodes()])
@@ -142,6 +147,7 @@ cycles = nx.cycle_basis(G)
 cycles = np.array([[tuple([cycles[j][i], cycles[j][i+1]]) if (i < len(cycles[j])-1) else tuple([cycles[j][i], cycles[j][0]]) for i in range(len(cycles[j]))] for j in range(len(cycles))])
 
 #L = [G.node[i]['demand'] for i in G.node.keys()]
+### NEED A NEW NAME FOR edges
 edges = np.array(G.edges())
 # Problem because nodes are no longer integer indexed VVV
 ### QUICKFIX
@@ -169,8 +175,35 @@ for u in cycles:
     X = np.vstack([X, z])
     S = np.append(S, 0)
 
-scipy.linalg.lstsq(X, S)
+sol = scipy.linalg.lstsq(X, S)
 
+#### NETWORK SIMPLEX SOLVER
+CG = G.subgraph(list(nx.connected_components(G))[0])
+
+C_gen = subgen.loc[CG.nodes()].round().astype(int)
+C_loads = subloads.loc[CG.nodes()].round().astype(int)
+
+weights = s.loc[s['UNIQUE_ID'].astype(int).isin(edgesubs[~np.in1d(edgesubs, s[s.within(phx_poly)]['UNIQUE_ID'].values.astype(int))])].set_index('UNIQUE_ID').loc[CG.nodes()]['MAX_VOLT'].dropna().sort_index()
+
+C_transfers = ((C_gen.sum() - C_loads.sum())*(weights/weights.sum()).loc[CG.nodes()].fillna(0)).astype(int)
+
+if C_transfers.sum() != (C_gen.sum() - C_loads.sum()):
+    dif = (C_transfers.sum() - (C_gen.sum() - C_loads.sum()))
+    direct = 1 if dif > 0 else -1
+    nz_idx = pd.Series(np.nonzero(C_transfers.values)[0])
+    for i in range(abs(dif)):
+        C_transfers.iloc[nz_idx[i]] -= direct 
+
+for i in CG.nodes():
+    CG.node[i]['load'] = C_loads[i]
+    CG.node[i]['gen'] = C_gen[i]
+    CG.node[i]['trans'] = C_transfers[i]
+
+for i in CG.nodes():
+    CG.node[i]['MW_net'] = CG.node[i]['gen'] - CG.node[i]['load'] - CG.node[i]['trans']
+
+DG = CG.to_directed()
+NS = nx.network_simplex(DG, demand='MW_net', weight='R', capacity='tot_MW_cap')
 #### EVERYTHING BELOW DOESN'T WORK!!!
 
 for i in G.nodes():
@@ -212,8 +245,21 @@ mwkv['I_trans'] = (1000*mwkv['trans']/mwkv['max_volt'])
 # gen = pd.concat([gridvolts, gen.set_index('GEN_ID')], axis=1).reset_index().rename(columns={2:'Grid_KV', 'index':'GEN_ID'})
 
 #### 
-s.loc[s['UNIQUE_ID'].astype(int).isin(outer_nodes)].plot()
+#s.loc[s['UNIQUE_ID'].astype(int).isin(outer_nodes)].plot()
 plot(phx_poly.exterior.xy[0], phx_poly.exterior.xy[1])
+for i in nx.connected_components(G):
+    geom = s.set_index('UNIQUE_ID').loc[i].dropna()
+    geom['geometry'].plot()
+
+#### DEBUGGING CONNECTED COMPONENTS
+
+cc = list(nx.connected_components(G))
+ss = edges[['SUB_1', 'SUB_2']].astype(int)
+
+# Each disconnected component in cc has one or more subs with a missing point of entry into system
+# This is caused by orphaned subgraphs being created when the bbox is drawn.
+# Probably can't be fixed -- will simply have to remove disconnected components
+
 
 #### LINALG SOLVER
 
