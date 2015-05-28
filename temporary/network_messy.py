@@ -36,6 +36,7 @@ edges = pd.read_csv('edges.csv', index_col=0)
 # This can probably be done when edges.csv is generated VVV
 edges = pd.concat([edges.set_index('TRANS_ID'), linelength], axis=1).reset_index()
 
+edges['TOT_CAP_KV'][edges['TOT_CAP_KV'] <= 0] = 69
 #### GENERATION
 
 gen = pd.read_csv('gen_to_sub_static.csv', index_col=0) 
@@ -100,6 +101,8 @@ for i in phx_edges.index:
 		tot_kv=row['TOT_CAP_KV'],
 		num_lines=int(row['NUM_LINES']),
 		length=row['length_m'])
+
+import cable
 
 cable_classes = {
     525 : {0 : ['Chukar', 'acsr'],
@@ -203,6 +206,8 @@ for i in CG.nodes():
     CG.node[i]['MW_net'] = CG.node[i]['gen'] - CG.node[i]['load'] - CG.node[i]['trans']
 
 DG = CG.to_directed()
+
+
 NS = nx.network_simplex(DG, demand='MW_net', weight='R', capacity='tot_MW_cap')
 #### EVERYTHING BELOW DOESN'T WORK!!!
 
