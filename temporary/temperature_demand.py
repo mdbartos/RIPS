@@ -10,7 +10,7 @@ import scipy
 import matplotlib.pyplot as plt
 
 #### IMPORT CENSUS AND UTILITY SHAPEFILES
-utility = '/home/akagi/github/RIPS_kircheis/data/shp/Electric_Retail_Service_Ter.shp'
+utility = gpd.read_file('/home/akagi/github/RIPS_kircheis/data/shp/Electric_Retail_Service_Ter.shp')
 
 census_shp = '/home/akagi/github/RIPS_kircheis/data/shp/census/census_tracts_all/census_tracts_us.shp'
 
@@ -107,6 +107,30 @@ for i in ucols:
 
 util_to_eia = pd.read_csv('/home/akagi/github/RIPS_kircheis/RIPS/crosswalk/util_eia_id.csv', index_col=0)
 
+#### QUICK FIXES
+
+rid = pd.read_csv('/home/akagi/github/RIPS_kircheis/data/eia_form_714/active/form714-database/form714-database/Respondent IDs.csv')
+
+util_to_eia.loc[2149, 'company_id'] = 2507     #Burbank
+util_to_eia.loc[2046, 'company_id'] = 16868    #Seattle City Lights
+util_to_eia.loc[2157, 'company_id'] = 17609    #Southern California Edison
+util_to_eia.loc[229, 'company_id'] = 5326      #PUD of Douglas County
+util_to_eia.loc[520, 'company_id'] = 3989      #Colorado Springs Utilities
+util_to_eia.loc[3296, 'company_id'] = 18429    #Tacoma
+util_to_eia.loc[2566, 'company_id'] = 7294     #Glendale
+util_to_eia.loc[2155, 'company_id'] = 16088    #Riverside
+util_to_eia.loc[2298, 'company_id'] = 15500    #Puget Sound
+
+# util_to_eia.loc[589, 'company_id'] =           #Farmington | FARM
+# util_to_eia.loc[533, 'company_id'] =           #Los Alamos | LOS
+# util_to_eia.loc[627, 'company_id'] =           #Navajo Tribal | NTUA
+# util_to_eia.loc[1008, 'company_id'] = 16534    #Redding | RDNG
+# util_to_eia.loc[2148, 'company_id'] =          #Vernon | VER
+
+# util_to_eia.loc[ , 'company_id'] = 229         #CAISO | CISO
+# util_to_eia.loc[ , 'company_id'] = 12397       #MWD of SC | MWD
+
+####
 
 j90 = pd.read_csv('/home/akagi/github/RIPS_kircheis/data/util_join_1990.csv', index_col=0).set_index('UNIQUE_ID')['GEOID_1990'].astype(str).str.pad(11, side='left', fillchar='0')
 
@@ -260,11 +284,26 @@ def fit_data_no_linreg(idno):
     util_d = {}
     hist_path = '/home/chesterlab/Bartos/pre/source_hist_forcings/master'
 
-    for i in range(len(dem_util.index)):
-        data_name = dem_util.iloc[i]['grid_cell']
+    if isinstance(dem_util, pd.DataFrame):
+        for i in range(len(dem_util.index)):
+            data_name = dem_util.iloc[i]['grid_cell']
+            lat = float(data_name.split('_')[1])
+            lon = float(data_name.split('_')[2])
+            pop = int(dem_util.iloc[i]['POP'])
+            df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
+            df.index = pd.date_range(start=datetime.date(1949, 1, 1), freq='d', periods=len(df))
+            df = df[np.in1d(df.index.month, [6,7,8])]
+            if not data_name in util_d.keys():
+                util_d.update({data_name : {}})
+                util_d[data_name].update({'pop' : pop})
+                util_d[data_name].update({'data' : df})
+            else:
+                util_d[data_name]['pop'] += pop
+    elif isinstance(dem_util, pd.Series):
+        data_name = dem_util['grid_cell']
         lat = float(data_name.split('_')[1])
         lon = float(data_name.split('_')[2])
-        pop = int(dem_util.iloc[i]['POP'])
+        pop = int(dem_util['POP'])
         df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
         df.index = pd.date_range(start=datetime.date(1949, 1, 1), freq='d', periods=len(df))
         df = df[np.in1d(df.index.month, [6,7,8])]
@@ -277,8 +316,12 @@ def fit_data_no_linreg(idno):
 
     totpop = sum([util_d[i]['pop'] for i in util_d.keys()])
     tempcat = pd.concat([util_d[i]['pop']*util_d[i]['data'] for i in util_d.keys()], axis=1)
-    tmax = tempcat[4].sum(axis=1)/totpop
-    tmin = tempcat[5].sum(axis=1)/totpop
+    if isinstance(tempcat[4], pd.DataFrame):
+        tmax = tempcat[4].sum(axis=1)/totpop
+        tmin = tempcat[5].sum(axis=1)/totpop
+    elif isinstance(tempcat[4], pd.Series):
+        tmax = tempcat[4]/totpop
+        tmin = tempcat[5]/totpop
 
 #    max_loads = norm_load.groupby(norm_load.index.date).max()
 #    max_loads.index = pd.to_datetime(max_loads.index)
