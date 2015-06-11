@@ -329,6 +329,8 @@ def fit_data_no_linreg(idno):
 
     peak = pd.concat([norm_load, tmax], axis=1).dropna()
     peak = peak[peak.index.weekday <= 4]    #BUSINESS DAYS ONLY
+    if idno in man_fixes:
+        peak = peak.loc[man_fixes[idno][0]:man_fixes[idno][1]]
 
 #    linfit = np.polyfit(peak[1], peak[0], 1)
 
@@ -352,6 +354,21 @@ def fit_data_no_linreg(idno):
     ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment='top', linespacing=1.25, bbox=props)
     plt.savefig('%s.png' % (idno), bbox_inches='tight')
     plt.clf()
+
+
+man_fixes = {
+        3413 : ('1993', '2000'),
+        5326 : ('2000', None),
+        5701 : ('1993', '2004'),
+        14328 : ('1997', None),
+        14354 : ('1999', '2004'),
+        15466 : ('1993', '2001'),
+        15473 : ('1993', '2004'),
+        17166 : ('1998', None),
+        19281 : ('1993', '2004'),
+        19545 : ('1997', '2004'),
+        20169 : ('2006', '2010'),
+        24211 : ('1993', '2004')}
 
 
 for fn in os.listdir('/home/akagi/github/RIPS_kircheis/RIPS/data/hourly_load/wecc'):
