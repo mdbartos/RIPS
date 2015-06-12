@@ -174,6 +174,142 @@ def plot_curvefit(xdata, ydata):
     z = scipy.stats.gaussian_kde(xy)(xy)
     plt.scatter(xdata, ydata, c=z, s=100, edgecolor='')
 
+def fit_data_no_linreg(idno):
+    data = cat_load_census(idno)[['load', 'pop', 'lforce_001', 'mHHI_001']].dropna()
+    data = data[data.index.year!=2005]
+    datasummer = data[np.in1d(data.index.month, [6,7,8])]
+
+    c_load = pd.read_csv('/home/akagi/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s.csv' % (idno), index_col=0, parse_dates=True)
+    c_load = c_load.groupby(c_load.index.date).max()
+
+    norm_load = (1000000*c_load['load']/(data['pop'].reindex_like(c_load).interpolate())).dropna()
+    norm_load.index = pd.to_datetime(norm_load.index)
+    norm_load = norm_load[np.in1d(norm_load.index.month, [6,7,8])]
+
+    dem_ua = pd.read_csv('/home/akagi/github/RIPS_kircheis/data/util_demand_to_met_ua')
+
+    dem_util = dem_ua.set_index('eia_code').sort_index().loc[idno]
+
+    util_d = {}
+    hist_path = '/home/chesterlab/Bartos/pre/source_hist_forcings/master'
+
+    if isinstance(dem_util, pd.DataFrame):
+        for i in range(len(dem_util.index)):
+            data_name = dem_util.iloc[i]['grid_cell']
+            lat = float(data_name.split('_')[1])
+            lon = float(data_name.split('_')[2])
+            pop = int(dem_util.iloc[i]['POP'])
+            if data_name in os.listdir(hist_path):
+                df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
+            else:
+                lats = np.asarray([float(i.split('_')[1]) for i in os.listdir(hist_path)])
+                lons = np.asarray([float(i.split('_')[2]) for i in os.listdir(hist_path)])
+                latlons = pd.DataFrame(np.column_stack([lats, lons]))
+                newdata = latlons.loc[latlons.apply(lambda x: ((x[0] - lat)**2 + (x[1] - lon)**2)**0.5, axis=1).idxmin()]
+                data_name = 'data_%s_%s' % (newdata[0], newdata[1])
+                df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
+            df.index = pd.date_range(start=datetime.date(1949, 1, 1), freq='d', periods=len(df))
+            df = df[np.in1d(df.index.month, [6,7,8])]
+            if not data_name in util_d.keys():
+                util_d.update({data_name : {}})
+                util_d[data_name].update({'pop' : pop})
+                util_d[data_name].update({'data' : df})
+            else:
+                util_d[data_name]['pop'] += pop
+    elif isinstance(dem_util, pd.Series):
+        data_name = dem_util['grid_cell']
+        lat = float(data_name.split('_')[1])
+        lon = float(data_name.split('_')[2])
+        pop = int(dem_util['POP'])
+        if data_name in os.listdir(hist_path):
+            df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
+        else:
+            lats = np.asarray([float(i.split('_')[1]) for i in os.listdir(hist_path)])
+            lons = np.asarray([float(i.split('_')[2]) for i in os.listdir(hist_path)])
+            latlons = pd.DataFrame(np.column_stack([lats, lons]))
+            newdata = latlons.loc[latlons.apply(lambda x: ((x[0] - lat)**2 + (x[1] - lon)**2)**0.5, axis=1).idxmin()]
+            data_name = 'data_%s_%s' % (newdata[0], newdata[1])
+            df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
+        df.index = pd.date_range(start=datetime.date(1949, 1, 1), freq='d', periods=len(df))
+        df = df[np.in1d(df.index.month, [6,7,8])]
+        if not data_name in util_d.keys():
+            util_d.update({data_name : {}})
+            util_d[data_name].update({'pop' : pop})
+            util_d[data_name].update({'data' : df})
+        else:
+            util_d[data_name]['pop'] += pop
+
+    totpop = sum([util_d[i]['pop'] for i in util_d.keys()])
+    tempcat = pd.concat([util_d[i]['pop']*util_d[i]['data'] for i in util_d.keys()], axis=1)
+    if isinstance(tempcat[4], pd.DataFrame):
+        tmax = tempcat[4].sum(axis=1)/totpop
+        tmin = tempcat[5].sum(axis=1)/totpop
+    elif isinstance(tempcat[4], pd.Series):
+        tmax = tempcat[4]/totpop
+        tmin = tempcat[5]/totpop
+
+#    max_loads = norm_load.groupby(norm_load.index.date).max()
+#    max_loads.index = pd.to_datetime(max_loads.index)
+#    max_loads = max_loads.resample('h', loffset='12H')
+
+    peak = pd.concat([norm_load, tmax], axis=1).dropna()
+    peak = peak[peak.index.weekday <= 4]    #BUSINESS DAYS ONLY
+    if idno in man_fixes:
+        peak = peak.loc[man_fixes[idno][0]:man_fixes[idno][1]]
+
+#    linfit = np.polyfit(peak[1], peak[0], 1)
+
+#    tot_load = c_load.groupby(c_load.index.date).max()
+#    tot_load.index = pd.to_datetime(tot_load.index)
+
+#    load_anom = (peak[0].resample('d')/tot_load['load']).dropna()
+
+    linreg = scipy.stats.linregress(peak[1], peak[0])
+
+    fig, ax = plt.subplots(1)
+    plot_curvefit(peak[1], peak[0])
+    plt.plot(np.arange(peak[1].min(), peak[1].max()), linreg[0]*np.arange(peak[1].min(), peak[1].max()) + linreg[1])
+
+    util_name = util_to_eia.dropna().set_index('company_id').loc[idno, 'utility_name']
+    plt.title('%s, %s' % (util_name, idno))
+    plt.ylabel('Load (W per capita)')
+    plt.xlabel('Air Temperature ($^\circ$C)')
+    textstr = '$\\alpha=%.2f$\n$\\beta=%.2f$\n$n=%s$\n$r=%.2f$' % (linreg[0], linreg[1], len(peak), linreg[2])
+    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
+    ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment='top', linespacing=1.25, bbox=props)
+    plt.savefig('%s.png' % (idno), bbox_inches='tight')
+    plt.clf()
+
+
+man_fixes = {
+        3413 : ('1993', '2000'),
+        5326 : ('2000', None),
+        5701 : ('1993', '2004'),
+        14328 : ('1997', None),
+        14354 : ('1999', '2004'),
+        15466 : ('1993', '2001'),
+        15473 : ('1993', '2004'),
+        17166 : ('1998', None),
+        19281 : ('1993', '2004'),
+        19545 : ('1997', '2004'),
+        20169 : ('2006', '2010'),
+        24211 : ('1993', '2004')}
+
+
+for fn in os.listdir('/home/akagi/github/RIPS_kircheis/RIPS/data/hourly_load/wecc'):
+    if fn.endswith('csv'):
+        i = int(fn.split('.')[0])
+        try:
+            fit_data_no_linreg(i)
+        except:
+            print(i)
+
+
+
+#### OLDER
+
+
+
 def fit_data(idno):
     data = cat_load_census(idno)[['load', 'pop', 'lforce_001', 'mHHI_001']].dropna()
     data = data[data.index.year!=2005]
@@ -253,138 +389,6 @@ for fn in os.listdir('/home/akagi/github/RIPS_kircheis/RIPS/data/hourly_load/wec
             fit_data(i)
         except:
             print(i)
-
-
-
-
-def fit_data_no_linreg(idno):
-    data = cat_load_census(idno)[['load', 'pop', 'lforce_001', 'mHHI_001']].dropna()
-    data = data[data.index.year!=2005]
-    datasummer = data[np.in1d(data.index.month, [6,7,8])]
-    # y = datasummer['load']
-    # X = datasummer[['pop', 'lforce_001', 'mHHI_001']]
-    # X = sm.add_constant(X)
-    # est = sm.OLS(y, X).fit()
-
-    c_load = pd.read_csv('/home/akagi/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s.csv' % (idno), index_col=0, parse_dates=True)
-    c_load = c_load.groupby(c_load.index.date).max()
-
-    norm_load = (1000000*c_load['load']/(data['pop'].reindex_like(c_load).interpolate())).dropna()
-    norm_load.index = pd.to_datetime(norm_load.index)
-    norm_load = norm_load[np.in1d(norm_load.index.month, [6,7,8])]
-
-#    norm_load = pd.Series(1000000*datasummer['load']/datasummer['pop'], index=data.index[np.in1d(data.index.month, [6,7,8])]).resample('h').interpolate()
-
-#    norm_load = (c_load - resampled).dropna()
-
-    dem_ua = pd.read_csv('/home/akagi/github/RIPS_kircheis/data/util_demand_to_met_ua')
-
-    dem_util = dem_ua.set_index('eia_code').sort_index().loc[idno]
-
-    util_d = {}
-    hist_path = '/home/chesterlab/Bartos/pre/source_hist_forcings/master'
-
-    if isinstance(dem_util, pd.DataFrame):
-        for i in range(len(dem_util.index)):
-            data_name = dem_util.iloc[i]['grid_cell']
-            lat = float(data_name.split('_')[1])
-            lon = float(data_name.split('_')[2])
-            pop = int(dem_util.iloc[i]['POP'])
-            df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
-            df.index = pd.date_range(start=datetime.date(1949, 1, 1), freq='d', periods=len(df))
-            df = df[np.in1d(df.index.month, [6,7,8])]
-            if not data_name in util_d.keys():
-                util_d.update({data_name : {}})
-                util_d[data_name].update({'pop' : pop})
-                util_d[data_name].update({'data' : df})
-            else:
-                util_d[data_name]['pop'] += pop
-    elif isinstance(dem_util, pd.Series):
-        data_name = dem_util['grid_cell']
-        lat = float(data_name.split('_')[1])
-        lon = float(data_name.split('_')[2])
-        pop = int(dem_util['POP'])
-        df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
-        df.index = pd.date_range(start=datetime.date(1949, 1, 1), freq='d', periods=len(df))
-        df = df[np.in1d(df.index.month, [6,7,8])]
-        if not data_name in util_d.keys():
-            util_d.update({data_name : {}})
-            util_d[data_name].update({'pop' : pop})
-            util_d[data_name].update({'data' : df})
-        else:
-            util_d[data_name]['pop'] += pop
-
-    totpop = sum([util_d[i]['pop'] for i in util_d.keys()])
-    tempcat = pd.concat([util_d[i]['pop']*util_d[i]['data'] for i in util_d.keys()], axis=1)
-    if isinstance(tempcat[4], pd.DataFrame):
-        tmax = tempcat[4].sum(axis=1)/totpop
-        tmin = tempcat[5].sum(axis=1)/totpop
-    elif isinstance(tempcat[4], pd.Series):
-        tmax = tempcat[4]/totpop
-        tmin = tempcat[5]/totpop
-
-#    max_loads = norm_load.groupby(norm_load.index.date).max()
-#    max_loads.index = pd.to_datetime(max_loads.index)
-#    max_loads = max_loads.resample('h', loffset='12H')
-
-    peak = pd.concat([norm_load, tmax], axis=1).dropna()
-    peak = peak[peak.index.weekday <= 4]    #BUSINESS DAYS ONLY
-    if idno in man_fixes:
-        peak = peak.loc[man_fixes[idno][0]:man_fixes[idno][1]]
-
-#    linfit = np.polyfit(peak[1], peak[0], 1)
-
-#    tot_load = c_load.groupby(c_load.index.date).max()
-#    tot_load.index = pd.to_datetime(tot_load.index)
-
-#    load_anom = (peak[0].resample('d')/tot_load['load']).dropna()
-
-    linreg = scipy.stats.linregress(peak[1], peak[0])
-
-    fig, ax = plt.subplots(1)
-    plot_curvefit(peak[1], peak[0])
-    plt.plot(np.arange(peak[1].min(), peak[1].max()), linreg[0]*np.arange(peak[1].min(), peak[1].max()) + linreg[1])
-
-    util_name = util_to_eia.dropna().set_index('company_id').loc[idno, 'utility_name']
-    plt.title('%s, %s' % (util_name, idno))
-    plt.ylabel('Load (W per capita)')
-    plt.xlabel('Air Temperature ($^\circ$C)')
-    textstr = '$\\alpha=%.2f$\n$\\beta=%.2f$\n$n=%s$\n$r=%.2f$' % (linreg[0], linreg[1], len(peak), linreg[2])
-    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
-    ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment='top', linespacing=1.25, bbox=props)
-    plt.savefig('%s.png' % (idno), bbox_inches='tight')
-    plt.clf()
-
-
-man_fixes = {
-        3413 : ('1993', '2000'),
-        5326 : ('2000', None),
-        5701 : ('1993', '2004'),
-        14328 : ('1997', None),
-        14354 : ('1999', '2004'),
-        15466 : ('1993', '2001'),
-        15473 : ('1993', '2004'),
-        17166 : ('1998', None),
-        19281 : ('1993', '2004'),
-        19545 : ('1997', '2004'),
-        20169 : ('2006', '2010'),
-        24211 : ('1993', '2004')}
-
-
-for fn in os.listdir('/home/akagi/github/RIPS_kircheis/RIPS/data/hourly_load/wecc'):
-    if fn.endswith('csv'):
-        i = int(fn.split('.')[0])
-        try:
-            fit_data_no_linreg(i)
-        except:
-            print(i)
-
-
-
-
-
-
-
 
 # idno = 803
 # data = cat_load_census(idno)[['load', 'pop', 'lforce_001', 'mHHI_001']].dropna()
