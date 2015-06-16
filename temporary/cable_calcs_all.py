@@ -65,6 +65,10 @@ join = tools.sjoin(lines, grid)
 
 grid_ix = np.column_stack(np.hstack(grid.centroid.apply(lambda x: x.xy).values))
 
+#grid_ix = pd.DataFrame(grid_ix)
+#datanames = 'data_' + grid_ix[1].astype(str) + '_' + grid_ix[0].astype(str)
+#join['dataname'] = pd.Series(join['index_right'].values, index=join['index_right'].values).map(datanames).values
+
 grid_shape = (nc[2010].variables['latitude'][:].size, nc[2010].variables['longitude'][:].size)
 
 
@@ -77,25 +81,30 @@ memsize = psutil.virtual_memory()[1]
 
 hist = {}
 
-hist_path = '/home/chesterlab/Bartos/pre/source_hist_forcings/color'
+hist_path = '/home/chesterlab/Bartos/pre/source_hist_forcings/master'
 
 hist = {}
 hist.update({'tmax_summer_mean' : {}})
 hist.update({'wind_summer_mean' : {}})
 
-for i in phx_ix:
+for i in grid_ix:
     lat = i[1]
     lon = i[0]
-    data_name = 'data_%s_%s' % (lat, lon)
-    df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)
-    df.index = pd.date_range(start=datetime.date(1949, 1, 1), freq='d', periods=len(df))
-    df = df[np.in1d(df.index.month, [6,7,8])]
     for j in hist.keys():
         if not lat in hist[j].keys():
             hist[j].update({lat : {}})
         hist[j][lat].update({lon : None})
-    hist['tmax_summer_mean'][lat][lon] = df[4].mean()
-    hist['wind_summer_mean'][lat][lon] = df[6].mean()
+    data_name = 'data_%s_%s' % (lat, lon)
+    if data_name in os.listdir(hist_path):
+        df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)
+        df.index = pd.date_range(start=datetime.date(1949, 1, 1), freq='d', periods=len(df))
+        df = df[np.in1d(df.index.month, [6,7,8])]
+        hist['tmax_summer_mean'][lat][lon] = df[4].mean()
+        hist['wind_summer_mean'][lat][lon] = df[6].mean()
+    else:
+        hist['tmax_summer_mean'][lat][lon] = np.nan
+        hist['wind_summer_mean'][lat][lon] = np.nan
+
 
 for i in hist.keys():
     hist[i] = pd.DataFrame.from_dict(hist[i], orient='index').sort_index().sort_index(axis=1)
@@ -109,5 +118,54 @@ for k in nc:
     cat = pd.Panel(cat, items=pd.date_range(datetime.date(k,1,1), freq='d', periods=nc[k].variables['tasmax'].shape[0]), major_axis=nc[k].variables['latitude'][:], minor_axis=nc[k].variables['longitude'][:] - 360)
     cat = cat[np.in1d(cat.items.month, [6,7,8])]
     tmax_mean = cat.mean(axis=0)
-    fut.update({ k : {}})
-    fut[k]['tmax_summer_mean'] = tmax_mean.sort_index().sort_index(axis=1)
+    fut[k] = tmax_mean.sort_index().sort_index(axis=1)
+
+#### Import csvs
+
+join = pd.read_csv('line_to_gridcell.csv')
+join['VOLTAGE'] = join['UNIQUE_ID'].map(t.set_index('UNIQUE_ID')['VOLTAGE'])
+
+hist_tmax = pd.read_csv('hist_tmax_summer_mean.csv', index_col=0)
+
+fut_d = {}
+
+for fn in os.listdir('.'):
+    if 'fut_tmax' in fn:
+        df = pd.read_csv(fn, index_col=0).replace(-2147483648, np.nan)
+        df.columns = df.columns.values.astype(float)
+	df.index = df.index.values.astype(float)
+	df = df.sort_index().sort_index(axis=1)
+        fut_d.update({ int(fn.split('.')[0].split('_')[-1]) : df})
+
+
+join['h_tmax'] = join['index_right'].apply(lambda x: hist_tmax.values.flat[x]) 
+
+for i in fut_d.keys():
+    join['f_%s' % (i)] = join['index_right'].apply(lambda x: fut_d[i].values.flat[x])
+
+
+
+
+
+
+#la_geom = la_join.set_index('index').geometry.reset_index().drop_duplicates('index').set_index('index')
+
+#la_join = la_join.groupby('index').mean()        
+
+join['CABLE_VOLT'] = join['VOLTAGE'].apply(lambda x: v_list[np.argmin(abs(x - v_list))])
+
+join['h_mean_amps'] = join.apply(lambda x: instance_cables[x['CABLE_VOLT']].I(348, 273 + x['h_tmax'], 0.6096), axis=1)
+
+#join['h_90th_amps'] = join.apply(lambda x: instance_cables[x['CABLE_VOLT']].I(348, 273 + x['h_tmax_summer_90th'], 0.6096), axis=1)
+
+for i in join.columns[pd.Series(join.columns).str.contains('^f_')]:
+    join['f_mean_amps_%s' % i] = join.apply(lambda x: instance_cables[x['CABLE_VOLT']].I(348, 273 + x[i], 0.6096), axis=1)
+
+
+# pct_decrease = 100*join.iloc[:, np.where(pd.Series(join.columns).str.contains('f_mean_amps'))[0]].sub(join['h_mean_amps'], 0).div(join['h_mean_amps'], 0)
+
+# la_pct_decrease.columns = 'pct_decrease_' + pd.Series(la_pct_decrease.columns).str.extract('(\d+)')
+
+# la_pct_decrease['pct_decrease_rcp26'] = la_pct_decrease[['pct_decrease_39', 'pct_decrease_68', 'pct_decrease_113']].mean(axis=1)
+# la_pct_decrease['pct_decrease_rcp45'] = la_pct_decrease[['pct_decrease_49', 'pct_decrease_69', 'pct_decrease_116']].mean(axis=1)
+# la_pct_decrease['pct_decrease_rcp85'] = la_pct_decrease[['pct_decrease_59', 'pct_decrease_71', 'pct_decrease_119']].mean(axis=1)
