@@ -144,28 +144,36 @@ for i in fut_d.keys():
     join['f_%s' % (i)] = join['index_right'].apply(lambda x: fut_d[i].values.flat[x])
 
 
-
-
-
-
-#la_geom = la_join.set_index('index').geometry.reset_index().drop_duplicates('index').set_index('index')
-
-#la_join = la_join.groupby('index').mean()        
-
 join['CABLE_VOLT'] = join['VOLTAGE'].apply(lambda x: v_list[np.argmin(abs(x - v_list))])
 
 join['h_mean_amps'] = join.apply(lambda x: instance_cables[x['CABLE_VOLT']].I(348, 273 + x['h_tmax'], 0.6096), axis=1)
-
-#join['h_90th_amps'] = join.apply(lambda x: instance_cables[x['CABLE_VOLT']].I(348, 273 + x['h_tmax_summer_90th'], 0.6096), axis=1)
 
 for i in join.columns[pd.Series(join.columns).str.contains('^f_')]:
     join['f_mean_amps_%s' % i] = join.apply(lambda x: instance_cables[x['CABLE_VOLT']].I(348, 273 + x[i], 0.6096), axis=1)
 
 
-# pct_decrease = 100*join.iloc[:, np.where(pd.Series(join.columns).str.contains('f_mean_amps'))[0]].sub(join['h_mean_amps'], 0).div(join['h_mean_amps'], 0)
+pct_decrease = 100*join.iloc[:, np.where(pd.Series(join.columns).str.contains('f_mean_amps'))[0]].sub(join['h_mean_amps'], 0).div(join['h_mean_amps'], 0)
 
-# la_pct_decrease.columns = 'pct_decrease_' + pd.Series(la_pct_decrease.columns).str.extract('(\d+)')
+pct_decrease.columns = 'pct_decrease_' + pd.Series(pct_decrease.columns).str.extract('(\d+)')
 
-# la_pct_decrease['pct_decrease_rcp26'] = la_pct_decrease[['pct_decrease_39', 'pct_decrease_68', 'pct_decrease_113']].mean(axis=1)
-# la_pct_decrease['pct_decrease_rcp45'] = la_pct_decrease[['pct_decrease_49', 'pct_decrease_69', 'pct_decrease_116']].mean(axis=1)
-# la_pct_decrease['pct_decrease_rcp85'] = la_pct_decrease[['pct_decrease_59', 'pct_decrease_71', 'pct_decrease_119']].mean(axis=1)
+join_geom = t.set_index('UNIQUE_ID')['geometry'][join['UNIQUE_ID'].values].reset_index()['geometry']
+
+join = pd.concat([join, pct_decrease, join_geom], axis=1)
+
+join_out = gpd.GeoDataFrame(join[join.columns[pd.Series(join.columns).str.contains('pct_')]], geometry=join.geometry.values).dropna()
+
+join_out.crs = t.crs
+
+#### Output file
+
+join_out.to_file('trans_impacts.shp')
+
+#### Histogram
+
+for i in np.arange(2020,2090,20):
+    hist(join_out['pct_decrease_%s' % i].values, bins=250, alpha=0.8, linewidth=0, label=str(i))
+
+legend()
+title('Bidecadal percent reduction in Transmission Line Capacity,\nMPI-ESM-MR, RCP4.5')
+xlabel('Rated Ampacity Reduction (%)')
+ylabel('Count')
