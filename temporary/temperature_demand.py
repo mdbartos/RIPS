@@ -178,7 +178,7 @@ def plot_curvefit(xdata, ydata):
 def curve_type(x, a, b, c):
     return abs(a*x**2) + b*x + c
 
-def fit_data_no_linreg(idno, plot_output=True):
+def fit_data_no_linreg(idno, plot_output=False):
     data = cat_load_census(idno)[['load', 'pop', 'lforce_001', 'mHHI_001']].dropna()
     data = data[data.index.year!=2005]
     datasummer = data[np.in1d(data.index.month, [6,7,8])]
@@ -319,6 +319,9 @@ for fn in os.listdir('/home/akagi/github/RIPS_kircheis/RIPS/data/hourly_load/wec
 
 #### Future projections
 
+import netCDF4
+
+homedir = os.path.expanduser('~')
 
 nc = {}
 
@@ -326,104 +329,43 @@ for fn in os.listdir('%s/CMIP5/rcp45' % homedir):
     nc.update({ int(fn.split('_')[-1].split('-')[0][:4]) : netCDF4.Dataset('%s/CMIP5/rcp45/%s' % (homedir, fn))})
 
 
-def project_reg(idno, yr):
-
-    latpos = pd.Series(np.arange(len(nc[yr].variables['latitude'][:])), index=nc[yr].variables['latitude'][:])
-    lonpos = pd.Series(np.arange(len(nc[yr].variables['longitude'][:])), index=nc[yr].variables['longitude'][:] - 360)
+def project_reg_vect(yr, idno):
 
     dem_ua = pd.read_csv('/home/akagi/github/RIPS_kircheis/data/util_demand_to_met_ua')
 
-    dem_util = dem_ua.set_index('eia_code').sort_index().loc[idno]
+    latpos = pd.Series(np.arange(len(nc[yr].variables['latitude'][:])), index=nc[yr].variables['latitude'][:])
+    lonpos = pd.Series(np.arange(len(nc[yr].variables['longitude'][:])), index=nc[yr].variables['longitude'][:] - 360)
+    latlon = pd.Series(dem_ua['grid_cell'].dropna().unique()).str.split('_').str[1:].apply(pd.Series).astype(float)
+    latlonix = pd.concat([latpos[latlon[0].values].reset_index(), lonpos[latlon[1].values].reset_index()], axis=1).dropna()
+    latlonix.columns = ['lat', 'latix', 'lon', 'lonix']
+    latlonix['latix'] = latlonix['latix'].astype(int)
+    latlonix['lonix'] = latlonix['lonix'].astype(int)
+    latlonix['lat'] = latlonix['lat'].astype(str)
+    latlonix['lon'] = latlonix['lon'].astype(str)
 
-    util_d = {}
+    cat = np.ma.filled(nc[yr].variables['tasmax'][:,:,:], np.iinfo(np.int32).min)[:, latlonix['latix'].values, latlonix['lonix'].values]
+    cat[cat == cat.min()] = np.nan
 
-    if isinstance(dem_util, pd.DataFrame):
-        tasproj = np.zeros(nc[yr].variables['tasmax'].shape[0])
-        for i in range(len(dem_util.index)):
-            data_name = dem_util.iloc[i]['grid_cell']
-            lat = float(data_name.split('_')[1])
-            lon = float(data_name.split('_')[2])
-	    pop = dem_util.iloc[i]['POP']
-	    if (lat in latpos.index.values) and (lon in lonpos.index.values):
-                latint = latpos[lat]
-                lonint = lonpos[lon]
-            else:
-                lat = latpos.index.values[np.argmin(lat - latpos.index.values)]
-                lon = lonpos.index.values[np.argmin(lon - lonpos.index.values)]
-                latint = latpos[lat]
-                lonint = lonpos[lon]
+    outdf = pd.DataFrame()
 
-            tasproj += pop*(nc[yr].variables['tasmax'][:, latint, lonint])
-
-        tasproj = tasproj/dem_util['POP'].astype(float).sum()    
-        tasproj = pd.Series(tasproj, index=pd.date_range(start=datetime.date(yr, 1, 1), freq='d', periods=len(tasproj)))
-        tasproj = tasproj[np.in1d(tasproj.index.month, [6,7,8])]
-        tasproj = tasproj[tasproj.index.weekday <= 4]
-        return tasproj
-
-    elif isinstance(dem_util, pd.Series):
-        tasproj = np.zeros(nc[yr].variables['tasmax'].shape[0])
-        data_name = dem_util['grid_cell']
-        lat = float(data_name.split('_')[1])
-        lon = float(data_name.split('_')[2])
-        if (lat in latpos.index.values) and (lon in lonpos.index.values):
-            latint = latpos[lat]
-            lonint = lonpos[lon]
+    for code_n in idno:
+        dem_util = dem_ua.set_index('eia_code').sort_index().loc[code_n]
+        data_name = pd.Series(dem_util['grid_cell'])
+        util_ll = data_name.str.split('_').str[1:].apply(pd.Series)
+        util_ll.columns = ['lat', 'lon']
+        util_ll = pd.merge(util_ll, latlonix.reset_index(), on=['lat', 'lon'])
+        pop = dem_util['POP'] 
+        if dem_util.ndim > 1:
+            nantest = np.isnan(cat[:, util_ll['index'].values][0])
+            if nantest.any():
+                nanpos = np.where(nantest)[0]
+                pop.iloc[nanpos] = np.nan
+            projtemp = np.nansum((cat[:, util_ll['index'].values] * pop.values), axis=1)/pop.sum()
         else:
-            lat = latpos.index.values[np.argmin(lat - latpos.index.values)]
-            lon = lonpos.index.values[np.argmin(lon - lonpos.index.values)]
-            latint = latpos[lat]
-            lonint = lonpos[lon]
-        tasproj = nc[yr].variables['tasmax'][:, latint, lonint])
+            projtemp = cat[:, util_ll['index'].values].ravel()
+        outdf[code_n] = projtemp
 
-        tasproj = pd.Series(tasproj, index=pd.date_range(start=datetime.date(yr, 1, 1), freq='d', periods=len(tasproj)))
-        tasproj = tasproj[np.in1d(tasproj.index.month, [6,7,8])]
-        tasproj = tasproj[tasproj.index.weekday <= 4]
-        return tasproj
+    return outdf
 
-	# return curve_type(tasproj.values, *reg_d[idno][0]), tasproj
 
-            # if data_name in os.listdir(hist_path):
-            #     df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
-            # else:
-            #     lats = np.asarray([float(i.split('_')[1]) for i in os.listdir(hist_path)])
-            #     lons = np.asarray([float(i.split('_')[2]) for i in os.listdir(hist_path)])
-            #     latlons = pd.DataFrame(np.column_stack([lats, lons]))
-            #     newdata = latlons.loc[latlons.apply(lambda x: ((x[0] - lat)**2 + (x[1] - lon)**2)**0.5, axis=1).idxmin()]
-            #     data_name = 'data_%s_%s' % (newdata[0], newdata[1])
-            #     df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
-            # df.index = pd.date_range(start=datetime.date(1949, 1, 1), freq='d', periods=len(df))
-            # df = df[np.in1d(df.index.month, [6,7,8])]
-            # if not data_name in util_d.keys():
-            #     util_d.update({data_name : {}})
-            #     util_d[data_name].update({'pop' : pop})
-            #     util_d[data_name].update({'data' : df})
-            # else:
-            #     util_d[data_name]['pop'] += pop
-    # elif isinstance(dem_util, pd.Series):
-        # data_name = dem_util['grid_cell']
-        # lat = float(data_name.split('_')[1])
-        # lon = float(data_name.split('_')[2])
-        # pop = int(dem_util['POP'])
-        # if data_name in os.listdir(hist_path):
-            # df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
-        # else:
-            # lats = np.asarray([float(i.split('_')[1]) for i in os.listdir(hist_path)])
-            # lons = np.asarray([float(i.split('_')[2]) for i in os.listdir(hist_path)])
-            # latlons = pd.DataFrame(np.column_stack([lats, lons]))
-            # newdata = latlons.loc[latlons.apply(lambda x: ((x[0] - lat)**2 + (x[1] - lon)**2)**0.5, axis=1).idxmin()]
-            # data_name = 'data_%s_%s' % (newdata[0], newdata[1])
-            # df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
-        # df.index = pd.date_range(start=datetime.date(1949, 1, 1), freq='d', periods=len(df))
-        # df = df[np.in1d(df.index.month, [6,7,8])]
-        # if not data_name in util_d.keys():
-            # util_d.update({data_name : {}})
-            # util_d[data_name].update({'pop' : pop})
-            # util_d[data_name].update({'data' : df})
-        # else:
-            # util_d[data_name]['pop'] += pop
-
-proj_d = {}
-
-for k in nc.keys():
-	proj_d.update({ k : project_reg(803, k)})
+idno = [int(i.split('.')[0]) for i in os.listdir('/home/akagi/Dropbox/NSF WSC AZ WEN Team Share/Electricity Demand/plots')]
