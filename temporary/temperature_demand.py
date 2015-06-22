@@ -10,14 +10,16 @@ import scipy
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 
+homedir = os.path.expanduser('~')
+
 #### IMPORT CENSUS AND UTILITY SHAPEFILES
-utility = gpd.read_file('/home/akagi/github/RIPS_kircheis/data/shp/Electric_Retail_Service_Ter.shp')
+utility = gpd.read_file('%s/github/RIPS_kircheis/data/shp/Electric_Retail_Service_Ter.shp' % homedir)
 
-census_shp = '/home/akagi/github/RIPS_kircheis/data/shp/census/census_tracts_all/census_tracts_us.shp'
+census_shp = '%s/github/RIPS_kircheis/data/shp/census/census_tracts_all/census_tracts_us.shp' % homedir
 
-census_path = '/home/akagi/github/RIPS_kircheis/data/census/'
+census_path = '%s/github/RIPS_kircheis/data/census/' % homedir
 
-acs_path = '/home/akagi/github/RIPS_kircheis/data/census/ACS_5y/'
+acs_path = '%s/github/RIPS_kircheis/data/census/ACS_5y/' % homedir
 
 #### IMPORT SOCIAL EXPLORER POPULATION DATA
 
@@ -106,11 +108,11 @@ for i in ucols:
 
 ####
 
-util_to_eia = pd.read_csv('/home/akagi/github/RIPS_kircheis/RIPS/crosswalk/util_eia_id.csv', index_col=0)
+util_to_eia = pd.read_csv('%s/github/RIPS_kircheis/RIPS/crosswalk/util_eia_id.csv' % homedir, index_col=0)
 
 #### QUICK FIXES
 
-rid = pd.read_csv('/home/akagi/github/RIPS_kircheis/data/eia_form_714/active/form714-database/form714-database/Respondent IDs.csv')
+rid = pd.read_csv('%s/github/RIPS_kircheis/data/eia_form_714/active/form714-database/form714-database/Respondent IDs.csv' % homedir)
 
 util_to_eia.loc[2149, 'company_id'] = 2507     #Burbank
 util_to_eia.loc[2046, 'company_id'] = 16868    #Seattle City Lights
@@ -133,11 +135,11 @@ util_to_eia.loc[2298, 'company_id'] = 15500    #Puget Sound
 
 ####
 
-j90 = pd.read_csv('/home/akagi/github/RIPS_kircheis/data/util_join_1990.csv', index_col=0).set_index('UNIQUE_ID')['GEOID_1990'].astype(str).str.pad(11, side='left', fillchar='0')
+j90 = pd.read_csv('%s/github/RIPS_kircheis/data/util_join_1990.csv' % homedir, index_col=0).set_index('UNIQUE_ID')['GEOID_1990'].astype(str).str.pad(11, side='left', fillchar='0')
 
-j00 = pd.read_csv('/home/akagi/github/RIPS_kircheis/data/util_join_2000.csv', index_col=0).set_index('UNIQUE_ID')['GEOID_2000'].astype(str).str.pad(11, side='left', fillchar='0')
+j00 = pd.read_csv('%s/github/RIPS_kircheis/data/util_join_2000.csv' % homedir, index_col=0).set_index('UNIQUE_ID')['GEOID_2000'].astype(str).str.pad(11, side='left', fillchar='0')
 
-j14 = pd.read_csv('/home/akagi/github/RIPS_kircheis/data/util_join_2014.csv', index_col=0).set_index('UNIQUE_ID')['GEOID_2014'].astype(str).str.pad(11, side='left', fillchar='0')
+j14 = pd.read_csv('%s/github/RIPS_kircheis/data/util_join_2014.csv' % homedir, index_col=0).set_index('UNIQUE_ID')['GEOID_2014'].astype(str).str.pad(11, side='left', fillchar='0')
 
 util_to_c = pd.concat([j90, j00, j14]).drop_duplicates().reset_index()
 util_to_c['company_id'] = util_to_c['UNIQUE_ID'].map(util_to_eia['company_id'])
@@ -164,7 +166,7 @@ def cat_load_census(idno):
 
     demdata = pd.concat(demdata, axis=1)
 
-    c_load = pd.read_csv('/home/akagi/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s.csv' % (idno), index_col=0, parse_dates=True)
+    c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s.csv' % (homedir, idno), index_col=0, parse_dates=True)
     c_load = c_load.resample('M').interpolate()
 
     cat = pd.concat([cT, c_load, demdata], axis=1)
@@ -183,14 +185,14 @@ def fit_data_no_linreg(idno, plot_output=False):
     data = data[data.index.year!=2005]
     datasummer = data[np.in1d(data.index.month, [6,7,8])]
 
-    c_load = pd.read_csv('/home/akagi/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s.csv' % (idno), index_col=0, parse_dates=True)
+    c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s.csv' % (homedir, idno), index_col=0, parse_dates=True)
     c_load = c_load.groupby(c_load.index.date).max()
 
     norm_load = (1000000*c_load['load']/(data['pop'].reindex_like(c_load).interpolate())).dropna()
     norm_load.index = pd.to_datetime(norm_load.index)
     norm_load = norm_load[np.in1d(norm_load.index.month, [6,7,8])]
 
-    dem_ua = pd.read_csv('/home/akagi/github/RIPS_kircheis/data/util_demand_to_met_ua')
+    dem_ua = pd.read_csv('%s/github/RIPS_kircheis/data/util_demand_to_met_ua' % homedir)
 
     dem_util = dem_ua.set_index('eia_code').sort_index().loc[idno]
 
@@ -308,7 +310,7 @@ man_fixes = {
 
 reg_d = {}
 
-for fn in os.listdir('/home/akagi/github/RIPS_kircheis/RIPS/data/hourly_load/wecc'):
+for fn in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc' % homedir):
     if fn.endswith('csv'):
         i = int(fn.split('.')[0])
         try:
@@ -321,17 +323,11 @@ for fn in os.listdir('/home/akagi/github/RIPS_kircheis/RIPS/data/hourly_load/wec
 
 import netCDF4
 
-homedir = os.path.expanduser('~')
-
-nc = {}
-
-for fn in os.listdir('%s/CMIP5/rcp45' % homedir):
-    nc.update({ int(fn.split('_')[-1].split('-')[0][:4]) : netCDF4.Dataset('%s/CMIP5/rcp45/%s' % (homedir, fn))})
-
 
 def project_reg_vect(yr, idno):
 
-    dem_ua = pd.read_csv('/home/akagi/github/RIPS_kircheis/data/util_demand_to_met_ua')
+    nc = call_reg.nc
+    dem_ua = pd.read_csv('%s/github/RIPS_kircheis/data/util_demand_to_met_ua' % homedir)
 
     latpos = pd.Series(np.arange(len(nc[yr].variables['latitude'][:])), index=nc[yr].variables['latitude'][:])
     lonpos = pd.Series(np.arange(len(nc[yr].variables['longitude'][:])), index=nc[yr].variables['longitude'][:] - 360)
@@ -365,7 +361,26 @@ def project_reg_vect(yr, idno):
             projtemp = cat[:, util_ll['index'].values].ravel()
         outdf[code_n] = projtemp
 
+    outdf.index = pd.date_range(start=datetime.date(yr, 1, 1), freq='d', periods=len(outdf))
     return outdf
 
 
-idno = [int(i.split('.')[0]) for i in os.listdir('/home/akagi/Dropbox/NSF WSC AZ WEN Team Share/Electricity Demand/plots')]
+idno = [int(i.split('.')[0]) for i in os.listdir('%s/Dropbox/NSF WSC AZ WEN Team Share/Electricity Demand/plots' % homedir)]
+
+
+def call_reg(model, scen, directory):
+    call_reg.nc = {}
+    curdir = '%s/%s/%s' % (directory, model, scen)
+    for fn in os.listdir(curdir):
+        call_reg.nc.update({ int(fn.split('_')[-1].split('-')[0][:4]) : netCDF4.Dataset('%s/%s' % (curdir, fn))})
+    for y in call_reg.nc.keys():
+        project_reg_vect(y, idno).to_csv('%s-%s-%s' % (model, scen, y))
+        call_reg.nc[y].close()
+
+default_dir = '%s/CMIP5' % homedir
+
+for subdir in os.listdir(default_dir):
+    scendir = '%s/%s' % (default_dir, subdir)
+    for sc in ['rcp26', 'rcp45', 'rcp85']:
+        if sc in os.listdir(scendir):
+            call_reg(subdir, sc, default_dir)
