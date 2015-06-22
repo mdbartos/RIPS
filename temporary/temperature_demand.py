@@ -384,3 +384,90 @@ for subdir in os.listdir(default_dir):
     for sc in ['rcp26', 'rcp45', 'rcp85']:
         if sc in os.listdir(scendir):
             call_reg(subdir, sc, default_dir)
+
+
+historical_dir = '%s/temp_regression/historical/hist_util_temps' % (homedir)
+projection_dir = '%s/temp_regression/projection' % (homedir)
+
+def combine_scenario(model, scenario, histpath, projdir):
+    proj_li = []
+    hist_df = pd.read_csv(histpath, index_col=0)
+    for i in os.listdir(projdir):
+        if ('%s-%s' % (model, scenario)) in i:
+            proj_li.append(pd.read_csv('%s/%s' % (projdir, i), index_col=0))
+    out_df = pd.concat(proj_li)
+    out_df = pd.concat([hist_df, out_df]).sort_index()
+    out_df.index = pd.to_datetime(out_df.index)
+    out_df.columns = np.asarray(out_df.columns).astype(int)
+    return out_df
+
+def util_hist_temp(idno):
+
+    out_df = pd.DataFrame()
+
+    dem_ua = pd.read_csv('%s/github/RIPS_kircheis/data/util_demand_to_met_ua' % homedir)
+
+    for code_n in idno:
+        dem_util = dem_ua.set_index('eia_code').sort_index().loc[code_n]
+
+        util_d = {}
+        hist_path = '/home/chesterlab/Bartos/pre/source_hist_forcings/master'
+
+        if isinstance(dem_util, pd.DataFrame):
+            for i in range(len(dem_util.index)):
+                data_name = dem_util.iloc[i]['grid_cell']
+                lat = float(data_name.split('_')[1])
+                lon = float(data_name.split('_')[2])
+                pop = int(dem_util.iloc[i]['POP'])
+                if data_name in os.listdir(hist_path):
+                    df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
+                else:
+                    lats = np.asarray([float(i.split('_')[1]) for i in os.listdir(hist_path)])
+                    lons = np.asarray([float(i.split('_')[2]) for i in os.listdir(hist_path)])
+                    latlons = pd.DataFrame(np.column_stack([lats, lons]))
+                    newdata = latlons.loc[latlons.apply(lambda x: ((x[0] - lat)**2 + (x[1] - lon)**2)**0.5, axis=1).idxmin()]
+                    data_name = 'data_%s_%s' % (newdata[0], newdata[1])
+                    df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
+                df.index = pd.date_range(start=datetime.date(1949, 1, 1), freq='d', periods=len(df))
+                if not data_name in util_d.keys():
+                    util_d.update({data_name : {}})
+                    util_d[data_name].update({'pop' : pop})
+                    util_d[data_name].update({'data' : df})
+                else:
+                    util_d[data_name]['pop'] += pop
+        elif isinstance(dem_util, pd.Series):
+            data_name = dem_util['grid_cell']
+            lat = float(data_name.split('_')[1])
+            lon = float(data_name.split('_')[2])
+            pop = int(dem_util['POP'])
+            if data_name in os.listdir(hist_path):
+                df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
+            else:
+                lats = np.asarray([float(i.split('_')[1]) for i in os.listdir(hist_path)])
+                lons = np.asarray([float(i.split('_')[2]) for i in os.listdir(hist_path)])
+                latlons = pd.DataFrame(np.column_stack([lats, lons]))
+                newdata = latlons.loc[latlons.apply(lambda x: ((x[0] - lat)**2 + (x[1] - lon)**2)**0.5, axis=1).idxmin()]
+                data_name = 'data_%s_%s' % (newdata[0], newdata[1])
+                df = pd.read_csv('%s/%s' % (hist_path, data_name), sep='\t', header=None)[[4,5]]
+            df.index = pd.date_range(start=datetime.date(1949, 1, 1), freq='d', periods=len(df))
+            if not data_name in util_d.keys():
+                util_d.update({data_name : {}})
+                util_d[data_name].update({'pop' : pop})
+                util_d[data_name].update({'data' : df})
+            else:
+                util_d[data_name]['pop'] += pop
+
+        totpop = sum([util_d[i]['pop'] for i in util_d.keys()])
+        tempcat = pd.concat([util_d[i]['pop']*util_d[i]['data'] for i in util_d.keys()], axis=1)
+        if isinstance(tempcat[4], pd.DataFrame):
+            tmax = tempcat[4].sum(axis=1)/totpop
+        elif isinstance(tempcat[4], pd.Series):
+            tmax = tempcat[4]/totpop
+        out_df[code_n] = tmax
+    return out_df.sort_index()
+
+def apply_demand_reg(idno, temp_df):
+    p = reg_d[idno][0]
+    x = temp_df[idno][np.in1d(temp_df.index.month, [6,7,8])]
+    y = pd.Series(np.polyval(p, x.values), index=x.index)
+    return y
