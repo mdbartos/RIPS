@@ -470,4 +470,24 @@ def apply_demand_reg(idno, temp_df):
     p = reg_d[idno][0]
     x = temp_df[idno][np.in1d(temp_df.index.month, [6,7,8])]
     y = pd.Series(np.polyval(p, x.values), index=x.index)
+    y.name = idno
     return y
+
+#Create output files of regression in directory ./regress
+
+dirlist = pd.Series([k.split('rcp') for k in os.listdir(projection_dir)]).apply(pd.Series)
+dirlist[0] = dirlist[0].str[:-1]
+dirlist[1] = 'rcp' + dirlist[1].str.split('-').str[0]
+
+for i in dirlist.index.values:
+    model = dirlist.loc[i, 0]
+    proj = dirlist.loc[i, 1]
+    temp_df = combine_scenario(model, proj, historical_dir, projection_dir)
+    reg_results = pd.DataFrame()
+    for j in reg_d.keys():
+        result = apply_demand_reg(j, temp_df)
+        reg_results[j] = result
+    reg_results.to_csv('demand_%s_%s' % (model, proj))
+
+
+# Combine output files in a pandas panel
