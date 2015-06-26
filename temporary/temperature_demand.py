@@ -145,6 +145,225 @@ util_to_c = pd.concat([j90, j00, j14]).drop_duplicates().reset_index()
 util_to_c['company_id'] = util_to_c['UNIQUE_ID'].map(util_to_eia['company_id'])
 util_to_c = util_to_c.dropna().rename(columns={0:'GEOID'}).set_index('company_id')
 
+####
+
+dem_ua = pd.read_csv('%s/github/RIPS_kircheis/data/util_demand_to_met_ua' % homedir)
+
+#### ADD ADDITIONAL ENTRIES TO util_to_c
+
+multi_d = {
+        'AEPC' : {'company_id' : 796, 'UNIQUE_ID' : None, 'geom' : None},
+        'APS' : {'company_id' : 803, 'UNIQUE_ID' : None, 'geom' : None},
+        'TEP' : {'company_id' : 24211, 'UNIQUE_ID' : None, 'geom' : None},
+        'SRP' : {'company_id' : 16572, 'UNIQUE_ID' : None, 'geom' : None},
+        'PNM' : {'company_id' : 15473, 'UNIQUE_ID' : None, 'geom' : None},
+        'PSC' : {'company_id' : 15466, 'UNIQUE_ID' : None, 'geom' : None},
+        'AVA' : {'company_id' : 20169, 'UNIQUE_ID' : None, 'geom' : None},
+        'PRPA' : {'company_id' : 15143, 'UNIQUE_ID' : None, 'geom' : None},
+        'SPP' : {'company_id' : 17166, 'UNIQUE_ID' : None, 'geom' : None},
+        'CISO' : {'company_id' : 99999, 'UNIQUE_ID' : None, 'geom' : None},
+        'BPA' : {'company_id' : 1738, 'UNIQUE_ID' : None, 'geom' : None},
+        'WALC' : {'company_id' : 19610, 'UNIQUE_ID' : None, 'geom' : None},
+        'WACM' : {'company_id' : 28503, 'UNIQUE_ID' : None, 'geom' : None},
+        'TSGTCW' : {'company_id' : 99998, 'UNIQUE_ID' : None, 'geom' : None},
+        'TSGTNM' : {'company_id' : 99997, 'UNIQUE_ID' : None, 'geom' : None}
+        }
+
+# AEPC
+
+multi_d['AEPC']['UNIQUE_ID'] = 9990
+multi_d['AEPC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[[1, 106, 108, 109, 1130, 2111]].dropna().reset_index().set_index('company_id')
+multi_d['AEPC']['census'].index = np.repeat(multi_d['AEPC']['company_id'], len(multi_d['AEPC']['census']))
+multi_d['AEPC']['census']['UNIQUE_ID'] = multi_d['AEPC']['UNIQUE_ID']
+multi_d['AEPC']['geom'] = utility[utility['UNIQUE_ID'].isin([1, 106, 108, 109, 1130, 2111])].unary_union
+multi_d['AEPC']['comp_UID'] = [1, 106, 108, 109, 1130, 2111]
+
+util_to_eia.loc[multi_d['AEPC']['UNIQUE_ID']] = [100, multi_d['AEPC']['company_id'], 'Arizona Electric Power Cooperative', 'Arizona Electric Power Cooperative']
+util_to_c = pd.concat([util_to_c, multi_d['AEPC']['census']])
+multi_d['AEPC']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['AEPC']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['AEPC']['ua']['UNIQUE_ID'] = multi_d['AEPC']['UNIQUE_ID'] 
+multi_d['AEPC']['ua']['eia_code'] = multi_d['AEPC']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['AEPC']['ua']])
+
+# Platte River Power Authority
+
+multi_d['PRPA']['UNIQUE_ID'] = 9991
+multi_d['PRPA']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Platte River')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+multi_d['PRPA']['census'].index = np.repeat(multi_d['PRPA']['company_id'], len(multi_d['PRPA']['census']))
+multi_d['PRPA']['census']['UNIQUE_ID'] = multi_d['PRPA']['UNIQUE_ID']
+multi_d['PRPA']['geom'] = utility[utility['PLAN_AREA'].str.contains('Platte River')].unary_union
+multi_d['PRPA']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Platte River')]['UNIQUE_ID'].unique().tolist()
+
+util_to_eia.loc[multi_d['PRPA']['UNIQUE_ID']] = [100, multi_d['PRPA']['company_id'], 'Platte River Power Authority', 'Platte River Power Authority']
+util_to_c = pd.concat([util_to_c, multi_d['PRPA']['census']])
+multi_d['PRPA']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['PRPA']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['PRPA']['ua']['UNIQUE_ID'] = multi_d['PRPA']['UNIQUE_ID'] 
+multi_d['PRPA']['ua']['eia_code'] = multi_d['PRPA']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['PRPA']['ua']])
+
+# CAISO
+
+multi_d['CISO']['UNIQUE_ID'] = 9992
+multi_d['CISO']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('California Independent System Operator')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+multi_d['CISO']['census'].index = np.repeat(multi_d['CISO']['company_id'], len(multi_d['CISO']['census']))
+multi_d['CISO']['census']['UNIQUE_ID'] = multi_d['CISO']['UNIQUE_ID']
+multi_d['CISO']['geom'] = utility[utility['CTRL_AREA'].str.contains('California Independent System Operator')].unary_union
+multi_d['CISO']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('California Independent System Operator')]['UNIQUE_ID'].unique().tolist()
+
+util_to_eia.loc[multi_d['CISO']['UNIQUE_ID']] = [100, multi_d['CISO']['company_id'], 'California ISO', 'California ISO']
+util_to_c = pd.concat([util_to_c, multi_d['CISO']['census']])
+multi_d['CISO']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['CISO']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['CISO']['ua']['UNIQUE_ID'] = multi_d['CISO']['UNIQUE_ID'] 
+multi_d['CISO']['ua']['eia_code'] = multi_d['CISO']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['CISO']['ua']])
+
+# Bonneville Power Administration
+# No Fit?
+multi_d['BPA']['UNIQUE_ID'] = 9993
+multi_d['BPA']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('Bonneville')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+multi_d['BPA']['census'].index = np.repeat(multi_d['BPA']['company_id'], len(multi_d['BPA']['census']))
+multi_d['BPA']['census']['UNIQUE_ID'] = multi_d['BPA']['UNIQUE_ID']
+multi_d['BPA']['geom'] = utility[utility['CTRL_AREA'].str.contains('Bonneville')].unary_union
+multi_d['BPA']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('Bonneville')]['UNIQUE_ID'].unique().tolist()
+
+util_to_eia.loc[multi_d['BPA']['UNIQUE_ID']] = [100, multi_d['BPA']['company_id'], 'Bonneville Power Administration', 'Bonneville Power Administration']
+util_to_c = pd.concat([util_to_c, multi_d['BPA']['census']])
+multi_d['BPA']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['BPA']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['BPA']['ua']['UNIQUE_ID'] = multi_d['BPA']['UNIQUE_ID'] 
+multi_d['BPA']['ua']['eia_code'] = multi_d['BPA']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['BPA']['ua']])
+
+# WAPA Desert Southwest
+# No fit
+multi_d['WALC']['UNIQUE_ID'] = 9994
+multi_d['WALC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('WAPA Desert')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+multi_d['WALC']['census'].index = np.repeat(multi_d['WALC']['company_id'], len(multi_d['WALC']['census']))
+multi_d['WALC']['census']['UNIQUE_ID'] = multi_d['WALC']['UNIQUE_ID']
+multi_d['WALC']['geom'] = utility[utility['CTRL_AREA'].str.contains('WAPA Desert')].unary_union
+multi_d['WALC']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('WAPA Desert')]['UNIQUE_ID'].unique().tolist()
+
+util_to_eia.loc[multi_d['WALC']['UNIQUE_ID']] = [100, multi_d['WALC']['company_id'], 'WAPA Desert Southwest', 'WAPA Desert Southwest']
+util_to_c = pd.concat([util_to_c, multi_d['WALC']['census']])
+multi_d['WALC']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['WALC']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['WALC']['ua']['UNIQUE_ID'] = multi_d['WALC']['UNIQUE_ID'] 
+multi_d['WALC']['ua']['eia_code'] = multi_d['WALC']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['WALC']['ua']])
+
+# WAPA Rocky Mountain
+# No fit
+
+multi_d['WACM']['UNIQUE_ID'] = 9995
+multi_d['WACM']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('WAPA Rocky')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+multi_d['WACM']['census'].index = np.repeat(multi_d['WACM']['company_id'], len(multi_d['WACM']['census']))
+multi_d['WACM']['census']['UNIQUE_ID'] = multi_d['WACM']['UNIQUE_ID']
+multi_d['WACM']['geom'] = utility[utility['CTRL_AREA'].str.contains('WAPA Rocky')].unary_union
+multi_d['WACM']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('WAPA Rocky')]['UNIQUE_ID'].unique().tolist()
+
+util_to_eia.loc[multi_d['WACM']['UNIQUE_ID']] = [100, multi_d['WACM']['company_id'], 'WAPA Desert Southwest', 'WAPA Desert Southwest']
+util_to_c = pd.concat([util_to_c, multi_d['WACM']['census']])
+multi_d['WACM']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['WACM']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['WACM']['ua']['UNIQUE_ID'] = multi_d['WACM']['UNIQUE_ID'] 
+multi_d['WACM']['ua']['eia_code'] = multi_d['WACM']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['WACM']['ua']])
+
+# Tri-state generation (CO and WY)
+
+TSGTCW_ID = [1598, 24, 988, 1318, 820, 1222, 1673, 551, 1320, 677, 978, 1562, 1753, 462, 763, 3116, 1164, 775, 606, 10, 17, 1644, 1599, 12, 15, 1554, 1096, 1145, 1717, 9, 1253]
+
+multi_d['TSGTCW']['UNIQUE_ID'] = 9996
+multi_d['TSGTCW']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('WAPA Rocky')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+multi_d['TSGTCW']['census'].index = np.repeat(multi_d['TSGTCW']['company_id'], len(multi_d['TSGTCW']['census']))
+multi_d['TSGTCW']['census']['UNIQUE_ID'] = multi_d['TSGTCW']['UNIQUE_ID']
+multi_d['TSGTCW']['geom'] = utility[utility['UNIQUE_ID'].isin(TSGTCW_ID)].unary_union
+multi_d['TSGTCW']['comp_UID'] = TSGTCW_ID
+
+util_to_eia.loc[multi_d['TSGTCW']['UNIQUE_ID']] = [100, multi_d['TSGTCW']['company_id'], 'Tri State Generation CO WY', 'Tri State Generation CO WY']
+util_to_c = pd.concat([util_to_c, multi_d['TSGTCW']['census']])
+multi_d['TSGTCW']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['TSGTCW']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['TSGTCW']['ua']['UNIQUE_ID'] = multi_d['TSGTCW']['UNIQUE_ID'] 
+multi_d['TSGTCW']['ua']['eia_code'] = multi_d['TSGTCW']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['TSGTCW']['ua']])
+
+# Tri-state generation (NM)
+
+TSGTNM_ID = [311, 308, 315, 532, 317, 319, 318, 2172, 1003, 1147, 309, 321, 1094]
+
+multi_d['TSGTNM']['UNIQUE_ID'] = 9997
+multi_d['TSGTNM']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('WAPA Rocky')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+multi_d['TSGTNM']['census'].index = np.repeat(multi_d['TSGTNM']['company_id'], len(multi_d['TSGTNM']['census']))
+multi_d['TSGTNM']['census']['UNIQUE_ID'] = multi_d['TSGTNM']['UNIQUE_ID']
+multi_d['TSGTNM']['geom'] = utility[utility['UNIQUE_ID'].isin(TSGTNM_ID)].unary_union
+multi_d['TSGTNM']['comp_UID'] = TSGTNM_ID
+
+util_to_eia.loc[multi_d['TSGTNM']['UNIQUE_ID']] = [100, multi_d['TSGTNM']['company_id'], 'Tri State Generation CO WY', 'Tri State Generation CO WY']
+util_to_c = pd.concat([util_to_c, multi_d['TSGTNM']['census']])
+multi_d['TSGTNM']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['TSGTNM']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['TSGTNM']['ua']['UNIQUE_ID'] = multi_d['TSGTNM']['UNIQUE_ID'] 
+multi_d['TSGTNM']['ua']['eia_code'] = multi_d['TSGTNM']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['TSGTNM']['ua']])
+
+# # APS
+# # NEED TO TAKE CARE OF EXISTING APS
+# multi_d['APS']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('Arizona Public Service Co')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+# multi_d['APS']['census'].index = np.repeat(803, len(multi_d['APS']['census']))
+# multi_d['APS']['census']['UNIQUE_ID'] = 9991
+# multi_d['APS']['UNIQUE_ID'] = 9991
+# multi_d['APS']['geom'] = utility[utility['CTRL_AREA'].str.contains('Arizona Public Service Co')].unary_union
+# multi_d['APS']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('Arizona Public Service Co')]['UNIQUE_ID'].unique().tolist()
+
+# util_to_c = pd.concat([util_to_c, multi_d['APS']['census']])
+
+# # TEP
+# # NEED TO TAKE CARE OF EXISTING TEP
+# multi_d['TEP']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('Tucson')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+# multi_d['TEP']['census'].index = np.repeat(24211, len(multi_d['TEP']['census']))
+# multi_d['TEP']['UNIQUE_ID'] = 9992
+# multi_d['TEP']['geom'] = utility[utility['CTRL_AREA'].str.contains('Tucson')].unary_union
+# multi_d['TEP']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('Tucson')]['UNIQUE_ID'].unique().tolist()
+
+# # SRP
+# # NEED TO TAKE CARE OF EXISTING SRP
+# multi_d['SRP']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('Salt River')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+# multi_d['SRP']['census'].index = np.repeat(16572, len(multi_d['SRP']['census']))
+# multi_d['SRP']['UNIQUE_ID'] = 9993
+# multi_d['SRP']['geom'] = utility[utility['CTRL_AREA'].str.contains('Salt River')].unary_union
+# multi_d['SRP']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('Salt River')]['UNIQUE_ID'].unique().tolist()
+
+# # Public Service Co of NM
+# # NEED TO TAKE CARE OF EXISTING PNM
+# multi_d['PNM']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('Public Service Co of New Mexico')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+# multi_d['PNM']['census'].index = np.repeat(15473, len(multi_d['PNM']['census']))
+# multi_d['PNM']['UNIQUE_ID'] = 9994
+# multi_d['PNM']['geom'] = utility[utility['CTRL_AREA'].str.contains('Public Service Co of New Mexico')].unary_union
+# multi_d['PNM']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('Public Service Co of New Mexico')]['UNIQUE_ID'].unique().tolist()
+
+# # Public Service Co of CO
+# # NEED TO TAKE CARE OF EXISTING PSC
+# multi_d['PSC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('Public Service Co of Colorado')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+# multi_d['PSC']['census'].index = np.repeat(15466, len(multi_d['PSC']['census']))
+# multi_d['PSC']['UNIQUE_ID'] = 9995
+# multi_d['PSC']['geom'] = utility[utility['CTRL_AREA'].str.contains('Public Service Co of Colorado')].unary_union
+# multi_d['PSC']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('Public Service Co of Colorado')]['UNIQUE_ID'].unique().tolist()
+
+# # Avista
+# # NEED TO TAKE CARE OF EXISTING AVISTA
+# multi_d['AVA']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('Avista')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+# multi_d['AVA']['census'].index = np.repeat(20169, len(multi_d['AVA']['census']))
+# multi_d['AVA']['UNIQUE_ID'] = 9996
+# multi_d['AVA']['geom'] = utility[utility['CTRL_AREA'].str.contains('Avista')].unary_union
+# multi_d['AVA']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('Avista')]['UNIQUE_ID'].unique().tolist()
+
+# # Sierra Pacific
+# # NEED TO TAKE CARE OF EXISTING SPP
+# multi_d['SPP']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('Sierra Pacific')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+# multi_d['SPP']['census'].index = np.repeat(17166, len(multi_d['SPP']['census']))
+# multi_d['SPP']['UNIQUE_ID'] = 9998
+# multi_d['SPP']['geom'] = utility[utility['CTRL_AREA'].str.contains('Sierra Pacific')].unary_union
+# multi_d['SPP']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('Sierra Pacific')]['UNIQUE_ID'].unique().tolist()
+
+
+
+
 def cat_load_census(idno):
     u = util_to_c.loc[idno]
     cT = pop_yrs.loc[u['GEOID'].values].sum()
@@ -166,7 +385,11 @@ def cat_load_census(idno):
 
     demdata = pd.concat(demdata, axis=1)
 
-    c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s.csv' % (homedir, idno), index_col=0, parse_dates=True)
+    nonames = {99999 : 'ciso', 99998 : 'tsgtcw', 99997 : 'tsgtnm'}
+    if idno in nonames.keys():
+        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s' % (homedir, nonames[idno]), index_col=0, parse_dates=True)
+    else:
+        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s.csv' % (homedir, idno), index_col=0, parse_dates=True)
     c_load = c_load.resample('M').interpolate()
 
     cat = pd.concat([cT, c_load, demdata], axis=1)
@@ -185,14 +408,18 @@ def fit_data_no_linreg(idno, plot_output=False):
     data = data[data.index.year!=2005]
     datasummer = data[np.in1d(data.index.month, [6,7,8])]
 
-    c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s.csv' % (homedir, idno), index_col=0, parse_dates=True)
+    nonames = {99999 : 'ciso', 99998 : 'tsgtcw', 99997 : 'tsgtnm'}
+    if idno in nonames.keys():
+        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s' % (homedir, nonames[idno]), index_col=0, parse_dates=True)
+    else:
+        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s.csv' % (homedir, idno), index_col=0, parse_dates=True)
     c_load = c_load.groupby(c_load.index.date).max()
 
     norm_load = (1000000*c_load['load']/(data['pop'].reindex_like(c_load).interpolate())).dropna()
     norm_load.index = pd.to_datetime(norm_load.index)
     norm_load = norm_load[np.in1d(norm_load.index.month, [6,7,8])]
 
-    dem_ua = pd.read_csv('%s/github/RIPS_kircheis/data/util_demand_to_met_ua' % homedir)
+#    dem_ua = pd.read_csv('%s/github/RIPS_kircheis/data/util_demand_to_met_ua' % homedir)
 
     dem_util = dem_ua.set_index('eia_code').sort_index().loc[idno]
 
@@ -305,18 +532,24 @@ man_fixes = {
         19281 : ('1993', '2004'),
         19545 : ('1997', '2004'),
         20169 : ('2006', '2010'),
-        24211 : ('1993', '2004')}
-
+        24211 : ('1993', '2004'),
+        796 : ('1999', '2004'),
+        1738 : ('2002', None),
+        19610 : ('2001', '2007'),
+        28503 : ('1993', '1996'),
+        15143 : ('1998', None)
+        }
 
 reg_d = {}
 
-for fn in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc' % homedir):
-    if fn.endswith('csv'):
-        i = int(fn.split('.')[0])
-        try:
-            reg_d.update({i : fit_data_no_linreg(i)})
-        except:
-            print(i)
+readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc' % homedir) if i.endswith('csv')] + [99999, 99998, 99997]
+
+for i in readlist:
+#    i = int(fn.split('.')[0])
+    try:
+        reg_d.update({i : fit_data_no_linreg(i, plot_output=True)})
+    except:
+        print(i)
 
 
 #### Future projections
