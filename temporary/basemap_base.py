@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import geopandas as gpd
+from scipy import stats
+import matplotlib as mpl
 
 fig = plt.figure(figsize=(8,8))
 ax = fig.add_axes([0.1,0.1,0.8,0.8])
@@ -119,22 +121,22 @@ def plot_to_basemap(m, name, column=None, geom_type='LineString', colormap='rain
     from matplotlib.colors import Normalize
     from matplotlib import cm as mcm
     from matplotlib import colorbar
+    from matplotlib import ticker
+    from scipy import stats
 
     values = np.array([i[column] for i in getattr(m, '%s_info' % name)])
     if man_bins:
-        valuebins = np.histogram(values, man_bins)
+        valuebins = np.asarray(man_bins)
+        k = len(man_bins) - 1
     else:
-        valuebins = np.histogram(values, k)
+        valuebins = stats.mstats.mquantiles(values, np.linspace(0,1,k+1))
 
     if scheme is not None:
         if fixed_bins:
-            values = np.digitize(values, valuebins[1])
+            values = np.digitize(values, valuebins)
         else:
             values = __pysal_choro(values, scheme, k=k)
     cmap, norm = norm_cmap(values, colormap, Normalize, mcm, mn=mn, mx=mx)
-
-    cax = fig.add_axes([0.90, 0.2, 0.02, 0.6])
-    colorbar.ColorbarBase(cax, cmap=colormap, norm=norm, orientation='vertical')
 
     for geom, value in zip(getattr(m, name), values):
        if geom_type == 'Polygon' or geom_type == 'MultiPolygon':
@@ -144,6 +146,22 @@ def plot_to_basemap(m, name, column=None, geom_type='LineString', colormap='rain
         # TODO: color point geometries
        elif geom_type == 'Point':
            plot_point(ax, geom, **kwargs)
+
+    dcmap = mpl.colors.ListedColormap([cmap.to_rgba(i) for i in range(k)][1:-1])
+    dcmap.set_under(cmap.to_rgba(0))
+    dcmap.set_over(cmap.to_rgba(k))
+
+    cax = fig.add_axes([0.92, 0.2, 0.02, 0.6])
+    cb = colorbar.ColorbarBase(cax, cmap=dcmap, norm=norm, orientation='vertical', extend='both', spacing='uniform', extendfrac='auto')
+    cb.locator = ticker.MaxNLocator(nbins=k-2)
+    cb.formatter = ticker.FixedFormatter(valuebins.astype(str).tolist()[1:-1])
+    cb.update_ticks()
+
+    # cax = fig.add_axes([0.92, 0.2, 0.02, 0.6])
+    # cb = colorbar.ColorbarBase(cax, cmap=colormap, norm=norm, orientation='vertical')
+    # cb.locator = ticker.MaxNLocator(nbins=k)
+    # cb.formatter = ticker.FixedFormatter(valuebins.astype(str).tolist())
+    # cb.update_ticks()
            
 
 # functions
@@ -158,6 +176,16 @@ def plot_multilinestring(ax, geom, color='red', linewidth=1):
         for line in geom.geoms:
             plot_linestring(ax, line, color=color, linewidth=linewidth)
 
+# RUN
+
+# plot_to_basemap(m, 'transmission', 'pct_decrea', scheme='Quantiles', colormap='jet_r', linewidth=0.1)
+
+# man_bins = (-9.17343664, -4.85376639, -4.4010333 , -3.98366336, -3.53319506, 0.0, 2.42685153)
+
+# plot_to_basemap(m, 'transmission', 'pct_decrea', fixed_bins=True, man_bins=man_bins, scheme='Quantiles', colormap='jet_r', linewidth=0.1)
+
+# THINGS
+
 name='transmission'
 column='pct_decrea'
 scheme='Quantiles'
@@ -166,7 +194,8 @@ linewidth=0.1
 mn=None
 mx=None
 k=5
-
+fixed_bins=True
+man_bins = (-9.17343664, -4.85376639, -4.4010333 , -3.98366336, -3.53319506, 0.0, 2.42685153)
 
 from matplotlib.colors import Normalize
 from matplotlib import cm as mcm
@@ -174,16 +203,36 @@ from matplotlib import colorbar
 from matplotlib import ticker
 
 values = np.array([i[column] for i in getattr(m, '%s_info' % name)])
-valuebins = np.histogram(values, k)
+valuebins = stats.mstats.mquantiles(values, np.linspace(0,1,k+1))
+
+values = np.array([i[column] for i in getattr(m, '%s_info' % name)])
+if man_bins:
+    valuebins = np.asarray(man_bins)
+    k = len(man_bins) - 1
+else:
+    valuebins = stats.mstats.mquantiles(values, np.linspace(0,1,k+1))
 
 if scheme is not None:
-    values = __pysal_choro(values, scheme, k=k)
-cmap, norm = norm_cmap(values, colormap, Normalize, mcm, mn=mn, mx=mx)
+    if fixed_bins:
+        values = np.digitize(values, valuebins)
+    else:
+        values = __pysal_choro(values, scheme, k=k)
 
-cax = fig.add_axes([0.90, 0.2, 0.02, 0.6])
-cb = colorbar.ColorbarBase(cax, cmap=plt.cm.jet_r, norm=norm, orientation='vertical')
-cb.locator = ticker.MaxNLocator(nbins=5)
-cb.formatter = ticker.FixedFormatter(valuebins[1].astype(str).tolist())
+cmap, norm = norm_cmap(values, colormap, Normalize, mcm, mn=mn, mx=mx)
+# try_discrete
+
+dcmap = mpl.colors.ListedColormap([cmap.to_rgba(i) for i in range(k)][1:-1])
+dcmap.set_under(cmap.to_rgba(0))
+dcmap.set_over(cmap.to_rgba(k))
+
+# cmap = mpl.colors.ListedColormap(['r', 'g', 'b', 'c'])
+# cmap.set_over('0.25')
+# cmap.set_under('0.75')
+
+cax = fig.add_axes([0.92, 0.2, 0.02, 0.6])
+cb = colorbar.ColorbarBase(cax, cmap=dcmap, norm=norm, orientation='vertical', extend='both', spacing='uniform', extendfrac='auto')
+cb.locator = ticker.MaxNLocator(nbins=k-2)
+cb.formatter = ticker.FixedFormatter(valuebins.astype(str).tolist()[1:-1])
 #cb.ax.set_yticklabels(valuebins[1].astype(str))
 cb.update_ticks()
 plt.show()
