@@ -5,11 +5,12 @@ import pandas as pd
 import geopandas as gpd
 from scipy import stats
 import matplotlib as mpl
+from shapely import geometry
 
 fig = plt.figure(figsize=(8,8))
 ax = fig.add_axes([0.1,0.1,0.8,0.8])
 # create polar stereographic Basemap instance.
-m = Basemap(-130, 20, -60, 50,\
+m = Basemap(-130, 20, -100, 50,\
             rsphere=6371200.,resolution='l',area_thresh=10000)
 # draw coastlines, state and country boundaries, edge of map.
 m.drawmapboundary()
@@ -18,17 +19,8 @@ m.drawcoastlines()
 m.drawstates()
 m.drawcountries()
 
-m.readshapefile('/home/akagi/trans_impacts', 'transmission', drawbounds=False)
-
-# for info, shape in zip(m.transmission_info, m.transmission):
-#     if info['pct_decrea'] < -3.3:
-#         x, y = zip(*shape)
-#         m.plot(x, y, marker=None, color='m', linewidth=0.1)
-#     else:
-#         x, y = zip(*shape)
-#         m.plot(x, y, marker=None, color='b', linewidth=0.1)
-
-# t = gpd.read_file('/home/akagi/trans_impacts.shp')
+#m.readshapefile('/home/akagi/trans_impacts', 'transmission', drawbounds=False)
+m.readshapefile('/home/akagi/Dropbox/NSF WSC AZ WEN Team Share/Electricity Demand/plots/util_proj/utility_rcp45', 'utility', drawbounds=False)
 
 def gencolor(N, colormap='Set1'):
     """
@@ -110,14 +102,45 @@ def __pysal_choro(values, scheme, k=5):
 
     return values
 
-def plot_linestring(ax, geom, color='black', **kwargs):
+def plot_linestring(ax, geom, color='black', linewidth=1, **kwargs):
     """ Plot a single LineString geometry """
     a = np.array(geom)
-    ax.plot(a[:, 0], a[:, 1], color=color, **kwargs)
+    ax.plot(a[:, 0], a[:, 1], color=color, linewidth=linewidth, **kwargs)
+
+def plot_multilinestring(ax, geom, color='red', linewidth=1):
+    """ Can safely call with either LineString or MultiLineString geometry
+    """
+    if geom_type == 'LineString':
+        plot_linestring(ax, geom, color=color, linewidth=linewidth)
+    elif geom_type == 'MultiLineString':
+        for line in geom.geoms:
+            plot_linestring(ax, line, color=color, linewidth=linewidth)
+
+def plot_polygon(ax, polymap, facecolor='red', edgecolor='black', alpha=1, linewidth=1):
+    """ Plot a single Polygon geometry """
+    from descartes.patch import PolygonPatch
+    a = np.asarray(polymap)
+    poly = geometry.asPolygon(polymap)
+    # without Descartes, we could make a Patch of exterior
+    ax.add_patch(PolygonPatch(poly, facecolor=facecolor, alpha=alpha))
+    ax.plot(a[:, 0], a[:, 1], color=edgecolor, linewidth=linewidth)
+    for p in poly.interiors:
+        x, y = zip(*p.coords)
+        ax.plot(x, y, color=edgecolor, linewidth=linewidth)
+
+
+def plot_multipolygon(ax, geom, facecolor='red', edgecolor='black', alpha=0.5):
+    """ Can safely call with either Polygon or Multipolygon geometry
+    """
+    if geom.type == 'Polygon':
+        plot_polygon(ax, geom, facecolor=facecolor, edgecolor=edgecolor, alpha=alpha)
+    elif geom.type == 'MultiPolygon':
+        for poly in geom.geoms:
+            plot_polygon(ax, poly, facecolor=facecolor, edgecolor=edgecolor, alpha=alpha)
 
 # colorset (from plot geodataframe
 
-def plot_to_basemap(m, name, column=None, geom_type='LineString', colormap='rainbow', scheme=None, k=5, fixed_bins=False, man_bins=None,  mn=None, mx=None, **kwargs):
+def plot_to_basemap(m, name, column=None, geom_type='LineString', colormap='rainbow', scheme=None, k=5, fixed_bins=False, man_bins=None,  mn=None, mx=None, linewidth=1, alpha=1, **kwargs):
     from matplotlib.colors import Normalize
     from matplotlib import cm as mcm
     from matplotlib import colorbar
@@ -134,14 +157,15 @@ def plot_to_basemap(m, name, column=None, geom_type='LineString', colormap='rain
     if fixed_bins:
         values = np.digitize(values, valuebins)
     else:
+        # pysal not working with new colorbar definition
         values = __pysal_choro(values, scheme, k=k)
     cmap, norm = norm_cmap(values, colormap, Normalize, mcm, mn=mn, mx=mx)
 
     for geom, value in zip(getattr(m, name), values):
        if geom_type == 'Polygon' or geom_type == 'MultiPolygon':
-           plot_multipolygon(ax, geom, facecolor=cmap.to_rgba(value), **kwargs)
+           plot_polygon(ax, geom, facecolor=cmap.to_rgba(value), alpha=alpha, linewidth=linewidth, **kwargs)
        elif geom_type == 'LineString' or geom_type == 'MultiLineString':
-        plot_linestring(m, geom, color=cmap.to_rgba(value), **kwargs)
+        plot_linestring(m, geom, color=cmap.to_rgba(value), linewidth=linewidth, **kwargs)
         # TODO: color point geometries
        elif geom_type == 'Point':
            plot_point(ax, geom, **kwargs)
@@ -168,14 +192,6 @@ man_bins = (-9.17343664, -4.85376639, -4.4010333 , -3.98366336, -3.53319506, 0.0
 # functions
 
 
-def plot_multilinestring(ax, geom, color='red', linewidth=1):
-    """ Can safely call with either LineString or MultiLineString geometry
-    """
-    if geom_type == 'LineString':
-        plot_linestring(ax, geom, color=color, linewidth=linewidth)
-    elif geom_type == 'MultiLineString':
-        for line in geom.geoms:
-            plot_linestring(ax, line, color=color, linewidth=linewidth)
 
 # RUN
 
@@ -184,6 +200,8 @@ def plot_multilinestring(ax, geom, color='red', linewidth=1):
 # man_bins = (-9.17343664, -4.85376639, -4.4010333 , -3.98366336, -3.53319506, 0.0, 2.42685153)
 
 # plot_to_basemap(m, 'transmission', 'pct_decrea', fixed_bins=True, man_bins=man_bins, colormap='jet_r', linewidth=0.1)
+
+# plot_to_basemap(m, 'utility', 'load_2050', geom_type='Polygon', scheme='Quantiles', colormap='OrRd', linewidth=0.1)
 
 # THINGS
 
