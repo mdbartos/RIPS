@@ -10,11 +10,11 @@ from shapely import geometry
 fig = plt.figure(figsize=(8,8))
 ax = fig.add_axes([0.1,0.1,0.8,0.8])
 # create polar stereographic Basemap instance.
-m = Basemap(-130, 20, -100, 50,\
+m = Basemap(-125, 31, -100, 50,\
             rsphere=6371200.,resolution='l',area_thresh=10000)
 # draw coastlines, state and country boundaries, edge of map.
-m.drawmapboundary()
-m.fillcontinents('0.85')
+m.drawmapboundary(fill_color='lightsteelblue')
+m.fillcontinents('0.85', lake_color='lightsteelblue')
 m.drawcoastlines()
 m.drawstates()
 m.drawcountries()
@@ -140,7 +140,7 @@ def plot_multipolygon(ax, geom, facecolor='red', edgecolor='black', alpha=0.5):
 
 # colorset (from plot geodataframe
 
-def plot_to_basemap(m, name, column=None, geom_type='LineString', colormap='rainbow', scheme=None, k=5, fixed_bins=False, man_bins=None,  mn=None, mx=None, linewidth=1, alpha=1, **kwargs):
+def plot_to_basemap(m, name, column=None, geom_type='LineString', colormap='rainbow', scheme=None, k=5, fixed_bins=False, man_bins=None,  mn=None, mx=None, linewidth=1, alpha=1, orientation='horizontal',  **kwargs):
     from matplotlib.colors import Normalize
     from matplotlib import cm as mcm
     from matplotlib import colorbar
@@ -174,8 +174,9 @@ def plot_to_basemap(m, name, column=None, geom_type='LineString', colormap='rain
     dcmap.set_under(cmap.to_rgba(0))
     dcmap.set_over(cmap.to_rgba(k+1))
 
-    cax = fig.add_axes([0.92, 0.2, 0.02, 0.6])
-    cb = colorbar.ColorbarBase(cax, cmap=dcmap, norm=norm, orientation='vertical', extend='both', spacing='uniform', extendfrac='auto')
+#    cax = fig.add_axes([0.92, 0.2, 0.02, 0.6])
+    cax = fig.add_axes([0.1, 0.1, 0.8, 0.02])
+    cb = colorbar.ColorbarBase(cax, cmap=dcmap, norm=norm, orientation=orientation, extend='both', spacing='uniform', extendfrac='auto')
     cb.locator = ticker.LinearLocator(numticks=k)
     cb.formatter = ticker.FixedFormatter(valuebins.astype(str).tolist()[:-1])
     cb.update_ticks()
@@ -189,6 +190,8 @@ def plot_to_basemap(m, name, column=None, geom_type='LineString', colormap='rain
 
 man_bins = (-9.17343664, -4.85376639, -4.4010333 , -3.98366336, -3.53319506, 0.0, 2.42685153)
 
+man_bins = (1.02, 1.04, 1.06, 1.08, 1.10, 1.12)
+
 # functions
 
 
@@ -201,7 +204,7 @@ man_bins = (-9.17343664, -4.85376639, -4.4010333 , -3.98366336, -3.53319506, 0.0
 
 # plot_to_basemap(m, 'transmission', 'pct_decrea', fixed_bins=True, man_bins=man_bins, colormap='jet_r', linewidth=0.1)
 
-# plot_to_basemap(m, 'utility', 'load_2050', geom_type='Polygon', scheme='Quantiles', colormap='OrRd', linewidth=0.1)
+# plot_to_basemap(m, 'utility', 'load_2050', geom_type='Polygon', fixed_bins=True, man_bins=man_bins, colormap='OrRd', linewidth=0.1)
 
 # THINGS
 
