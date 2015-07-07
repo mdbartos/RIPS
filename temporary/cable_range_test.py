@@ -47,6 +47,19 @@ acss = [     u'Avocet',     u'Bittern',    u'Bluebird',
                    u'Trogon',     u'Turacos',      u'Turbit',     u'Wagtail',
               u'Whooper',     u'Widgeon',    u'Woodcock']
 
+aac = [    u'Arbutus',       u'Aster',    u'Bluebell',  u'Bluebonnet',
+             u'Canna',   u'Carnation',   u'Cockscomb',   u'Columbine',
+         u'Coreopsis',      u'Cosmos',     u'Cowslip',    u'Daffodil',
+            u'Dahlia',       u'Daisy',   u'Goldenrod',  u'Goldentuft',
+          u'Hawkweed',    u'Hawthorn',    u'Heuchera',        u'Iris',
+         u'Jessamine',    u'Larkspur',      u'Laurel',       u'Lilac',
+            u'Lupine',    u'Magnolia',    u'Marigold', u'Meadowsweet',
+         u'Mistletoe',   u'Narcissus',  u'Nasturtium',      u'Orchid',
+             u'Oxlip',       u'Pansy',   u'Peachbell',       u'Peony',
+           u'Petunia',       u'Phlox',       u'Poppy',        u'Rose',
+        u'Sneezewort',     u'Syringa',    u'Trillium',       u'Tulip',
+          u'Valerian',     u'Verbena',      u'Violet',      u'Zinnia']
+
 # Had to remove wood duck because of title() function
 
 # ACSR
@@ -65,24 +78,53 @@ for k in acss:
     cable_i = cable.cable(k, 'acss')
     acss_df[k] = np.asarray([cable_i.I(348, i, 0.61) for i in np.arange(273+0, 273+60)])/(cable_i.I(348, 298, 0.61))
 
+aac_df = pd.DataFrame()
+
+for k in aac:
+    cable_i = cable.cable(k, 'aac')
+    aac_df[k] = np.asarray([cable_i.I(348, i, 0.61) for i in np.arange(273+0, 273+60)])/(cable_i.I(348, 298, 0.61))
+
 #####################
 
-acsr_df.idxmin(axis=1) # ACSR BLUEBIRD HEATS UP THE FASTEST
-
-acsr_cat = pd.concat([acsr_df.loc[59], cable_i.models['acsr'].T], axis=1)
+acsr_cat = pd.concat([acsr_df.loc[50], cable_i.models['acsr'].T], axis=1)
+acss_cat = pd.concat([acss_df.loc[50], cable_i.models['acss'].T], axis=1)
+aac_cat = pd.concat([aac_df.loc[50], cable_i.models['aac'].T], axis=1)
 
 # As cable diameter increases, effect of temperature on ampacity increases
-scatter(acsr_cat['cable_d'], acsr_cat[59])
+scatter(acsr_cat['cable_d'], acsr_cat[50], color='blue', alpha=0.7, label='ACSR')
+scatter(acss_cat['cable_d'], acss_cat[50], color='orange', alpha=0.7, label='ACSS')
+scatter(aac_cat['cable_d'], aac_cat[50], color='red', alpha=0.7, label='AAC')
+xlabel('Cable diameter (m)')
+ylabel('Percent of rated ampacity at 50 C')
+title('Reduction in rated ampacity vs. cable diameter')
 
 # Contour plot
-trange = np.asarray([bluebird.I(348, i, np.arange(0,4,0.01)) for i in np.arange(273+0, 273+60, 0.1)])/bluebird.I(348, 273+25, 0.61)
-trange = pd.DataFrame(trange).fillna(0).values
 
-cf = contourf(trange.T, cmap='jet_r')
-cb = colorbar()
-cf.ax.set_xticklabels([0, 10, 20, 30, 40, 50])
-cf.ax.set_yticklabels(np.linspace(0, 4, 8, endpoint=False))
-title('Weather effects on ampacity')
-ylabel('Wind speed (m/s)')
-xlabel('Ambient temperature (C)')
-cb.set_label('Fraction of Rated Ampacity')
+# trange = np.asarray([bluebird.I(348, i, np.arange(0,4,0.01)) for i in np.arange(273+0, 273+60, 0.1)])/bluebird.I(348, 273+25, 0.61)
+# trange = pd.DataFrame(trange).fillna(0).values
+
+# cf = contourf(trange.T, cmap='jet_r')
+# cb = colorbar()
+# cf.ax.set_xticklabels([0, 10, 20, 30, 40, 50])
+# cf.ax.set_yticklabels(np.linspace(0, 4, 8, endpoint=False))
+# title('Weather effects on ampacity')
+# ylabel('Wind speed (m/s)')
+# xlabel('Ambient temperature (C)')
+# cb.set_label('Fraction of Rated Ampacity')
+
+def contour_plot(name, model, trange, vrange, maxtemp, a_s=0.9, e_s=0.7, levels=[0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25]):
+
+    cable_i = cable.cable(name, model)
+    a = np.asarray([cable_i.I(maxtemp, i, np.arange(*vrange), a_s=a_s, e_s=e_s) for i in np.arange(*trange)])/cable_i.I(maxtemp, 273+25, 0.61, a_s=a_s, e_s=e_s)
+    a = pd.DataFrame(a).fillna(0).values
+    
+    cf = contourf(a.T, cmap='jet_r', levels=levels)
+    cb = colorbar()
+    cf.ax.set_xticklabels([0, 10, 20, 30, 40, 50])
+    cf.ax.set_yticklabels(np.linspace(0, 4, 8, endpoint=False))
+    title('Meteorological effects on ampacity')
+    ylabel('Wind speed (m/s)')
+    xlabel('Ambient temperature (C)')
+    cb.set_label('Fraction of Rated Ampacity')
+
+contour_plot('Bluebird', 'acsr', (273+0, 273+60, 0.1), (0,4,0.01),  273+75)
