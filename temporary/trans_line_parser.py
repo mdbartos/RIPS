@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 d = {}
 for i in range (2001, 2011):
@@ -18,5 +19,3 @@ s = c.groupby(['NERC Region', 'Design (kV)', 'Material'])['Size  (MCM)']
 s.value_counts()
 
 boxplot(np.asarray([c[c['Design (kV)'] == i]['Size  (MCM)'].values for i in sorted(c['Design (kV)'].unique().tolist())]), labels=sorted(c['Design (kV)'].unique().tolist()))
-
-boxplot(np.asarray([c[c['Design (kV)'] == i]['Size  (MCM)'].values for i in c['Design (kV)'].unique()]))
