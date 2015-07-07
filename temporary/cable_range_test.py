@@ -70,20 +70,39 @@ acsr_df = pd.DataFrame()
 
 for k in acsr:
     cable_i = cable.cable(k, 'acsr')
-    acsr_df[k] = np.asarray([cable_i.I(348, i, 0.61) for i in np.arange(273+0, 273+60)])/(cable_i.I(348, 298, 0.61))
+    acsr_df[k] = np.asarray([cable_i.I(348, i, 0.61) for i in np.arange(273+0, 273+61)])/(cable_i.I(348, 298, 0.61))
 
 acss_df = pd.DataFrame()
 
 for k in acss:
     cable_i = cable.cable(k, 'acss')
-    acss_df[k] = np.asarray([cable_i.I(348, i, 0.61) for i in np.arange(273+0, 273+60)])/(cable_i.I(348, 298, 0.61))
+    acss_df[k] = np.asarray([cable_i.I(348, i, 0.61) for i in np.arange(273+0, 273+61)])/(cable_i.I(348, 298, 0.61))
 
 aac_df = pd.DataFrame()
 
 for k in aac:
     cable_i = cable.cable(k, 'aac')
-    aac_df[k] = np.asarray([cable_i.I(348, i, 0.61) for i in np.arange(273+0, 273+60)])/(cable_i.I(348, 298, 0.61))
+    aac_df[k] = np.asarray([cable_i.I(348, i, 0.61) for i in np.arange(273+0, 273+61)])/(cable_i.I(348, 298, 0.61))
 
+fill_between(acsr_df.index.values, acsr_df.min(axis=1), acsr_df.max(axis=1), color='blue', label='ACSR', alpha=1)
+xlabel('Ambient temperature (C)')
+ylabel('Fraction of rated capacity')
+title('ACSR cable')
+clf()
+
+
+fill_between(acss_df.index.values, acss_df.min(axis=1), acss_df.max(axis=1), color='orange', label='ACSS', alpha=1)
+xlabel('Ambient temperature (C)')
+ylabel('Fraction of rated capacity')
+title('ACSS cable')
+clf()
+
+fill_between(aac_df.index.values, aac_df.min(axis=1), aac_df.max(axis=1), color='red', label='AAC', alpha=1)
+xlabel('Ambient temperature (C)')
+ylabel('Fraction of rated capacity')
+title('AAC cable')
+ylim(0.4, 1.3)
+clf()
 #####################
 
 acsr_cat = pd.concat([acsr_df.loc[50], cable_i.models['acsr'].T], axis=1)
@@ -95,7 +114,7 @@ scatter(acsr_cat['cable_d'], acsr_cat[50], color='blue', alpha=0.7, label='ACSR'
 scatter(acss_cat['cable_d'], acss_cat[50], color='orange', alpha=0.7, label='ACSS')
 scatter(aac_cat['cable_d'], aac_cat[50], color='red', alpha=0.7, label='AAC')
 xlabel('Cable diameter (m)')
-ylabel('Percent of rated ampacity at 50 C')
+ylabel('Fraction of rated ampacity at 50 C') # at 50 C
 title('Reduction in rated ampacity vs. cable diameter')
 
 # Contour plot
