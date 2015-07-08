@@ -85,20 +85,20 @@ for k in aac:
     aac_df[k] = np.asarray([cable_i.I(348, i, 0.61) for i in np.arange(273+0, 273+61)])/(cable_i.I(348, 298, 0.61))
 
 fill_between(acsr_df.index.values, acsr_df.min(axis=1), acsr_df.max(axis=1), color='blue', label='ACSR', alpha=1)
-xlabel('Ambient temperature (C)')
+xlabel('Ambient temperature ($^\circ$C)')
 ylabel('Fraction of rated capacity')
 title('ACSR cable')
 clf()
 
 
 fill_between(acss_df.index.values, acss_df.min(axis=1), acss_df.max(axis=1), color='orange', label='ACSS', alpha=1)
-xlabel('Ambient temperature (C)')
+xlabel('Ambient temperature ($^\circ$C)')
 ylabel('Fraction of rated capacity')
 title('ACSS cable')
 clf()
 
 fill_between(aac_df.index.values, aac_df.min(axis=1), aac_df.max(axis=1), color='red', label='AAC', alpha=1)
-xlabel('Ambient temperature (C)')
+xlabel('Ambient temperature ($^\circ$C)')
 ylabel('Fraction of rated capacity')
 title('AAC cable')
 ylim(0.4, 1.3)
@@ -114,7 +114,7 @@ scatter(acsr_cat['cable_d'], acsr_cat[50], color='blue', alpha=0.7, label='ACSR'
 scatter(acss_cat['cable_d'], acss_cat[50], color='orange', alpha=0.7, label='ACSS')
 scatter(aac_cat['cable_d'], aac_cat[50], color='red', alpha=0.7, label='AAC')
 xlabel('Cable diameter (m)')
-ylabel('Fraction of rated ampacity at 50 C') # at 50 C
+ylabel('Fraction of rated ampacity at 50 $^\circ$C') # at 50 C
 title('Reduction in rated ampacity vs. cable diameter')
 
 # Contour plot
@@ -141,9 +141,9 @@ def contour_plot(name, model, trange, vrange, maxtemp, a_s=0.9, e_s=0.7, levels=
     cb = colorbar()
     cf.ax.set_xticklabels([0, 10, 20, 30, 40, 50])
     cf.ax.set_yticklabels(np.linspace(0, 4, 8, endpoint=False))
-    title('Meteorological effects on ampacity')
+    title('Conductor Temperature: %s $^\circ$C' % (maxtemp - 273))
     ylabel('Wind speed (m/s)')
-    xlabel('Ambient temperature (C)')
+    xlabel('Ambient temperature ($^\circ$C)')
     cb.set_label('Fraction of Rated Ampacity')
 
 contour_plot('Bluebird', 'acsr', (273+0, 273+60, 0.1), (0,4,0.01),  273+75)
