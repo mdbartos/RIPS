@@ -147,3 +147,37 @@ def contour_plot(name, model, trange, vrange, maxtemp, a_s=0.9, e_s=0.7, levels=
     cb.set_label('Fraction of Rated Ampacity')
 
 contour_plot('Bluebird', 'acsr', (273+0, 273+60, 0.1), (0,4,0.01),  273+75)
+
+
+#### contour of ampacity vs. temperature and diameter
+
+
+trange = (273+0, 273+60, 0.1)
+drange = (0.005, 0.05, 0.001)
+maxtemp = 273+75
+
+def contour_diam(trange, drange, maxtemp, a_s=0.9, e_s=0.7, levels=[0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25]):
+
+    cable_i = cable.cable('Bluebird', 'acsr')
+    trange = np.arange(*trange)
+    drange = np.arange(*drange)
+    
+    df = pd.DataFrame()
+
+    for d in drange:
+        cable_i.D = d
+        a = np.asarray([cable_i.I(maxtemp, i, 0.61, a_s=a_s, e_s=e_s) for i in trange])/cable_i.I(maxtemp, 273+25, 0.61, a_s=a_s, e_s=e_s)
+        df[d] = a
+#    a = pd.DataFrame(a).fillna(0).values
+    a = df.sort_index(axis=1).values
+    
+    cf = contourf(a, cmap='jet_r', levels=levels)
+    cb = colorbar()
+    cf.ax.set_yticklabels([0, 10, 20, 30, 40, 50])
+    cf.ax.set_xticklabels(100*np.linspace(0, 0.05, 10, endpoint=False))
+    title('Conductor Temperature: %s $^\circ$C' % (maxtemp - 273))
+    xlabel('Conductor diameter (cm)')
+    ylabel('Ambient temperature ($^\circ$C)')
+    cb.set_label('Fraction of Rated Ampacity')
+
+contour_diam((273+0, 273+60, 0.1), (0.005, 0.05, 0.001),  273+75)
