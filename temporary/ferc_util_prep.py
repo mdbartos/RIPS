@@ -90,57 +90,56 @@ coed = {
 coed[1995] = pd.concat([coed[1995][2].dropna(), coed[1995][6]]).values.ravel()
 
 # COEL
->
 
 coel = {
-1993 : pd.read_fwf('./1993/COEL93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1),
-1995 : pd.read_fwf('./1995/COEL95', header=None) #Day split into three parts,
-1996 : pd.read_csv('./1996/COEL96', sep=' ', skipinitialspace=True, header=None),
-1997 : pd.read_csv('./1997/COEL97', sep=' ', skipinitialspace=True, header=None),
-1998 : pd.read_csv('./1998/COEL98', sep=' ', skipinitialspace=True, header=None),
-1999 : pd.read_csv('./1999/COEL99', sep=' ', skipinitialspace=True, header=None, skiprows=3),
-2000 : pd.read_csv('./2000/COEL00', sep=' ', skipinitialspace=True, header=None, skiprows=3),
-2001 : pd.read_csv('./2001/COEL01', sep=' ', skipinitialspace=True, header=None, skiprows=3),
-2002 : pd.read_csv('./2002/COEL02', sep=' ', skipinitialspace=True, header=None, skiprows=3),
-2003 : pd.read_csv('./2003/COEL03', sep=' ', skipinitialspace=True, header=None, skiprows=3),
-2004 : pd.read_csv('./2004/COEL04', sep=' ', skipinitialspace=True, header=None, skiprows=3)
+        1993 : pd.read_fwf('./1993/COEL93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel(),
+        1995 : pd.read_fwf('./1995/COEL95', header=None).iloc[:, 1:].values.ravel(), 
+1996 : pd.read_csv('./1996/COEL96', sep=' ', skipinitialspace=True, header=None)[3].values,
+1997 : pd.read_csv('./1997/COEL97', sep=' ', skipinitialspace=True, header=None)[4].values,
+1998 : pd.read_csv('./1998/COEL98', sep=' ', skipinitialspace=True, header=None)[4].values,
+1999 : pd.read_csv('./1999/COEL99', sep=' ', skipinitialspace=True, header=None, skiprows=3)[4].values,
+2000 : pd.read_csv('./2000/COEL00', sep=' ', skipinitialspace=True, header=None, skiprows=3)[4].values,
+2001 : pd.read_csv('./2001/COEL01', sep=' ', skipinitialspace=True, header=None, skiprows=3)[4].values,
+2002 : pd.read_csv('./2002/COEL02', sep=' ', skipinitialspace=True, header=None, skiprows=3)[4].values,
+2003 : pd.read_csv('./2003/COEL03', sep=' ', skipinitialspace=True, header=None, skiprows=3)[4].values,
+2004 : pd.read_csv('./2004/COEL04', sep=' ', skipinitialspace=True, header=None, skiprows=3)[4].values
 }
 
 # CVPS
 
 # 1994 Can't read
 cvps = {
-1995 : pd.read_fwf('./1995/CVPS95', header=None),
-1996 : pd.read_csv('./1996/CVPS96', header=None, skipfooter=1),
-1997 : pd.read_csv('./1997/CVPS97', header=None),
-1998 : pd.read_csv('./1998/CVPS98', header=None, skipfooter=1),
-1999 : pd.read_csv('./1999/CVPS99', header=None)
+1995 : pd.read_fwf('./1995/CVPS95', header=None).iloc[:, 1:].values.ravel(),
+1996 : pd.read_csv('./1996/CVPS96', header=None, skipfooter=1)[1].values,
+1997 : pd.read_csv('./1997/CVPS97', header=None)[2].values,
+1998 : pd.read_csv('./1998/CVPS98', header=None, skipfooter=1)[4].values,
+1999 : pd.read_csv('./1999/CVPS99')['Load'].values
 }
 
 # EUA
 
 eua = {
-1993 : pd.read_fwf('./1993/EUA93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1),
-1994 : pd.read_fwf('./1994/EUA94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1),
-1995 : pd.read_fwf('./1995/EUA95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1),
-1996 : pd.read_fwf('./1996/EUA96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1),
-1997 : pd.read_fwf('./1997/EUA97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1),
-1999 : pd.read_fwf('./1999/EUA99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1)
+        1993 : pd.read_fwf('./1993/EUA93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel(),
+        1994 : pd.read_fwf('./1994/EUA94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel(),
+        1995 : pd.read_fwf('./1995/EUA95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel(),
+        1996 : pd.read_fwf('./1996/EUA96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel(),
+        1997 : pd.read_fwf('./1997/EUA97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel(),
+        1999 : pd.read_fwf('./1999/EUA99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
 }
 
 # GMP
 
 gmp = {
-1993 : pd.read_csv('./1993/GMP93', sep=' ', skipinitialspace=True, header=None, skiprows=4),
-1994 : pd.read_fwf('./1994/GMP94'),
-1995 : pd.read_csv('./1995/GMP95', sep=' ', skipinitialspace=True, header=None),
-1996 : pd.read_csv('./1996/GMP96', sep='\t', skipinitialspace=True, header=None),
-1997 : pd.read_csv('./1997/GMP97', sep='\t', skipinitialspace=True, header=None),
-1998 : pd.read_csv('./1998/GMP98', sep='\t', skipinitialspace=True, header=None),
-1999 : pd.read_csv('./1999/GMP99', sep=' ', skipinitialspace=True, header=None, skipfooter=1),
-2002 : pd.read_excel('./2002/GMP02', skiprows=6, skipfooter=1),
-2003 : pd.read_excel('./2003/GMP03', skiprows=6, skipfooter=1),
-2004 : pd.read_csv('./2004/GMP04', skiprows=13, sep='\s')
+1993 : pd.read_csv('./1993/GMP93', sep=' ', skipinitialspace=True, header=None, skiprows=4)[0].values,
+1994 : pd.read_fwf('./1994/GMP94', header=None)[0].values,
+1995 : pd.read_csv('./1995/GMP95', sep=' ', skipinitialspace=True, header=None)[0].values,
+1996 : pd.read_csv('./1996/GMP96', sep='\t', skipinitialspace=True, header=None)[0].values,
+1997 : pd.read_csv('./1997/GMP97', sep='\t', skipinitialspace=True, header=None)[0].values,
+1998 : pd.read_csv('./1998/GMP98', sep='\t', skipinitialspace=True, header=None)[0].values,
+1999 : pd.read_csv('./1999/GMP99', sep=' ', skipinitialspace=True, header=None, skipfooter=1).iloc[:8760, 0].values,
+2002 : pd.read_excel('./2002/GMP02', skiprows=6, skipfooter=1).iloc[:, 0].values,
+2003 : pd.read_excel('./2003/GMP03', skiprows=6, skipfooter=1).iloc[:, 0].values,
+2004 : pd.read_csv('./2004/GMP04', skiprows=13, sep='\s').iloc[:, 0].values
 }
 
 # 2001 : # 2001 WEIRD FORMAT,
@@ -149,17 +148,17 @@ gmp = {
 # ISONY
 
 isony = {
-2002 : pd.read_csv('./2002/ISONY02', sep='\t'),
-2003 : pd.read_excel('./2003/ISONY03'),
-2004 : pd.read_excel('./2004/ISONY04')
+2002 : pd.read_csv('./2002/ISONY02', sep='\t')['mw'].values,
+2003 : pd.read_excel('./2003/ISONY03')['Load'].values,
+2004 : pd.read_excel('./2004/ISONY04').loc[:, 'HR1':].values.ravel()
 }
 
 # LILC
 
 lilc = {
-1994 : pd.read_fwf('./1994/LILC94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1),
-1995 : pd.read_fwf('./1995/LILC95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None),
-1997 : pd.read_fwf('./1997/LILC97', skiprows=4)
+        1994 : pd.read_fwf('./1994/LILC94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel(),
+        1995 : pd.read_fwf('./1995/LILC95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel(),
+        1997 : pd.read_fwf('./1997/LILC97', skiprows=4, widths=[8,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel(),
 }
 
 # 1996 : pd.read_fwf('./1996/LILC96', header=None, skipfooter=1)[4].str.split('\t').apply(pd.Series),
@@ -168,20 +167,20 @@ lilc = {
 # MMWE
 
 mmwe = {
-1998 : pd.read_fwf('./1998/MMWE98', skiprows=1),
-1999 : pd.read_fwf('./1999/MMWE99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1),
-2000 : pd.read_fwf('./2000/MMWE00', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1),
-2001 : pd.read_fwf('./2001/MMWE01', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1),
-2002 : pd.read_fwf('./2002/MMWE02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1),
-2003 : pd.read_fwf('./2003/MMWE03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1),
-2004 : pd.read_fwf('./2004/MMWE04', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1)
+1998 : pd.read_fwf('./1998/MMWE98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1).iloc[:, 1:].values.ravel(),
+1999 : pd.read_fwf('./1999/MMWE99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1).iloc[:, 1:].values.ravel(),
+2000 : pd.read_fwf('./2000/MMWE00', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1).iloc[:, 1:].values.ravel(),
+2001 : pd.read_fwf('./2001/MMWE01', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1).iloc[:, 1:].values.ravel(),
+2002 : pd.read_fwf('./2002/MMWE02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1).iloc[:, 1:].values.ravel(),
+2003 : pd.read_fwf('./2003/MMWE03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1).iloc[:, 1:].values.ravel(),
+2004 : pd.read_fwf('./2004/MMWE04', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1).iloc[:, 1:].values.ravel()
 }
 
 # NEES
 
 nees = {
-1993 : pd.read_fwf('./1993/NEES93', widths=(8,7), header=None, skipfooter=1),
-1994 : pd.read_csv('./1994/NEES94', header=None, skipfooter=1, sep=' ', skipinitialspace=True)
+1993 : pd.read_fwf('./1993/NEES93', widths=(8,7), header=None, skipfooter=1)[1].values,
+1994 : pd.read_csv('./1994/NEES94', header=None, skipfooter=1, sep=' ', skipinitialspace=True)[3].values
 }
 # 1995 can't read
 
