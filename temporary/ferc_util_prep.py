@@ -120,6 +120,12 @@ pd.read_excel('./2002/GMP02', skiprows=6, skipfooter=1)
 pd.read_excel('./2003/GMP03', skiprows=6, skipfooter=1)
 pd.read_csv('./2004/GMP04', skiprows=13, sep='\s')
 
+# ISONY
+
+pd.read_csv('./2002/ISONY02', sep='\t')
+pd.read_excel('./2003/ISONY03')
+pd.read_excel('./2004/ISONY04')
+
 # LILC
 
 pd.read_fwf('./1994/LILC94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1)
@@ -142,6 +148,22 @@ pd.read_fwf('./2004/MMWE04', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, s
 pd.read_fwf('./1993/NEES93', widths=(8,7), header=None, skipfooter=1)
 pd.read_csv('./1994/NEES94', header=None, skipfooter=1, sep=' ', skipinitialspace=True)
 # 1995 can't read
+
+# NEPOOL
+
+pd.read_fwf('./1993/NEPOOL93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=2)
+pd.read_fwf('./1994/NEPOOL94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None)
+pd.read_fwf('./1995/NEPOOL95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=3)
+pd.read_csv('./1996/NEPOOL96', sep=' ', skipinitialspace=True)
+pd.read_fwf('./1997/NEPOOL97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None)
+pd.read_excel('./1998/NEPOOL98')
+pd.read_csv('./1999/NEPOOL99', engine='python', skiprows=1)
+pd.read_fwf('./2000/NEPOOL00', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None)
+pd.read_fwf('./2001/NEPOOL01', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None)
+pd.read_csv('./2002/NEPOOL02', sep='\t')
+pd.read_fwf('./2003/NEPOOL03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None)
+pd.read_csv('./2004/NEPOOL04', sep='\t', header=None, skiprows=10)
+
 
 # NMPC
 
