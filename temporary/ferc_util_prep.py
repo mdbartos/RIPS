@@ -438,3 +438,132 @@ pd.read_fwf('./1997/WTU97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).il
 wtu[1993][2] = wtu[1993][2].str[-3:]
 
 
+###### FRCC
+
+# GAIN
+
+
+pd.read_fwf('./1993/GAIN93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel()
+pd.read_csv('./1994/GAIN94', header=None, sep=' ', skipinitialspace=True, skipfooter=2, skiprows=5).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1995/GAIN95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel()
+pd.read_csv('./1996/GAIN96', sep=' ', skipinitialspace=True).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1997/GAIN97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel()
+pd.read_csv('./1998/GAIN98', sep=' ', skipinitialspace=True, skiprows=3, header=None).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1999/GAIN99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel()
+pd.read_fwf('./2000/GAIN00', header=None).iloc[:, 4:].values.ravel()
+pd.read_excel('./2002/GAIN02', sheetname=1, skiprows=3, header=None).iloc[:730, 8:20].values.ravel()
+pd.read_excel('./2003/GAIN03', sheetname=2, skiprows=3, header=None).iloc[:730, 8:20].values.ravel()
+pd.read_excel('./2004/GAIN04', sheetname=0, header=None).iloc[:, 8:].values.ravel()
+
+# LAKE
+
+
+pd.read_fwf('./1993/LAKE93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1994/LAKE94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1995/LAKE95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1996/LAKE96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1997/LAKE97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1998/LAKE98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1999/LAKE99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./2000/LAKE00', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel()
+pd.read_fwf('./2001/LAKE01', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./2002/LAKE02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+
+# TAL
+# EXTREMELY ODD FORMAT
+
+# FMPA
+
+pd.read_fwf('./1993/FMPA93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1994/FMPA94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=5).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1995/FMPA95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=5).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1996/FMPA96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=5).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1997/FMPA97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=5).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1998/FMPA98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=5).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1999/FMPA99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=6).iloc[:, 1:].values.ravel()
+pd.read_csv('./2001/FMPA01', header=None, sep=' ', skipinitialspace=True, skiprows=6).iloc[:, 2:-1].values.ravel()
+pd.read_csv('./2002/FMPA02', header=None, sep='\t', skipinitialspace=True, skiprows=7).iloc[:, 1:].values.ravel()
+pd.read_csv('./2003/FMPA03', header=None, sep='\t', skipinitialspace=True, skiprows=7).iloc[:, 1:].values.ravel()
+pd.read_csv('./2004/FMPA04', header=None, sep=' ', skipinitialspace=True, skiprows=6, skipfooter=1).iloc[:, 1:].values.ravel()
+
+# FPC
+
+pd.read_csv('./1993/FPC93', sep=' ', skipinitialspace=True, header=None)[1].values
+pd.read_csv('./1994/FPC94', sep=' ', skipinitialspace=True, header=None).iloc[:, 2:].values.ravel()
+pd.read_csv('./1995/FPC95', engine='python', header=None).values
+pd.read_excel('./1996/FPC96', header=None, skiprows=2, skipfooter=1).iloc[:, 6:].values.ravel()
+#1997 weird format
+pd.read_excel('./1998/FPC98', header=None, skiprows=5).iloc[:, 7:].values.ravel()
+pd.read_excel('./1999/FPC99', header=None, skiprows=4).iloc[:, 7:].values.ravel()
+pd.read_excel('./2000/FPC00', header=None, skiprows=4).iloc[:, 7:].values.ravel()
+pd.read_excel('./2001/FPC01', header=None, skiprows=5).iloc[:, 7:].values.ravel()
+pd.read_excel('./2002/FPC02', header=None, skiprows=4).iloc[:, 7:].values.ravel()
+pd.read_excel('./2004/FPC04', header=None, skiprows=4).iloc[:, 7:].values.ravel()
+
+# FPL
+
+pd.DataFrame([i.split('\t') for i in open('./1993/FPL93', 'r').readlines()]).iloc[:365, :24].apply(lambda x: x.str.replace('\r\n', '').str.replace('"', '').str.replace(',', '')).replace('', np.nan).astype(float).values.ravel()
+pd.DataFrame([i.split('\t') for i in open('./1994/FPL94', 'r').readlines()]).iloc[3:, 1:13].apply(lambda x: x.str.replace('\r\n', '').str.replace('"', '').str.replace(',', '')).replace('', np.nan).astype(float).values.ravel()
+pd.DataFrame([i.split('\t') for i in open('./1995/FPL95', 'r').readlines()[3:]]).iloc[:730, 1:13].apply(lambda x: x.str.replace('\r\n', '').str.replace('"', '').str.replace(',', '')).replace('', np.nan).astype(float).values.ravel()
+pd.DataFrame([i.split('\t') for i in open('./1996/FPL96', 'r').readlines()[4:]]).iloc[:730, 1:13].apply(lambda x: x.str.replace('\r\n', '').str.replace('"', '').str.replace(',', '')).replace('', np.nan).astype(float).values.ravel()
+pd.DataFrame([i.split('\t') for i in open('./1997/FPL97', 'r').readlines()[4:]]).iloc[:730, 1:13].apply(lambda x: x.str.replace('\r\n', '').str.replace('"', '').str.replace(',', '')).replace('', np.nan).astype(float).values.ravel()
+pd.DataFrame([i.split('\t') for i in open('./1998/FPL98', 'r').readlines()[4:]]).iloc[:730, 1:13].apply(lambda x: x.str.replace('\r\n', '').str.replace('"', '').str.replace(',', '')).replace('', np.nan).astype(float).values.ravel()
+pd.DataFrame([i.split('\t') for i in open('./1999/FPL99', 'r').readlines()[4:]]).iloc[:730, 1:13].apply(lambda x: x.str.replace('\r\n', '').str.replace('"', '').str.replace(',', '')).replace('', np.nan).astype(float).values.ravel()
+pd.DataFrame([i.split('\t') for i in open('./2000/FPL00', 'r').readlines()[4:]]).iloc[:730, 1:13].apply(lambda x: x.str.replace('\r\n', '').str.replace('"', '').str.replace(',', '')).replace('', np.nan).astype(float).values.ravel()
+pd.DataFrame([i.split('\t') for i in open('./2001/FPL01', 'r').readlines()[4:]]).iloc[:730, 1:13].apply(lambda x: x.str.replace('\r\n', '').str.replace('"', '').str.replace(',', '')).replace('', np.nan).astype(float).values.ravel()
+pd.DataFrame([i.split('\t') for i in open('./2002/FPL02', 'r').readlines()[4:]]).iloc[:730, 1:13].apply(lambda x: x.str.replace('\r\n', '').str.replace('"', '').str.replace(',', '')).replace('', np.nan).astype(float).values.ravel()
+pd.DataFrame([i.split('\t') for i in open('./2003/FPL03', 'r').readlines()[4:]]).iloc[:730, 1:13].apply(lambda x: x.str.replace('\r\n', '').str.replace('"', '').str.replace(',', '')).replace('', np.nan).astype(float).values.ravel()
+pd.DataFrame([i.split('\t') for i in open('./2004/FPL04', 'r').readlines()[4:]]).iloc[:730, 1:13].apply(lambda x: x.str.replace('\r\n', '').str.replace('"', '').str.replace(',', '')).replace('', np.nan).astype(float).values.ravel()
+
+# JEA
+
+pd.read_csv('./1993/JEA93', sep=' ', skipinitialspace=True, header=None)[2].values
+pd.read_csv('./1994/JEA94', sep=' ', skipinitialspace=True, header=None)[2].values
+pd.read_fwf('./1996/JEA96', header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1997/JEA97', header=None).iloc[:, 1:].values.ravel()
+pd.read_csv('./1998/JEA98', sep='\t', header=None)[2].values
+pd.read_csv('./1999/JEA99', sep='\t', header=None)[2].values
+pd.read_excel('./2000/JEA00', header=None)[2].values
+pd.read_excel('./2001/JEA01', header=None, skiprows=2)[2].values
+pd.read_excel('./2002/JEA02', header=None, skiprows=1)[2].values
+pd.read_excel('./2003/JEA03', header=None, skiprows=1)[2].values
+pd.read_excel('./2004/JEA04', header=None, skiprows=1)[2].values
+
+# KUA
+
+pd.read_csv('./1994/KUA94', sep=' ', skipinitialspace=True, header=None).iloc[:, 1:].values.ravel()
+pd.read_csv('./1995/KUA95', sep=' ', skipinitialspace=True, header=None).iloc[:, 1:].values.ravel()
+#1996 multiple excel sheets
+pd.read_csv('./1997/KUA97', sep='\t', skipinitialspace=True, header=None).iloc[:, 2:].values.ravel()
+#1998 weird formatting
+#pd.read_csv('./1998/KUA98', sep='\s', skipinitialspace=True, header=None).iloc[:, 1:].values.ravel()
+#pd.read_csv('./2000/KUA00', sep='\t', skipinitialspace=True, header=None).iloc[:, 2:].values.ravel()
+pd.read_csv('./2001/KUA01', skiprows=1, header=None, sep=' ', skipinitialspace=True).iloc[:, 1:].values.ravel()
+pd.read_csv('./2002/KUA02', skipfooter=1, header=None, sep=' ', skipinitialspace=True).iloc[:, 1:].values.ravel() # Only goes to september
+
+# OUC
+
+
+pd.read_fwf('./1993/OUC93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1994/OUC94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1995/OUC95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1996/OUC96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1997/OUC97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1998/OUC98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1999/OUC99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel()
+pd.read_fwf('./2000/OUC00', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel()
+pd.read_fwf('./2001/OUC01', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=2).iloc[:, 1:].values.ravel()
+pd.read_fwf('./2002/OUC02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel()
+
+# TECO
+
+
+pd.read_fwf('./1993/TECO93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1).iloc[:, 1:].values.ravel()
+pd.read_fwf('./1994/TECO94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=1).iloc[:, 1:].values.ravel()
+
+pd.read_csv('./1998/TECO98', engine='python', skiprows=3, header=None)[0].values
+pd.read_csv('./1999/TECO99', engine='python', skiprows=3, header=None)[0].values
+pd.read_csv('./2000/TECO00', engine='python', skiprows=3, header=None)[0].str[:4].astype(int).values
+pd.read_csv('./2001/TECO01', skiprows=3, header=None)[0].values
+pd.read_csv('./2002/TECO02', sep='\t').loc[:, 'HR1':].values.ravel()
+pd.read_csv('./2003/TECO03', skiprows=2, header=None, sep=' ', skipinitialspace=True).iloc[:, 2:].values.ravel()
