@@ -1283,3 +1283,34 @@ pd.DataFrame([i.split() for i in open('./2001/DUKE01').readlines()[5:]])[2].asty
 pd.DataFrame([i.split() for i in open('./2002/DUKE02').readlines()[5:]])[2].astype(float).values
 pd.DataFrame([i.split() for i in open('./2003/DUKE03').readlines()[5:-8]])[2].astype(float).values
 pd.DataFrame([i.split() for i in open('./2004/DUKE04').readlines()[5:]])[2].astype(float).values
+
+# FPWC
+
+# FLINT
+
+(pd.DataFrame([i.split() for i in open('./1993/FLINT93').readlines()])[6].astype(float)/1000).values
+((pd.DataFrame([i.split() for i in open('./1994/FLINT94').readlines()[:-1]])).iloc[:, -1].astype(float)/1000).values
+((pd.DataFrame([i.split() for i in open('./1995/FLINT95').readlines()[1:]]))[3].astype(float)/1000).values
+(pd.DataFrame([i.split() for i in open('./1996/FLINT96').readlines()[3:-2]]))[2].astype(float).values
+(pd.DataFrame([i.split() for i in open('./1997/FLINT97').readlines()[6:]]))[3].astype(float).values
+(pd.DataFrame([i.split() for i in open('./1998/FLINT98').readlines()[4:]]))[2].astype(float).values
+(pd.DataFrame([i.split() for i in open('./1999/FLINT99').readlines()[1:]]))[1].astype(float).values
+(pd.DataFrame([i.split() for i in open('./2000/FLINT00').readlines()[2:]]))[4].astype(float).values
+# go and get later entries if needed
+
+# GUC
+guc = {
+1993 : np.concatenate([pd.read_excel('./2000/GUC00', sheetname='1993', skiprows=7, header=None).iloc[:24, 1:183].values.ravel(order='F'), pd.read_excel('./2000/GUC00', sheetname='1993', skiprows=45, header=None).iloc[:24, 1:183].values.ravel(order='F')]).astype(float)/1000,
+1994 : np.concatenate([pd.read_excel('./2000/GUC00', sheetname='1994', skiprows=7, header=None).iloc[:24, 1:183].values.ravel(order='F'), pd.read_excel('./2000/GUC00', sheetname='1994', skiprows=45, header=None).iloc[:24, 1:183].values.ravel(order='F')]).astype(float)/1000,
+1995 : np.concatenate([pd.read_excel('./2000/GUC00', sheetname='1995', skiprows=7, header=None).iloc[:24, 1:183].values.ravel(order='F'), pd.read_excel('./2000/GUC00', sheetname='1995', skiprows=45, header=None).iloc[:24, 1:183].values.ravel(order='F')]).astype(float)/1000,
+1996 : np.concatenate([pd.read_excel('./2000/GUC00', sheetname='1996', skiprows=7, header=None).iloc[:24, 1:183].values.ravel(order='F'), pd.read_excel('./2000/GUC00', sheetname='1996', skiprows=45, header=None).iloc[:24, 1:183].values.ravel(order='F')]).astype(float)/1000,
+1997 : np.concatenate([pd.read_excel('./2000/GUC00', sheetname='1997', skiprows=7, header=None).iloc[:24, 1:183].values.ravel(order='F'), pd.read_excel('./2000/GUC00', sheetname='1997', skiprows=45, header=None).iloc[:24, 1:183].values.ravel(order='F')]).astype(float)/1000,
+1998 : np.concatenate([pd.read_excel('./2000/GUC00', sheetname='1998', skiprows=7, header=None).iloc[:24, 1:183].values.ravel(order='F'), pd.read_excel('./2000/GUC00', sheetname='1998', skiprows=45, header=None).iloc[:24, 1:183].values.ravel(order='F')]).astype(float)/1000,
+1999 : np.concatenate([pd.read_excel('./2000/GUC00', sheetname='1999', skiprows=7, header=None).iloc[:24, 1:183].values.ravel(order='F'), pd.read_excel('./2000/GUC00', sheetname='1999', skiprows=45, header=None).iloc[:24, 1:183].values.ravel(order='F')]).astype(float)/1000,
+2000 : np.concatenate([pd.read_excel('./2000/GUC00', sheetname='2000', skiprows=7, header=None).iloc[:24, 1:183].values.ravel(order='F'), pd.read_excel('./2000/GUC00', sheetname='2000', skiprows=45, header=None).iloc[:24, 1:183].values.ravel(order='F')]).astype(float)/1000,
+}
+# Get more for GUC if necessary
+
+# LCEC
+
+
