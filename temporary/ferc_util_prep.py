@@ -1207,3 +1207,79 @@ pd.read_csv('./1998/PJM98', sep=' ', skipinitialspace=True, header=None).iloc[:,
 pd.read_excel('./1999/PJM99', header=None)[2].values
 pd.read_excel('./2000/PJM00', header=None)[2].values
 
+###### SERC
+
+# AEC
+
+pd.read_csv('./1993/AEC93', sep=' ', skipinitialspace=True, header=None).iloc[:, 1:].values.ravel()
+pd.read_csv('./1994/AEC94', sep=' ', skipinitialspace=True, header=None, skiprows=6).iloc[:, 1:].values.ravel()
+pd.read_csv('./1995/AEC95', sep=' ', skipinitialspace=True, header=None, skiprows=1).iloc[:, 1:].values.ravel()
+pd.read_csv('./1996/AEC96', sep=' ', skipinitialspace=True, header=None, skiprows=6).iloc[:, 1:].values.ravel()
+pd.read_csv('./1997/AEC97', sep=' ', skipinitialspace=True, header=None, skiprows=6).iloc[:, 1:].values.ravel()
+pd.read_csv('./1998/AEC98', sep=' ', skipinitialspace=True, header=None, skiprows=5).iloc[:, 1:].values.ravel()
+pd.read_csv('./1999/AEC99', sep='\t', skipinitialspace=True, header=None, skiprows=3).iloc[:, 1:].values.ravel()
+pd.read_csv('./2000/AEC00', sep='\t', skipinitialspace=True, header=None, skiprows=5).iloc[:, 1:].values.ravel()
+pd.read_csv('./2001/AEC01', sep='\t', skipinitialspace=True, header=None, skiprows=5).iloc[:, 1:].values.ravel()
+pd.read_csv('./2002/AEC02', sep='\t', skipinitialspace=True, header=None, skiprows=4).iloc[:, 1:].values.ravel()
+pd.read_csv('./2004/AEC04', sep=' ', skipinitialspace=True, header=None, skiprows=4).iloc[:, 1:].values.ravel()
+
+# CPL
+
+pd.read_csv('./1994/CPL94', sep=' ', skipinitialspace=True, header=None).iloc[:, -1].values
+pd.read_csv('./1995/CPL95', sep=' ', skipinitialspace=True, header=None, skiprows=5)[1].values
+pd.DataFrame([i.split() for i in open('./1996/CEPL96').readlines()[1:]])[2].astype(float).values
+pd.DataFrame([i.split() for i in open('./1997/CPL97').readlines()[1:]])[2].astype(float).values
+pd.DataFrame([i.split() for i in open('./1998/CPL98').readlines()[1:]])[2].astype(float).values
+pd.DataFrame([i.split() for i in open('./1999/CPL99').readlines()[1:]])[2].astype(float).values
+pd.read_excel('./2000/CPL00')['Load'].values
+pd.read_excel('./2001/CPL01')['Load'].values
+pd.read_excel('./2002/CPL02')['Load'].values
+pd.read_excel('./2003/CPL03')['Load'].values
+pd.read_excel('./2004/CPL04')['Load'].values
+
+# CEPC
+
+pd.read_fwf('./1993/CEPC93', header=None).iloc[:, 1:-1].values.ravel()
+pd.read_csv('./1994/CEPC94', sep=' ', skipinitialspace=True, header=None, skiprows=1).iloc[:, 1:-1].replace('.', '0').astype(float).values.ravel()
+pd.read_csv('./1995/CEPC95', sep=' ', skipinitialspace=True, header=None).iloc[:, 1:-1].replace('.', '0').astype(float).values.ravel()
+(pd.read_fwf('./1996/CEPC96').iloc[:-1, 1:]/1000).values.ravel()
+(pd.DataFrame([i.split() for i in open('./1997/CEPC97').readlines()[5:]]).iloc[:-1, 1:].astype(float)/1000).values.ravel()
+(pd.DataFrame([i.split() for i in open('./1998/CEPC98').readlines()]).iloc[:, 1:].astype(float)).values.ravel()
+pd.read_excel('./2000/CEPC00', sheetname=1, skiprows=3)['MW'].values
+pd.read_excel('./2001/CEPC01', sheetname=1, skiprows=3)['MW'].values
+pd.read_excel('./2002/CEPC02', sheetname=0, skiprows=5)['MW'].values
+pd.read_excel('./2002/CEPC02', sheetname=0, skiprows=5)['MW'].values
+
+# CEPB
+
+(pd.DataFrame([i.split() for i in open('./1993/CEPB93').readlines()[12:]])[1].astype(float)/1000).values
+(pd.DataFrame([i.split() for i in open('./1994/CEPB94').readlines()[10:]])[1].astype(float)).values
+(pd.DataFrame([i.split() for i in open('./1995/CEPB95').readlines()[6:]])[2].astype(float)).values
+(pd.DataFrame([i.split() for i in open('./1996/CEPB96').readlines()[10:]])[2].astype(float)).values
+(pd.DataFrame([i.split() for i in open('./1997/CEPB97').readlines()[9:]])[2].astype(float)).values
+(pd.DataFrame([i.split() for i in open('./1998/CEPB98').readlines()[9:]])[2].astype(float)).values
+(pd.DataFrame([i.split() for i in open('./1999/CEPB99').readlines()[8:]])[2].astype(float)).values
+(pd.DataFrame([i.split() for i in open('./2000/CEPB00').readlines()[11:]])[2].astype(float)).values
+(pd.DataFrame([i.split() for i in open('./2001/CEPB01').readlines()[8:]])[2].astype(float)).values
+(pd.DataFrame([i.split() for i in open('./2002/CEPB02').readlines()[6:]])[4].astype(float)).values
+(pd.DataFrame([i.split() for i in open('./2003/CEPB03').readlines()[6:]])[2].astype(float)).values
+
+
+# MEMP
+# Bizarre format until 1999
+
+(pd.read_csv('./2000/MEMP00').iloc[:, -1]/1000).values
+(pd.DataFrame([i.split() for i in open('./2001/MEMP01').readlines()[1:]])[3].str.replace(',', '').astype(float)/1000).values
+(pd.read_csv('./2002/MEMP02', sep='\t').iloc[:, -1].str.replace(',', '').astype(float)/1000).values
+pd.read_csv('./2003/MEMP03').iloc[:, -1].str.replace(',', '').astype(float).values
+
+# DUKE
+
+# Go back and get earlier entries if needed
+
+pd.DataFrame([i.split() for i in open('./1999/DUKE99').readlines()[4:]])[2].astype(float).values
+pd.DataFrame([i.split() for i in open('./2000/DUKE00').readlines()[5:]])[2].astype(float).values
+pd.DataFrame([i.split() for i in open('./2001/DUKE01').readlines()[5:]])[2].astype(float).values
+pd.DataFrame([i.split() for i in open('./2002/DUKE02').readlines()[5:]])[2].astype(float).values
+pd.DataFrame([i.split() for i in open('./2003/DUKE03').readlines()[5:-8]])[2].astype(float).values
+pd.DataFrame([i.split() for i in open('./2004/DUKE04').readlines()[5:]])[2].astype(float).values
