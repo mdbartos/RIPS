@@ -1082,6 +1082,18 @@ pd.read_csv('./1997/WPL97', sep=' ', skipinitialspace=True, skiprows=1, header=N
 
 # WPS
 
+pd.read_csv('./1993/WPS93', sep=' ', header=None, skipinitialspace=True, skipfooter=1).values.ravel()
+(pd.read_csv('./1994/WPS94', sep=' ', header=None, skipinitialspace=True, skipfooter=1).iloc[:, 1:-1]/100).values.ravel()
+pd.read_csv('./1995/WPS95', sep=' ', skipinitialspace=True, skiprows=8, header=None, skipfooter=7)[2].values
+pd.read_csv('./1996/WPS96', sep='\t', skiprows=2).loc[:365, '100':'2400'].astype(float).values.ravel()
+pd.read_csv('./1997/WPS97', sep='\s', header=None, skipfooter=1)[2].values
+pd.read_csv('./1998/WPS98', sep='\s', header=None)[2].values
+pd.read_excel('./1999/WPS99', skiprows=8, skipfooter=8, header=None)[1].values
+pd.read_excel('./2000/WPS00', sheetname=1, skiprows=5, skipfooter=8, header=None)[2].values
+pd.read_excel('./2001/WPS01', sheetname=0, skiprows=5, header=None)[2].values
+pd.read_csv('./2002/WPS02', sep='\s', header=None, skiprows=5)[2].values
+pd.read_excel('./2003/WPS03', sheetname=1, skiprows=6, header=None)[2].values
+
 # UPP
 pd.read_csv('./1996/UPP96', header=None, skipfooter=1).iloc[:, -1].values
 pd.read_excel('./2004/UPP04').iloc[:, -1].values
@@ -1194,3 +1206,4 @@ pd.read_excel('./1997/PJM97', sheetname='PJM_LOAD').iloc[:366, 1:25].values.rave
 pd.read_csv('./1998/PJM98', sep=' ', skipinitialspace=True, header=None).iloc[:, 2:].values.ravel()
 pd.read_excel('./1999/PJM99', header=None)[2].values
 pd.read_excel('./2000/PJM00', header=None)[2].values
+
