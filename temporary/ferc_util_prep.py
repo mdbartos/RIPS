@@ -1688,3 +1688,50 @@ pd.DataFrame([i.split() for i in open('./2001/GSEC01').readlines()[1:]])[0].asty
 pd.read_csv('./2002/GSEC02', sep=' ', skipinitialspace=True, skiprows=2, header=None)[5].values
 pd.read_csv('./2003/GSEC03', header=None)[2].values
 (pd.read_csv('./2004/GSEC04', sep=' ', skipinitialspace=True, skiprows=1, header=None)[5]/1000).values
+
+
+###### MAPP
+
+# CIPC
+
+pd.read_fwf('./1998/CIPC98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+
+# CP
+
+pd.read_fwf('./1993/CP93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1994/CP94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1996/CP96', header=None).iloc[:, 2:].values.ravel()
+
+# CBPC
+
+
+pd.read_fwf('./1993/CBPC93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1994/CBPC94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1996/CBPC96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1998/CBPC98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1999/CBPC99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./2002/CB02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+
+# DPC
+
+
+pd.read_fwf('./1993/DPC93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1994/DPC94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_csv('./1996/DPC96', sep='\t', skipinitialspace=True, header=None).iloc[:, 6:].values.ravel()
+
+
+# HUC
+
+
+pd.read_fwf('./1993/HUC93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1994/HUC94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1996/HUC96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1997/HUC97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1998/HUC98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1999/HUC99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./2002/HUC02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./2003/HUC03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+
+# IES
+
+
