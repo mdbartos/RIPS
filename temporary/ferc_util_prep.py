@@ -1735,3 +1735,215 @@ pd.read_fwf('./2003/HUC03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,
 # IES
 
 
+pd.read_fwf('./1993/IESC93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1994/IES94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1996/IESC96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:-1, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1997/IES97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:-1, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1998/IESC98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+
+# IPW
+
+
+pd.read_fwf('./1993/IPW93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1994/IPW94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1995/IPW95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1996/IPW96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1997/IPW97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:-1, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1998/IPW98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+
+# IIGE
+
+
+pd.read_fwf('./1993/IIGE93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1994/IIGE94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1995/IIGE95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+
+# LES
+
+
+pd.read_fwf('./1993/LES93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1994/LES94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_csv('./1995/LES95').iloc[:, 1:].values.ravel()
+pd.read_fwf('./1996/LES96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1997/LES97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1998/LES98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1999/LES99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_excel('./2000/LES00', skipfooter=3).iloc[:, 1:].values.ravel()
+pd.read_excel('./2001/LES01', skipfooter=3).iloc[:, 1:].values.ravel()
+pd.read_fwf('./2002/LES02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./2003/LES03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+
+# MPL
+
+pd.read_fwf('./1995/MPL95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./2000/MPL00', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./2001/MPL01', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+
+# MPC
+
+pd.read_fwf('./1993/MPC93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1994/MPC94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1995/MPC95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1996/MPC96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1997/MPC97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1998/MPC98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1999/MPC99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./2002/MPC02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./2003/MPC03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+
+# MDU
+
+
+pd.read_fwf('./1993/MDU93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1994/MDU94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:-1, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1995/MDU95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1996/MDU96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1997/MDU97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1998/MDU98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1999/MDU99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./2002/MDU02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./2003/MDU03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+
+# MEAN
+
+
+pd.read_fwf('./1993/MEAN93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1995/MEAN95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).dropna().values.ravel()
+pd.read_fwf('./1996/MEAN96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).dropna().values.ravel()
+pd.read_fwf('./1997/MEAN97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).dropna().values.ravel()
+pd.read_fwf('./1998/MEAN98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).dropna().values.ravel()
+pd.read_fwf('./1999/MEAN99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).dropna().values.ravel()
+pd.read_fwf('./2002/MEAN02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./2003/MEAN03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+
+# MPW
+
+pd.read_fwf('./1993/MPW93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1994/MPW94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1995/MPW95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1996/MPW96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1997/MPW97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:-1, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1998/MPW98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1999/MPW99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./2002/MPW02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./2003/MPW03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+
+# NPPD
+
+pd.read_fwf('./1993/NPPD93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1994/NPPD94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1995/NPPD95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=6).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1996/NPPD96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1997/NPPD97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1998/NPPD98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1999/NPPD99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./2000/NPPD00', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=9, skipfooter=1).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./2001/NPPD01', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=9, skipfooter=1).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_csv('./2002/NPPD02', sep='\t', skipinitialspace=True, header=None).iloc[:, 2:].values.ravel()
+pd.read_fwf('./2003/NPPD03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+
+# NSP
+
+
+pd.read_fwf('./1993/NSP93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1994/NSP94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1996/NSP96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1997/NSP97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1998/NSP98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1999/NSP99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_csv('./2000/NSP00', sep='\t', skipinitialspace=True, skiprows=2, header=None, skipfooter=1)[2].values
+
+# NWPS
+
+pd.read_fwf('./1993/NWPS93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+#pd.read_fwf('./1994/NWPS94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./1995/NWPS95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1996/NWPS96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1997/NWPS97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1998/NWPS98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1999/NWPS99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./2002/NWPS02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./2003/NWPS03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+
+# OPPD
+
+pd.read_fwf('./1993/OPPD93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1994/OPPD94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_csv('./1995/OPPD95', sep='\t', skipinitialspace=True, header=None).iloc[:, 7:].values.ravel()
+pd.read_fwf('./1996/OPPD96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1997/OPPD97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1998/OPPD98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1999/OPPD99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./2002/OPPD02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+pd.read_fwf('./2003/OPPD03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+
+# OTP
+
+pd.read_fwf('./1993/OTP93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1994/OTP94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_csv('./1995/OTP95', header=None).iloc[:, -2].values.ravel()
+pd.read_fwf('./1996/OTP96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1997/OTP97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1998/OTP98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1999/OTP99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./2000/OTP00', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skiprows=2).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./2002/OTP02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+pd.read_fwf('./2003/OTP03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+
+# RPU
+
+pd.read_fwf('./1993/SMMP93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+pd.read_fwf('./1994/SMP94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1996/SMMP96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1997/SMMP97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1998/SMMP98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1999/SMMPA99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_csv('./2000/SMMP00').iloc[:-1, 3].values
+pd.read_csv('./2001/SMMP01', header=None).iloc[:, 2].values
+pd.read_fwf('./2002/SMMPA02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+pd.read_fwf('./2003/SMMPA03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+
+# UPA
+
+
+pd.read_fwf('./1993/UPA93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+pd.read_fwf('./1994/UPA94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+pd.read_fwf('./1996/UPA96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+pd.read_fwf('./1997/UPA97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+pd.read_fwf('./1998/UPA98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+
+# WPPI
+
+
+pd.read_fwf('./1993/WPPI93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+pd.read_fwf('./1994/WPPI94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+pd.read_fwf('./1996/WPPI96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_csv('./1997/WPPI97', sep=' ', skipinitialspace=True, header=None).iloc[:, 2:-1].values.ravel()
+pd.read_fwf('./1998/WPPI98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1999/WPPI99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./2002/WPPI02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+pd.read_fwf('./2003/WPPI03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+
+# MEC
+
+pd.read_fwf('./1995/MEC95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1996/MEC96', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1997/MEC97', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+pd.read_fwf('./1998/MEC98', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1999/MEC99', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./2000/MEC00', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./2002/MEC02', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+pd.read_fwf('./2003/MEC_ALL03', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
+
+# CP/A
+
+pd.read_fwf('./1993/CP93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1994/CP94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1996/CP96', header=None).iloc[:, 2:].values.ravel()
+
+# MWPS/MPSI
+
+pd.read_fwf('./1993/MPSI93', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1994/MPSI94', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+pd.read_fwf('./1995/MPSI95', widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
+
