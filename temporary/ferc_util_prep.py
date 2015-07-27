@@ -1,18 +1,19 @@
 import numpy as np
 import pandas as pd
 import os
+import datetime
 
 homedir = os.path.expanduser('~')
 datadir = 'github/RIPS_kircheis/data/eia_form_714/processed/'
 fulldir = homedir + '/' + datadir
 
-li = []
+# li = []
 
-for d1 in os.listdir('.'):
-    for fn in os.listdir('./%s' % d1):
-        li.append(fn)
+# for d1 in os.listdir('.'):
+#     for fn in os.listdir('./%s' % d1):
+#         li.append(fn)
 
-dir_u = pd.Series(li).str[:-2].order().unique()
+# dir_u = pd.Series(li).str[:-2].order().unique()
 
 ###### NPCC
 # BECO: 1998
@@ -202,17 +203,17 @@ npcc = {
             2003 : pd.read_excel('%s/npcc/2003/NU03' % (fulldir), skipfooter=1).iloc[:, -1].values 
     },
     15296 : {
-        1993 : pd.read_csv('%s/npcc/1993/NYPA93' % (fulldir), engine='python', header=None).values,
-        1994 : pd.read_csv('%s/npcc/1994/NYPA94' % (fulldir), engine='python', header=None).values,
-        1995 : pd.read_csv('%s/npcc/1995/NYPA95' % (fulldir), engine='python', header=None).values,
-        1996 : pd.read_csv('%s/npcc/1996/NYPA96' % (fulldir), engine='python', header=None).values,
-        1997 : pd.read_csv('%s/npcc/1997/NYPA97' % (fulldir), engine='python', header=None).values,
-        1998 : pd.read_csv('%s/npcc/1998/NYPA98' % (fulldir), engine='python', header=None).values,
-        1999 : pd.read_excel('%s/npcc/1999/NYPA99' % (fulldir), header=None).values,
-        2000 : pd.read_csv('%s/npcc/2000/NYPA00' % (fulldir), engine='python', header=None).values,
-        2001 : pd.read_csv('%s/npcc/2001/NYPA01' % (fulldir), engine='python', header=None).values,
-        2002 : pd.read_csv('%s/npcc/2002/NYPA02' % (fulldir), engine='python', header=None).values,
-        2003 : pd.read_csv('%s/npcc/2003/NYPA03' % (fulldir), engine='python', header=None).values
+        1993 : pd.read_csv('%s/npcc/1993/NYPA93' % (fulldir), engine='python', header=None).values.ravel(),
+        1994 : pd.read_csv('%s/npcc/1994/NYPA94' % (fulldir), engine='python', header=None).values.ravel(),
+        1995 : pd.read_csv('%s/npcc/1995/NYPA95' % (fulldir), engine='python', header=None).values.ravel(),
+        1996 : pd.read_csv('%s/npcc/1996/NYPA96' % (fulldir), engine='python', header=None).values.ravel(),
+        1997 : pd.read_csv('%s/npcc/1997/NYPA97' % (fulldir), engine='python', header=None).values.ravel(),
+        1998 : pd.read_csv('%s/npcc/1998/NYPA98' % (fulldir), engine='python', header=None).values.ravel(),
+        1999 : pd.read_excel('%s/npcc/1999/NYPA99' % (fulldir), header=None).values.ravel(),
+        2000 : pd.read_csv('%s/npcc/2000/NYPA00' % (fulldir), engine='python', header=None).values.ravel(),
+        2001 : pd.read_csv('%s/npcc/2001/NYPA01' % (fulldir), engine='python', header=None).values.ravel(),
+        2002 : pd.read_csv('%s/npcc/2002/NYPA02' % (fulldir), engine='python', header=None).values.ravel(),
+        2003 : pd.read_csv('%s/npcc/2003/NYPA03' % (fulldir), engine='python', header=None).values.ravel()
     },
     13501 : {
             1993 : pd.read_fwf('%s/npcc/1993/NYPP93' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
@@ -255,13 +256,18 @@ npcc = {
         1997 : pd.read_fwf('%s/npcc/1997/UI97' % (fulldir), header=None, skipfooter=1).iloc[:, 1:].values.ravel(),
         1998 : pd.read_excel('%s/npcc/1998/UI98' % (fulldir))['MW'].values,
         1999 : pd.read_excel('%s/npcc/1999/UI99' % (fulldir)).loc[:, 'HR1':'HR24'].values.ravel(),
-        2001 : pd.read_excel('%s/npcc/2001/UI01' % (fulldir), sheetname=0).ix[:-2, 'HR1':'HR24'],
-        2002 : pd.read_excel('%s/npcc/2002/UI02' % (fulldir), sheetname=0).ix[:-2, 'HR1':'HR24'],
-        2003 : pd.read_excel('%s/npcc/2003/UI03' % (fulldir), sheetname=0, skipfooter=2).ix[:, 'HR1':'HR24'],
-        2004 : pd.read_excel('%s/npcc/2004/UI04' % (fulldir), sheetname=0, skipfooter=1).ix[:, 'HR1':'HR24']
+        2001 : pd.read_excel('%s/npcc/2001/UI01' % (fulldir), sheetname=0).ix[:-2, 'HR1':'HR24'].values.ravel(),
+        2002 : pd.read_excel('%s/npcc/2002/UI02' % (fulldir), sheetname=0).ix[:-2, 'HR1':'HR24'].values.ravel(),
+        2003 : pd.read_excel('%s/npcc/2003/UI03' % (fulldir), sheetname=0, skipfooter=2).ix[:, 'HR1':'HR24'].values.ravel(),
+        2004 : pd.read_excel('%s/npcc/2004/UI04' % (fulldir), sheetname=0, skipfooter=1).ix[:, 'HR1':'HR24'].values.ravel()
     }
 }
 npcc[4226][1995] = pd.concat([npcc[4226][1995][2].dropna(), npcc[4226][1995][6]]).values.ravel()
+
+for k in npcc.keys():
+    print k
+    s = pd.DataFrame(pd.concat([pd.Series(npcc[k][i], index=pd.date_range(start=datetime.date(i, 1, 1), freq='h', periods=len(npcc[k][i]))) for i in npcc[k].keys()]).sort_index(), columns=['load'])
+    s.to_csv('./npcc/%s.csv' % k)
 
 ###### ERCOT
 # AUST: 1015
@@ -353,7 +359,7 @@ ercot = {
         1998 : (pd.read_excel('%s/ercot/1998/FERC714.xls' % (fulldir), skiprows=3)['TUEC'].loc[2:].astype(int)/1000).values
     },
     18715 : {
-        1993 : pd.read_fwf('%s/ercot/1993/TMPP93' % (fulldir), skiprows=6, header=None).dropna(how='all'),
+        1993 : pd.read_csv('%s/ercot/1993/TMPP93' % (fulldir), skiprows=7, header=None, sep=' ', skipinitialspace=True).iloc[:, 3:].values.ravel(),
         1995 : pd.read_fwf('%s/ercot/1995/TMPP95' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel(),
         1997 : pd.read_fwf('%s/ercot/1997/TMPP97' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel(),
         1999 : (pd.read_excel('%s/ercot/1999/ERCOT99HRLD060800.xls' % (fulldir), skiprows=14)['TMPP'].astype(float)/1000).values,
@@ -374,6 +380,11 @@ ercot = {
         1998 : (pd.read_excel('%s/ercot/1998/FERC714.xls' % (fulldir), skiprows=3)['WTUC'].loc[2:].astype(int)/1000).values
     }
 }
+
+for k in ercot.keys():
+    print k
+    s = pd.DataFrame(pd.concat([pd.Series(ercot[k][i], index=pd.date_range(start=datetime.date(i, 1, 1), freq='h', periods=len(ercot[k][i]))) for i in ercot[k].keys()]).sort_index(), columns=['load'])
+    s.to_csv('./ercot/%s.csv' % k)
 
 ###### FRCC
 # GAIN: 6909
@@ -428,7 +439,7 @@ frcc = {
     6455 : {
         1993 : pd.read_csv('%s/frcc/1993/FPC93' % (fulldir), sep=' ', skipinitialspace=True, header=None)[1].values,
         1994 : pd.read_csv('%s/frcc/1994/FPC94' % (fulldir), sep=' ', skipinitialspace=True, header=None).iloc[:, 2:].values.ravel(),
-        1995 : pd.read_csv('%s/frcc/1995/FPC95' % (fulldir), engine='python', header=None).values,
+        1995 : pd.read_csv('%s/frcc/1995/FPC95' % (fulldir), engine='python', header=None)[0].values,
         1996 : pd.read_excel('%s/frcc/1996/FPC96' % (fulldir), header=None, skiprows=2, skipfooter=1).iloc[:, 6:].values.ravel(),
         1998 : pd.read_excel('%s/frcc/1998/FPC98' % (fulldir), header=None, skiprows=5).iloc[:, 7:].values.ravel(),
         1999 : pd.read_excel('%s/frcc/1999/FPC99' % (fulldir), header=None, skiprows=4).iloc[:, 7:].values.ravel(),
@@ -494,6 +505,11 @@ frcc = {
         2003 : pd.read_csv('%s/frcc/2003/TECO03' % (fulldir), skiprows=2, header=None, sep=' ', skipinitialspace=True).iloc[:, 2:].values.ravel()
     }
 }
+
+for k in frcc.keys():
+    print k
+    s = pd.DataFrame(pd.concat([pd.Series(frcc[k][i], index=pd.date_range(start=datetime.date(i, 1, 1), freq='h', periods=len(frcc[k][i]))) for i in frcc[k].keys()]).sort_index(), columns=['load'])
+    s.to_csv('./frcc/%s.csv' % k)
 
 ###### ECAR
 # AEP: 829
@@ -768,7 +784,7 @@ ecar = {
         2003 : pd.read_fwf('%s/ecar/2003/CIN03' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         2004 : pd.read_fwf('%s/ecar/2004/CIN04' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
     },
-    'FE' : {
+    'fe' : {
         1997 : pd.read_fwf('%s/ecar/1997/FE97' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         1998 : pd.read_fwf('%s/ecar/1998/FE98' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         1999 : pd.read_fwf('%s/ecar/1999/FE99' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
@@ -778,7 +794,7 @@ ecar = {
         2003 : pd.read_fwf('%s/ecar/2003/FE03' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         2004 : pd.read_fwf('%s/ecar/2004/FE04' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
     },
-    'MCCP' : {
+    'mccp' : {
         1993 : pd.read_fwf('%s/ecar/1993/MCCP93' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         1996 : pd.read_fwf('%s/ecar/1996/MCCP96' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         1997 : pd.read_fwf('%s/ecar/1997/MCCP97' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
@@ -789,6 +805,11 @@ ecar = {
         2004 : pd.read_fwf('%s/ecar/2004/MCCP04' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
     }
 }
+
+for k in ecar.keys():
+    print k
+    s = pd.DataFrame(pd.concat([pd.Series(ecar[k][i], index=pd.date_range(start=datetime.date(i, 1, 1), freq='h', periods=len(ecar[k][i]))) for i in ecar[k].keys()]).sort_index(), columns=['load'])
+    s.to_csv('./ecar/%s.csv' % k)
 
 ###### MAIN
 # CECO : 4110
@@ -957,6 +978,11 @@ main = {
     }
 }
 
+for k in main.keys():
+    print k
+    s = pd.DataFrame(pd.concat([pd.Series(main[k][i], index=pd.date_range(start=datetime.date(i, 1, 1), freq='h', periods=len(main[k][i]))) for i in main[k].keys()]).sort_index(), columns=['load'])
+    s.to_csv('./main/%s.csv' % k)
+
 # EEI
 # Bizarre formatting until 1998
 
@@ -1042,6 +1068,11 @@ maac = {
             2000 : pd.read_excel('%s/maac/2000/PJM00' % (fulldir), header=None)[2].values
     }
 }
+
+for k in maac.keys():
+    print k
+    s = pd.DataFrame(pd.concat([pd.Series(maac[k][i], index=pd.date_range(start=datetime.date(i, 1, 1), freq='h', periods=len(maac[k][i]))) for i in maac[k].keys()]).sort_index(), columns=['load'])
+    s.to_csv('./maac/%s.csv' % k)
 
 ###### SERC
 # AEC: 189
@@ -1239,7 +1270,7 @@ serc = {
         1995 : (pd.read_csv('%s/serc/1995/WEMC95' % (fulldir), skiprows=1, header=None, sep=' ', skipinitialspace=True)[3]/1000).values,
         1996 : (pd.read_excel('%s/serc/1996/WEMC96' % (fulldir))['Load']/1000).values,
         1997 : pd.read_excel('%s/serc/1997/WEMC97' % (fulldir), skiprows=4)['MW'].values,
-        1998 : pd.concat([pd.read_excel('%s/serc/1998/WEMC98' % (fulldir), sheetname=i).iloc[:, -1] for i in range(12)]),
+        1998 : pd.concat([pd.read_excel('%s/serc/1998/WEMC98' % (fulldir), sheetname=i).iloc[:, -1] for i in range(12)]).values,
         1999 : pd.read_excel('%s/serc/1999/WEMC99' % (fulldir))['mwh'].values,
         2000 : (pd.read_excel('%s/serc/2000/WEMC00' % (fulldir)).iloc[:, -1]/1000).values,
         2001 : (pd.read_excel('%s/serc/2001/WEMC01' % (fulldir), header=None)[0]/1000).values
@@ -1327,6 +1358,11 @@ serc = {
         2004 : pd.read_excel('%s/serc/2004/SOCO04' % (fulldir), skiprows=1).iloc[:, 5].values
     }
 }
+
+for k in serc.keys():
+    print k
+    s = pd.DataFrame(pd.concat([pd.Series(serc[k][i], index=pd.date_range(start=datetime.date(i, 1, 1), freq='h', periods=len(serc[k][i]))) for i in serc[k].keys()]).sort_index(), columns=['load'])
+    s.to_csv('./serc/%s.csv' % k)
 
 ###### SPP
 # AECC: 807
@@ -1498,6 +1534,11 @@ spp = {
         2004 : (pd.read_csv('%s/spp/2004/GSEC04' % (fulldir), sep=' ', skipinitialspace=True, skiprows=1, header=None)[5]/1000).values
     }
 }
+
+for k in spp.keys():
+    print k
+    s = pd.DataFrame(pd.concat([pd.Series(spp[k][i], index=pd.date_range(start=datetime.date(i, 1, 1), freq='h', periods=len(spp[k][i]))) for i in spp[k].keys()]).sort_index(), columns=['load'])
+    s.to_csv('./spp/%s.csv' % k)
 
 ###### MAPP
 # CIPC: 3258
@@ -1744,3 +1785,8 @@ mapp = {
         1995 : pd.read_fwf('%s/mapp/1995/MPSI95' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel()
     }
 }
+
+for k in mapp.keys():
+    print k
+    s = pd.DataFrame(pd.concat([pd.Series(mapp[k][i], index=pd.date_range(start=datetime.date(i, 1, 1), freq='h', periods=len(mapp[k][i]))) for i in mapp[k].keys()]).sort_index(), columns=['load'])
+    s.to_csv('./mapp/%s.csv' % k)
