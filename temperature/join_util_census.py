@@ -975,19 +975,20 @@ dem_ua = pd.concat([dem_ua, multi_d['FMPA']['ua']])
 
 ###### ERCOT
 # NTEC
-multi_d['NTEC']['UNIQUE_ID'] = 9910
-multi_d['NTEC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Northeast Texas')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
-multi_d['NTEC']['census'].index = np.repeat(multi_d['NTEC']['company_id'], len(multi_d['NTEC']['census']))
-multi_d['NTEC']['census']['UNIQUE_ID'] = multi_d['NTEC']['UNIQUE_ID']
-multi_d['NTEC']['geom'] = utility[utility['PLAN_AREA'].str.contains('Northeast Texas')].unary_union
-multi_d['NTEC']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Northeast Texas')]['UNIQUE_ID'].unique().tolist()
+# No census tracts??
+# multi_d['NTEC']['UNIQUE_ID'] = 9910
+# multi_d['NTEC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Northeast Texas')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+# multi_d['NTEC']['census'].index = np.repeat(multi_d['NTEC']['company_id'], len(multi_d['NTEC']['census']))
+# multi_d['NTEC']['census']['UNIQUE_ID'] = multi_d['NTEC']['UNIQUE_ID']
+# multi_d['NTEC']['geom'] = utility[utility['PLAN_AREA'].str.contains('Northeast Texas')].unary_union
+# multi_d['NTEC']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Northeast Texas')]['UNIQUE_ID'].unique().tolist()
 
-util_to_eia.loc[multi_d['NTEC']['UNIQUE_ID']] = [100, multi_d['NTEC']['company_id'], 'Mass Muni Wholesale', 'Mass Muni Wholesale']
-util_to_c = pd.concat([util_to_c, multi_d['NTEC']['census']])
-multi_d['NTEC']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['NTEC']['comp_UID'])].drop_duplicates(subset=['UACE10'])
-multi_d['NTEC']['ua']['UNIQUE_ID'] = multi_d['NTEC']['UNIQUE_ID'] 
-multi_d['NTEC']['ua']['eia_code'] = multi_d['NTEC']['company_id'] 
-dem_ua = pd.concat([dem_ua, multi_d['NTEC']['ua']])
+# util_to_eia.loc[multi_d['NTEC']['UNIQUE_ID']] = [100, multi_d['NTEC']['company_id'], 'Mass Muni Wholesale', 'Mass Muni Wholesale']
+# util_to_c = pd.concat([util_to_c, multi_d['NTEC']['census']])
+# multi_d['NTEC']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['NTEC']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+# multi_d['NTEC']['ua']['UNIQUE_ID'] = multi_d['NTEC']['UNIQUE_ID'] 
+# multi_d['NTEC']['ua']['eia_code'] = multi_d['NTEC']['company_id'] 
+# dem_ua = pd.concat([dem_ua, multi_d['NTEC']['ua']])
 
 # SRGT
 multi_d['SRGT']['UNIQUE_ID'] = 9929
