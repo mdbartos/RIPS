@@ -315,7 +315,7 @@ multi_d = {
         'NTEC' : {'company_id' : 13670, 'UNIQUE_ID' : None, 'geom' : None},
         'SRGT' : {'company_id' : 40233, 'UNIQUE_ID' : None, 'geom' : None},
         'TXLA' : {'company_id' : 18679, 'UNIQUE_ID' : None, 'geom' : None},
-        'MPC' : {'company_id' : 12658, 'UNIQUE_ID' : None, 'geom' : None},
+        'MPC' : {'company_id' : 12658, 'UNIQUE_ID' : None, 'geom' : None}
         }
 
 
