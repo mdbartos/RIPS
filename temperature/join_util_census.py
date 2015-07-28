@@ -133,41 +133,37 @@ util_to_eia.loc[2298, 'company_id'] = 15500    #Puget Sound
 # NPCC
 util_to_eia.loc[2183, 'company_id'] = 2886     #Cambridge (CELC)
 util_to_eia.loc[2739, 'company_id'] = 4089     #Commonwealth Edison (COEL) ##DOUBLECHECK
-#util_to_eia.loc[ , 'company_id'] = 15296     #New York Power Authority
-#util_to_eia.loc[ , 'company_id'] = 1998     #Boston Edison Co
 util_to_eia.loc[1586, 'company_id'] = 11172     #Long Island Light (LILC)
-#util_to_eia.loc[ , 'company_id'] = 13556     #Northeast Utilities (Renamed to Eversource)
+util_to_eia.loc[2727, 'company_id'] = 7601     # Green Mountain Power
+#util_to_eia.loc[ , 'company_id'] = 15296     #New York Power Authority
+util_to_eia.loc[3084, 'company_id'] = 1998     #Boston Edison Co  #Part of NSTAR
 #util_to_eia.loc[ , 'company_id'] = 5618     #Eastern Utilities
 #util_to_eia.loc[ , 'company_id'] = 13433     #New England Electric Co
 #util_to_eia.loc[2723 , 'company_id'] = 3292     #Central Vermont Public Service (CVPS)
-util_to_eia.loc[2727, 'company_id'] = 7601     # Green Mountain Power
 
 # SERC
 #util_to_eia.loc[, 'company_id'] = 13204     #Nantahala Power and Light
 
 # ECAR
-#util_to_eia.loc[, 'company_id'] =      #
-#util_to_eia.loc[, 'company_id'] = 5109     #Detroit Edison Co
-#util_to_eia.loc[, 'company_id'] = 3260     #CINERGY (NOW PART OF DUKE) # POSSIBLY UID 2683
+util_to_eia.loc[2348, 'company_id'] = 5109     #Detroit Edison Co #DTE Energy Co
+util_to_eia.loc[2683, 'company_id'] = 3260     #CINERGY (NOW PART OF DUKE) # POSSIBLY UID 2683, Duke Energy Ohio
 #util_to_eia.loc[, 'company_id'] = 14015     #Ohio Valley Elec. Coop
 #util_to_eia.loc[, 'company_id'] = 538     #Allegheny (Now part of FirstEnergy)
 #util_to_eia.loc[, 'company_id'] = 9267     #Hoosier Energy REC
-#util_to_eia.loc[, 'company_id'] =      #FirstEnergy
 #util_to_eia.loc[, 'company_id'] =      #Municipal Coop Coord Pool
 
 # MAIN
-#util_to_eia.loc[, 'company_id'] = 3253     #Central Illinois Pub Serv # Now part of AMEREN #Prob 3105
-#util_to_eia.loc[, 'company_id'] = 20858     #Wisconsin Public Power
-#util_to_eia.loc[, 'company_id'] = 3252     #Central Illinois Light Co # Also part of AMEREN
 util_to_eia.loc[2667, 'company_id'] = 17632     #Southern Illinois Power Coop
+#util_to_eia.loc[, 'company_id'] = 3253     #Central Illinois Pub Serv # Now part of AMEREN #Prob 3105
+#util_to_eia.loc[, 'company_id'] = 3252     #Central Illinois Light Co # Also part of AMEREN
 #util_to_eia.loc[, 'company_id'] = 9208     #Illinois Power Co # Also part of AMEREN
 
 # SPP
 util_to_eia.loc[933, 'company_id'] = 20391     #Westplains Energy - Kansas
+util_to_eia.loc[3095, 'company_id'] = 7806     #Gulf State Utilities # Now ENTERGY Gulf States # May want to get all in TX and LA
 #util_to_eia.loc[, 'company_id'] = 807     #Arkansas Electric Coop # Members here: http://www.aecc.com/distribution-cooperatives
 #util_to_eia.loc[, 'company_id'] = 40233     #Sam Rayburn
 #util_to_eia.loc[, 'company_id'] = 12699     #Missouri Public Service # Now Part of Aquila/Black Hills
-util_to_eia.loc[3095, 'company_id'] = 7806     #Gulf State Utilities # Now ENTERGY Gulf States # May want to get all in TX and LA
 
 #ERCOT
 util_to_eia.loc[795, 'company_id'] = 8901     #Houston Lighting And Power #Probably 795
@@ -178,6 +174,21 @@ util_to_eia.loc[3108, 'company_id'] = 3278     #Central Power and Light #Probabl
 #util_to_eia.loc[, 'company_id'] = 44372    #Texas Utilities Elec # TXU
 #util_to_eia.loc[, 'company_id'] = 17583    #South Texas Electric Coop # Possibly 272
 
+#MAPP
+util_to_eia.loc[1695, 'company_id'] = 9435     #MidAmerican Energy Co
+util_to_eia.loc[1608, 'company_id'] = 4363     #Corn Belt Power Cooperative
+#util_to_eia.loc[, 'company_id'] = 9219     #IES Industries #Interstate Power and Light
+#util_to_eia.loc[, 'company_id'] = 4716     #Dairyland Power Coop
+#util_to_eia.loc[, 'company_id'] = 4322     #Cooperative Power Assoc #Part of Great River
+#util_to_eia.loc[, 'company_id'] = 21352     #Municipal Energy Agency NE
+#util_to_eia.loc[, 'company_id'] = 9438     #Iowa-Illinois Gas and Electric
+#util_to_eia.loc[, 'company_id'] = 40580     #Southern Minnesota Municipal PA #Could be Minn. Muni. Power Agency
+#util_to_eia.loc[, 'company_id'] = 13809     #Northwestern Public Service #Probably part of Norhwestern Energy
+#util_to_eia.loc[, 'company_id'] = 23333     #Midwest Power Systems Inc
+#util_to_eia.loc[, 'company_id'] = 12819     #Montana-Dakota Utilities
+#util_to_eia.loc[, 'company_id'] = 19514     #United Power Association #Part of "Great River"
+#util_to_eia.loc[, 'company_id'] = 3258     #Central Iowa Power Coop
+#util_to_eia.loc[, 'company_id'] = 9392     #Interstate Power Company
 
 ####
 
@@ -212,14 +223,21 @@ multi_d = {
         'WALC' : {'company_id' : 19610, 'UNIQUE_ID' : None, 'geom' : None},
         'WACM' : {'company_id' : 28503, 'UNIQUE_ID' : None, 'geom' : None},
         'TSGTCW' : {'company_id' : 99998, 'UNIQUE_ID' : None, 'geom' : None},
-        'TSGTNM' : {'company_id' : 99997, 'UNIQUE_ID' : None, 'geom' : None}
+        'TSGTNM' : {'company_id' : 99997, 'UNIQUE_ID' : None, 'geom' : None},
+        'MMWE' : {'company_id' : 11806, 'UNIQUE_ID' : None, 'geom' : None},
+        'NEPOOL' : {'company_id' : 13435, 'UNIQUE_ID' : None, 'geom' : None},
+        'NYISO' : {'company_id' : 13501, 'UNIQUE_ID' : None, 'geom' : None},
+        'NU' : {'company_id' : 13556, 'UNIQUE_ID' : None, 'geom' : None},
+        'SOCO' : {'company_id' : 18195, 'UNIQUE_ID' : None, 'geom' : None},
+        'OTP' : {'company_id' : 13994, 'UNIQUE_ID' : None, 'geom' : None},
         }
 
 #TODO
 # NPCC
-#util_to_eia.loc[, 'company_id'] = 11806     #Mass. Muni Wholesale # Contains Multiple
-#util_to_eia.loc[ , 'company_id'] = 13435     #New England Power Pool/NE ISO
-#util_to_eia.loc[ , 'company_id'] = 13501     #New York Power Pool/NY ISO
+#util_to_eia.loc[, 'company_id'] = 11806     #Mass. Muni Wholesale # Contains Multiple *
+#util_to_eia.loc[ , 'company_id'] = 13435     #New England Power Pool/NE ISO *
+#util_to_eia.loc[ , 'company_id'] = 13501     #New York Power Pool/NY ISO *
+#util_to_eia.loc[ , 'company_id'] = 13556     #Northeast Utilities # (HOLD_CO) 
 
 #SERC
 #util_to_eia.loc[, 'company_id'] = 18195     #Southern Company (CTRL_AREA)
@@ -238,6 +256,10 @@ multi_d = {
 #util_to_eia.loc[, 'company_id'] = 40577     #American Municipal Power OH
 #util_to_eia.loc[, 'company_id'] = 1692     #Big Rivers Electric Corp: Members are Jackson Purchase Energy Corporation, Kenergy Corporation, and Meade County Rural Electric Cooperative Corporation.
 #util_to_eia.loc[, 'company_id'] = 829     #American Electric Power
+#util_to_eia.loc[, 'company_id'] =      #FirstEnergy (HOLD_CO)
+
+#MAIN
+#util_to_eia.loc[, 'company_id'] = 20858     #Wisconsin Public Power #WPPI Energy (PLAN_AREA)
 
 #MAAC
 #util_to_eia.loc[, 'company_id'] = 14725     #PJM
@@ -261,8 +283,12 @@ multi_d = {
 #util_to_eia.loc[, 'company_id'] = 40233     #Sam Rayburn
 #util_to_eia.loc[, 'company_id'] = 18679    #Tex La Elec Coop
 
+#MAPP
+#util_to_eia.loc[, 'company_id'] = 12658     #Minnkota Power Coop Inc
+#util_to_eia.loc[, 'company_id'] = 20858     #Wisconsin Public Power Inc # Also in MAIN
 #TODO
 
+###### WECC
 # AEPC
 
 multi_d['AEPC']['UNIQUE_ID'] = 9990
@@ -455,8 +481,105 @@ dem_ua = pd.concat([dem_ua, multi_d['TSGTNM']['ua']])
 # multi_d['SPP']['geom'] = utility[utility['CTRL_AREA'].str.contains('Sierra Pacific')].unary_union
 # multi_d['SPP']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('Sierra Pacific')]['UNIQUE_ID'].unique().tolist()
 
+###### NPCC
+# MMWE 
+
+multi_d['MMWE']['UNIQUE_ID'] = 9998
+multi_d['MMWE']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Massachusetts Municipal')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+multi_d['MMWE']['census'].index = np.repeat(multi_d['MMWE']['company_id'], len(multi_d['MMWE']['census']))
+multi_d['MMWE']['census']['UNIQUE_ID'] = multi_d['MMWE']['UNIQUE_ID']
+multi_d['MMWE']['geom'] = utility[utility['PLAN_AREA'].str.contains('Massachusetts Municipal')].unary_union
+multi_d['MMWE']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Massachusetts Municipal')]['UNIQUE_ID'].unique().tolist()
+
+util_to_eia.loc[multi_d['MMWE']['UNIQUE_ID']] = [100, multi_d['MMWE']['company_id'], 'Mass Muni Wholesale', 'Mass Muni Wholesale']
+util_to_c = pd.concat([util_to_c, multi_d['MMWE']['census']])
+multi_d['MMWE']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['MMWE']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['MMWE']['ua']['UNIQUE_ID'] = multi_d['MMWE']['UNIQUE_ID'] 
+multi_d['MMWE']['ua']['eia_code'] = multi_d['MMWE']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['MMWE']['ua']])
+
+# NEPOOL 
+
+multi_d['NEPOOL']['UNIQUE_ID'] = 9999
+multi_d['NEPOOL']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('New England ISO')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+multi_d['NEPOOL']['census'].index = np.repeat(multi_d['NEPOOL']['company_id'], len(multi_d['NEPOOL']['census']))
+multi_d['NEPOOL']['census']['UNIQUE_ID'] = multi_d['NEPOOL']['UNIQUE_ID']
+multi_d['NEPOOL']['geom'] = utility[utility['PLAN_AREA'].str.contains('New England ISO')].unary_union
+multi_d['NEPOOL']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('New England ISO')]['UNIQUE_ID'].unique().tolist()
+
+util_to_eia.loc[multi_d['NEPOOL']['UNIQUE_ID']] = [100, multi_d['NEPOOL']['company_id'], 'Mass Muni Wholesale', 'Mass Muni Wholesale']
+util_to_c = pd.concat([util_to_c, multi_d['NEPOOL']['census']])
+multi_d['NEPOOL']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['NEPOOL']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['NEPOOL']['ua']['UNIQUE_ID'] = multi_d['NEPOOL']['UNIQUE_ID'] 
+multi_d['NEPOOL']['ua']['eia_code'] = multi_d['NEPOOL']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['NEPOOL']['ua']])
+
+# NYISO 
+
+multi_d['NYISO']['UNIQUE_ID'] = 9909
+multi_d['NYISO']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('New York ISO')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+multi_d['NYISO']['census'].index = np.repeat(multi_d['NYISO']['company_id'], len(multi_d['NYISO']['census']))
+multi_d['NYISO']['census']['UNIQUE_ID'] = multi_d['NYISO']['UNIQUE_ID']
+multi_d['NYISO']['geom'] = utility[utility['CTRL_AREA'].str.contains('New York ISO')].unary_union
+multi_d['NYISO']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('New York ISO')]['UNIQUE_ID'].unique().tolist()
+
+util_to_eia.loc[multi_d['NYISO']['UNIQUE_ID']] = [100, multi_d['NYISO']['company_id'], 'Mass Muni Wholesale', 'Mass Muni Wholesale']
+util_to_c = pd.concat([util_to_c, multi_d['NYISO']['census']])
+multi_d['NYISO']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['NYISO']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['NYISO']['ua']['UNIQUE_ID'] = multi_d['NYISO']['UNIQUE_ID'] 
+multi_d['NYISO']['ua']['eia_code'] = multi_d['NYISO']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['NYISO']['ua']])
+
+# NU 
+
+multi_d['NU']['UNIQUE_ID'] = 9919
+multi_d['NU']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['HOLD_CO'].str.contains('Northeast Util')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+multi_d['NU']['census'].index = np.repeat(multi_d['NU']['company_id'], len(multi_d['NU']['census']))
+multi_d['NU']['census']['UNIQUE_ID'] = multi_d['NU']['UNIQUE_ID']
+multi_d['NU']['geom'] = utility[utility['HOLD_CO'].str.contains('Northeast Util')].unary_union
+multi_d['NU']['comp_UID'] = utility[utility['HOLD_CO'].str.contains('Northeast Util')]['UNIQUE_ID'].unique().tolist()
+
+util_to_eia.loc[multi_d['NU']['UNIQUE_ID']] = [100, multi_d['NU']['company_id'], 'Mass Muni Wholesale', 'Mass Muni Wholesale']
+util_to_c = pd.concat([util_to_c, multi_d['NU']['census']])
+multi_d['NU']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['NU']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['NU']['ua']['UNIQUE_ID'] = multi_d['NU']['UNIQUE_ID'] 
+multi_d['NU']['ua']['eia_code'] = multi_d['NU']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['NU']['ua']])
+
+###### SERC
+
+# SOCO
+multi_d['SOCO']['UNIQUE_ID'] = 9929
+multi_d['SOCO']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('Southern Co')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+multi_d['SOCO']['census'].index = np.repeat(multi_d['SOCO']['company_id'], len(multi_d['SOCO']['census']))
+multi_d['SOCO']['census']['UNIQUE_ID'] = multi_d['SOCO']['UNIQUE_ID']
+multi_d['SOCO']['geom'] = utility[utility['CTRL_AREA'].str.contains('Southern Co')].unary_union
+multi_d['SOCO']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('Southern Co')]['UNIQUE_ID'].unique().tolist()
+
+util_to_eia.loc[multi_d['SOCO']['UNIQUE_ID']] = [100, multi_d['SOCO']['company_id'], 'Mass Muni Wholesale', 'Mass Muni Wholesale']
+util_to_c = pd.concat([util_to_c, multi_d['SOCO']['census']])
+multi_d['SOCO']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['SOCO']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['SOCO']['ua']['UNIQUE_ID'] = multi_d['SOCO']['UNIQUE_ID'] 
+multi_d['SOCO']['ua']['eia_code'] = multi_d['SOCO']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['SOCO']['ua']])
+
+#OTP
+multi_d['OTP']['UNIQUE_ID'] = 9939
+multi_d['OTP']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Oglethorp')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
+multi_d['OTP']['census'].index = np.repeat(multi_d['OTP']['company_id'], len(multi_d['OTP']['census']))
+multi_d['OTP']['census']['UNIQUE_ID'] = multi_d['OTP']['UNIQUE_ID']
+multi_d['OTP']['geom'] = utility[utility['PLAN_AREA'].str.contains('Oglethorp')].unary_union
+multi_d['OTP']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Oglethorp')]['UNIQUE_ID'].unique().tolist()
+
+util_to_eia.loc[multi_d['OTP']['UNIQUE_ID']] = [100, multi_d['OTP']['company_id'], 'Mass Muni Wholesale', 'Mass Muni Wholesale']
+util_to_c = pd.concat([util_to_c, multi_d['OTP']['census']])
+multi_d['OTP']['ua'] = dem_ua[dem_ua['UNIQUE_ID'].isin(multi_d['OTP']['comp_UID'])].drop_duplicates(subset=['UACE10'])
+multi_d['OTP']['ua']['UNIQUE_ID'] = multi_d['OTP']['UNIQUE_ID'] 
+multi_d['OTP']['ua']['eia_code'] = multi_d['OTP']['company_id'] 
+dem_ua = pd.concat([dem_ua, multi_d['OTP']['ua']])
 
 
+################################################################################
 
 def cat_load_census(idno):
     u = util_to_c.loc[idno]
