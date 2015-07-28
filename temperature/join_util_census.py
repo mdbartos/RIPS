@@ -123,15 +123,61 @@ util_to_eia.loc[2296, 'company_id'] = 18429    #Tacoma
 util_to_eia.loc[2566, 'company_id'] = 7294     #Glendale
 util_to_eia.loc[2155, 'company_id'] = 16088    #Riverside
 util_to_eia.loc[2298, 'company_id'] = 15500    #Puget Sound
-
 # util_to_eia.loc[589, 'company_id'] =           #Farmington | FARM
 # util_to_eia.loc[533, 'company_id'] =           #Los Alamos | LOS
 # util_to_eia.loc[627, 'company_id'] =           #Navajo Tribal | NTUA
 # util_to_eia.loc[1008, 'company_id'] = 16534    #Redding | RDNG
 # util_to_eia.loc[2148, 'company_id'] =          #Vernon | VER
-
-# util_to_eia.loc[ , 'company_id'] = 229         #CAISO | CISO
 # util_to_eia.loc[ , 'company_id'] = 12397       #MWD of SC | MWD
+
+# NPCC
+util_to_eia.loc[2183, 'company_id'] = 2886     #Cambridge (CELC)
+util_to_eia.loc[2739, 'company_id'] = 4089     #Commonwealth Edison (COEL) ##DOUBLECHECK
+#util_to_eia.loc[ , 'company_id'] = 15296     #New York Power Authority
+#util_to_eia.loc[ , 'company_id'] = 1998     #Boston Edison Co
+util_to_eia.loc[1586, 'company_id'] = 11172     #Long Island Light (LILC)
+#util_to_eia.loc[ , 'company_id'] = 13556     #Northeast Utilities (Renamed to Eversource)
+#util_to_eia.loc[ , 'company_id'] = 5618     #Eastern Utilities
+#util_to_eia.loc[ , 'company_id'] = 13433     #New England Electric Co
+#util_to_eia.loc[2723 , 'company_id'] = 3292     #Central Vermont Public Service (CVPS)
+util_to_eia.loc[2727, 'company_id'] = 7601     # Green Mountain Power
+
+# SERC
+#util_to_eia.loc[, 'company_id'] = 13204     #Nantahala Power and Light
+
+# ECAR
+#util_to_eia.loc[, 'company_id'] =      #
+#util_to_eia.loc[, 'company_id'] = 5109     #Detroit Edison Co
+#util_to_eia.loc[, 'company_id'] = 3260     #CINERGY (NOW PART OF DUKE) # POSSIBLY UID 2683
+#util_to_eia.loc[, 'company_id'] = 14015     #Ohio Valley Elec. Coop
+#util_to_eia.loc[, 'company_id'] = 538     #Allegheny (Now part of FirstEnergy)
+#util_to_eia.loc[, 'company_id'] = 9267     #Hoosier Energy REC
+#util_to_eia.loc[, 'company_id'] =      #FirstEnergy
+#util_to_eia.loc[, 'company_id'] =      #Municipal Coop Coord Pool
+
+# MAIN
+#util_to_eia.loc[, 'company_id'] = 3253     #Central Illinois Pub Serv # Now part of AMEREN #Prob 3105
+#util_to_eia.loc[, 'company_id'] = 20858     #Wisconsin Public Power
+#util_to_eia.loc[, 'company_id'] = 3252     #Central Illinois Light Co # Also part of AMEREN
+util_to_eia.loc[2667, 'company_id'] = 17632     #Southern Illinois Power Coop
+#util_to_eia.loc[, 'company_id'] = 9208     #Illinois Power Co # Also part of AMEREN
+
+# SPP
+util_to_eia.loc[933, 'company_id'] = 20391     #Westplains Energy - Kansas
+#util_to_eia.loc[, 'company_id'] = 807     #Arkansas Electric Coop # Members here: http://www.aecc.com/distribution-cooperatives
+#util_to_eia.loc[, 'company_id'] = 40233     #Sam Rayburn
+#util_to_eia.loc[, 'company_id'] = 12699     #Missouri Public Service # Now Part of Aquila/Black Hills
+util_to_eia.loc[3095, 'company_id'] = 7806     #Gulf State Utilities # Now ENTERGY Gulf States # May want to get all in TX and LA
+
+#ERCOT
+util_to_eia.loc[795, 'company_id'] = 8901     #Houston Lighting And Power #Probably 795
+util_to_eia.loc[3108, 'company_id'] = 3278     #Central Power and Light #Probably AEP Texas Central Co
+#util_to_eia.loc[, 'company_id'] = 18715    #Texas Municipal Power Pool
+#util_to_eia.loc[, 'company_id'] = 20404    #West Texas Utilities
+#util_to_eia.loc[, 'company_id'] = 11269    #Lower Colorado River Auth
+#util_to_eia.loc[, 'company_id'] = 44372    #Texas Utilities Elec # TXU
+#util_to_eia.loc[, 'company_id'] = 17583    #South Texas Electric Coop # Possibly 272
+
 
 ####
 
@@ -168,6 +214,54 @@ multi_d = {
         'TSGTCW' : {'company_id' : 99998, 'UNIQUE_ID' : None, 'geom' : None},
         'TSGTNM' : {'company_id' : 99997, 'UNIQUE_ID' : None, 'geom' : None}
         }
+
+#TODO
+# NPCC
+#util_to_eia.loc[, 'company_id'] = 11806     #Mass. Muni Wholesale # Contains Multiple
+#util_to_eia.loc[ , 'company_id'] = 13435     #New England Power Pool/NE ISO
+#util_to_eia.loc[ , 'company_id'] = 13501     #New York Power Pool/NY ISO
+
+#SERC
+#util_to_eia.loc[, 'company_id'] = 18195     #Southern Company (CTRL_AREA)
+#util_to_eia.loc[, 'company_id'] = 13994     #Oglethorp Power Corp (PLAN_AREA)
+#util_to_eia.loc[, 'company_id'] = 3046     #Carolina P&L/Progress Energy Carolina
+#util_to_eia.loc[, 'company_id'] = 924     #Associated Electric Coop
+#util_to_eia.loc[, 'company_id'] = 40218     #Central Electric Power Coop (PLAN_AREA)
+#util_to_eia.loc[, 'company_id'] = 17568     #South Mississippi El. Pow. Assoc. (CTRL/PLAN_AREA)
+#util_to_eia.loc[, 'company_id'] = 189     #Alabama Electric Coop #POWERSOUTH?
+#util_to_eia.loc[, 'company_id'] = 40229     #Old Dominion #VA | #DE,MA
+#
+
+#ECAR
+#util_to_eia.loc[, 'company_id'] = 5580     #East Kentucky Power Coop
+#util_to_eia.loc[, 'company_id'] = 7004     #Buckeye (PLAN_AREA)
+#util_to_eia.loc[, 'company_id'] = 40577     #American Municipal Power OH
+#util_to_eia.loc[, 'company_id'] = 1692     #Big Rivers Electric Corp: Members are Jackson Purchase Energy Corporation, Kenergy Corporation, and Meade County Rural Electric Cooperative Corporation.
+#util_to_eia.loc[, 'company_id'] = 829     #American Electric Power
+
+#MAAC
+#util_to_eia.loc[, 'company_id'] = 14725     #PJM
+#util_to_eia.loc[, 'company_id'] = 7088     #General Public Utilities # Part of First Energy # Contains Jersey Central Power and Light; Pennsylvania Electric Company (Penelec); Metropolitan Edison (Met-Ed)
+
+#SPP
+#util_to_eia.loc[, 'company_id'] = 20447     #Western Farmer's Electric Coop (CTRL|PLAN_AREA)
+#util_to_eia.loc[, 'company_id'] = 12506     #Entergy System Power Pool (CTRL|PLAN AREA)
+#util_to_eia.loc[, 'company_id'] = 14077     #Oklahoma Muni Power Auth
+#util_to_eia.loc[, 'company_id'] = 7349     #Golden Spread
+#util_to_eia.loc[, 'company_id'] = 18315     #Sunflower Electric Power Corp
+#util_to_eia.loc[, 'company_id'] = 2777     #Cajun Electric Power Coop # Probably Louisiana Generating LLC
+#util_to_eia.loc[, 'company_id'] = 3283     #Central and SouthWest Serv # American Electric Power West
+#util_to_eia.loc[, 'company_id'] = 26253     #LA Energy and Power Authority
+
+#FRCC
+#util_to_eia.loc[, 'company_id'] = 6567     #Florida Municipal Power Agency
+
+# ERCOT
+#util_to_eia.loc[, 'company_id'] = 13670     #Northeast Texas Elec Coop
+#util_to_eia.loc[, 'company_id'] = 40233     #Sam Rayburn
+#util_to_eia.loc[, 'company_id'] = 18679    #Tex La Elec Coop
+
+#TODO
 
 # AEPC
 
