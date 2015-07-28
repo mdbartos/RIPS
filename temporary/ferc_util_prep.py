@@ -396,6 +396,7 @@ for k in ercot.keys():
 # KUA: 10376
 # OUC: 14610
 # TECO: 18454
+# SECI: 21554
 
 frcc = {
     6909 : {
@@ -503,6 +504,17 @@ frcc = {
         2001 : pd.read_csv('%s/frcc/2001/TECO01' % (fulldir), skiprows=3, header=None)[0].values,
         2002 : pd.read_csv('%s/frcc/2002/TECO02' % (fulldir), sep='\t').loc[:, 'HR1':].values.ravel(),
         2003 : pd.read_csv('%s/frcc/2003/TECO03' % (fulldir), skiprows=2, header=None, sep=' ', skipinitialspace=True).iloc[:, 2:].values.ravel()
+    },
+    21554 : {
+        1993 : pd.read_fwf('%s/frcc/1993/SECI93' % (fulldir), header=None, skipfooter=1).iloc[:, 3:].values.ravel(),
+	1994 : pd.read_fwf('%s/frcc/1994/SECI94' % (fulldir), header=None, skipfooter=1).iloc[:, 3:].values.ravel(), 
+	1995 : pd.read_fwf('%s/frcc/1995/SECI95' % (fulldir), header=None, skipfooter=1).iloc[:, 3:].values.ravel(), 
+	1996 : pd.read_fwf('%s/frcc/1996/SECI96' % (fulldir), header=None, skipfooter=1).iloc[:, 3:].values.ravel(), 
+	1997 : pd.read_fwf('%s/frcc/1997/SECI97' % (fulldir), header=None, skipfooter=1).iloc[:, 3:].values.ravel(), 
+	1999 : pd.read_fwf('%s/frcc/1999/SECI99' % (fulldir), header=None, skipfooter=1).iloc[:, 3:].values.ravel(), 
+	2000 : pd.read_fwf('%s/frcc/2000/SECI00' % (fulldir), header=None, skipfooter=1).iloc[:, 3:].values.ravel(),
+	2002 : pd.read_fwf('%s/frcc/2002/SECI02' % (fulldir), header=None).iloc[:, 3:].values.ravel(),
+	2004 : pd.read_fwf('%s/frcc/2004/SECI04' % (fulldir), header=None).iloc[:, 3:].values.ravel() 
     }
 }
 
@@ -784,7 +796,7 @@ ecar = {
         2003 : pd.read_fwf('%s/ecar/2003/CIN03' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         2004 : pd.read_fwf('%s/ecar/2004/CIN04' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
     },
-    'fe' : {
+    32208 : {
         1997 : pd.read_fwf('%s/ecar/1997/FE97' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         1998 : pd.read_fwf('%s/ecar/1998/FE98' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         1999 : pd.read_fwf('%s/ecar/1999/FE99' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
