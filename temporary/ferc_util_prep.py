@@ -1815,3 +1815,21 @@ for k in mapp.keys():
     print k
     s = pd.DataFrame(pd.concat([pd.Series(mapp[k][i], index=pd.date_range(start=datetime.date(i, 1, 1), freq='h', periods=len(mapp[k][i]))) for i in mapp[k].keys()]).sort_index(), columns=['load'])
     s.to_csv('./mapp/%s.csv' % k)
+
+#################################
+
+from itertools import chain
+
+li = []
+
+for fn in os.listdir('.'):
+    li.append(os.listdir('./%s' % (fn)))
+
+s = pd.Series(list(chain(*li)))
+s = s.str.replace('\.csv', '')
+u = s[s.str.contains('\d+')].str.replace('[^\d]', '').astype(int).unique()
+
+homedir = os.path.expanduser('~')
+rid = pd.read_csv('%s/github/RIPS_kircheis/data/eia_form_714/active/form714-database/form714-database/Respondent IDs.csv' % homedir)
+ridu = rid[rid['eia_code'] != 0]
+ridu[~ridu['eia_code'].isin(u)]
