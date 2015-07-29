@@ -1107,8 +1107,9 @@ for k in maac.keys():
 # WEMC: 20065
 # DU: 4958
 # AECI: 924
-# ODEC-D: 40229D
-# ODEC-V: 40229V
+# ODEC-D: 402290
+# ODEC-V: 402291
+# ODEC: 40229
 # SOCO-APCO: 18195AL
 # SOCO-GPCO: 18195GP
 # SOCO-GUCO: 18195GU
@@ -1297,7 +1298,7 @@ serc = {
         2001 : pd.read_excel('%s/serc/2001/AECI01' % (fulldir)).iloc[:, -1].values,
         2002 : pd.Series(pd.read_excel('%s/serc/2002/AECI02' % (fulldir), skiprows=3).loc[:, 'Jan':'Dec'].values.ravel(order='F')).dropna().values
     },
-    '40229D' : {
+    402290 : {
         1996 : pd.Series(pd.DataFrame([i.split() for i in open('%s/serc/1996/ODECD96' % (fulldir)).readlines()[3:]]).iloc[:, 3:].values.ravel()).str.replace('[^\d]', '').replace('', '0').astype(float).values,
         1997 : pd.Series(pd.DataFrame([i.split() for i in open('%s/serc/1997/ODECD97' % (fulldir)).readlines()[4:]]).iloc[:, 3:].values.ravel()).str.replace('[^\d]', '').replace('', '0').astype(float).values,
         1998 : pd.Series(pd.DataFrame([i.split() for i in open('%s/serc/1998/ODECD98' % (fulldir)).readlines()[2:]]).iloc[:, 3:].values.ravel()).str.replace('[^\d]', '').replace('', '0').astype(float).values,
@@ -1308,13 +1309,13 @@ serc = {
         2003 : pd.DataFrame([i.split() for i in open('%s/serc/2003/ODECD03' % (fulldir)).readlines()[5:]])[4].str.replace('[N/A]', '').replace('', '0').astype(float).values,
         2004 : pd.DataFrame([i.split() for i in open('%s/serc/2004/ODECD04' % (fulldir)).readlines()[5:]])[4].str.replace('[N/A]', '').replace('', '0').astype(float).values
     },
-    '40229V' : {
+    402291 : {
         1996 : pd.Series(pd.DataFrame([i.split() for i in open('%s/serc/1996/ODECV96' % (fulldir)).readlines()[3:]]).iloc[:, 3:].values.ravel()).str.replace('[^\d]', '').replace('', '0').astype(float).values,
         1997 : pd.Series(pd.DataFrame([i.split() for i in open('%s/serc/1997/ODECV97' % (fulldir)).readlines()[4:]]).iloc[:, 3:].values.ravel()).str.replace('[^\d]', '').replace('', '0').astype(float).values,
         1998 : pd.Series(pd.DataFrame([i.split() for i in open('%s/serc/1998/ODECV98' % (fulldir)).readlines()[2:]]).iloc[:, 3:].values.ravel()).str.replace('[^\d]', '').replace('', '0').astype(float).values,
         1999 : pd.Series(pd.DataFrame([i.split() for i in open('%s/serc/1999/ODECV99' % (fulldir)).readlines()[2:]]).iloc[:, 3:].values.ravel()).str.replace('[^\d]', '').replace('', '0').astype(float).values,
         2000 : pd.DataFrame([i.split() for i in open('%s/serc/2000/ODECV00' % (fulldir)).readlines()[3:]])[4].astype(float).values,
-        2001 : pd.DataFrame([i.split() for i in open('%s/serc/2001/ODECV01' % (fulldir)).readlines()[3:]])[4].str.replace('[N/A]', '').replace('', '0').astype(float).values,
+        2001 : pd.DataFrame([i.split() for i in open('%s/serc/2001/ODECV01' % (fulldir)).readlines()[3:]])[4].dropna().str.replace('[N/A]', '').replace('', '0').astype(float).values,
         2002 : pd.DataFrame([i.split() for i in open('%s/serc/2002/ODECV02' % (fulldir)).readlines()[5:]])[4].str.replace('[N/A]', '').replace('', '0').astype(float).values,
         2003 : pd.DataFrame([i.split() for i in open('%s/serc/2003/ODECV03' % (fulldir)).readlines()[5:]])[4].str.replace('[N/A]', '').replace('', '0').astype(float).values,
         2004 : pd.DataFrame([i.split() for i in open('%s/serc/2004/ODECV04' % (fulldir)).readlines()[5:]])[4].str.replace('[N/A]', '').replace('', '0').astype(float).values
@@ -1368,8 +1369,20 @@ serc = {
         2002 : pd.read_excel('%s/serc/2002/SOCO02' % (fulldir), skiprows=1).iloc[:, 6].values,
         2003 : pd.read_excel('%s/serc/2003/SOCO03' % (fulldir)).iloc[:, 6].values,
         2004 : pd.read_excel('%s/serc/2004/SOCO04' % (fulldir), skiprows=1).iloc[:, 5].values
+    },
+    18195 : {
+        1999 : pd.read_excel('%s/serc/1999/SOCO99' % (fulldir))['System'].dropna().values,
+        2000 : pd.read_excel('%s/serc/2000/SOCO00' % (fulldir), skiprows=1).iloc[:, 7].values,
+        2001 : pd.read_excel('%s/serc/2001/SOCO01' % (fulldir))['Southern'].values,
+        2002 : pd.read_excel('%s/serc/2002/SOCO02' % (fulldir), skiprows=1).iloc[:, 7].values,
+        2003 : pd.read_excel('%s/serc/2003/SOCO03' % (fulldir)).iloc[:, 8].values,
+        2004 : pd.read_excel('%s/serc/2004/SOCO04' % (fulldir), skiprows=1).iloc[:, 7].values
     }
 }
+
+serc.update({40229 : {}})
+for i in serc[402290].keys():
+    serc[40229][i] = serc[402290][i] + serc[402291][i]
 
 for k in serc.keys():
     print k
