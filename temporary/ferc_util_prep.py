@@ -1110,11 +1110,11 @@ for k in maac.keys():
 # ODEC-D: 402290
 # ODEC-V: 402291
 # ODEC: 40229
-# SOCO-APCO: 18195AL
-# SOCO-GPCO: 18195GP
-# SOCO-GUCO: 18195GU
-# SOCO-MPCO: 18195MP
-# SOCO-SECO: 18195SE
+# SOCO-APCO: 195
+# SOCO-GPCO: 7140
+# SOCO-GUCO: 7801
+# SOCO-MPCO: 12686
+# SOCO-SECO: 16687 *?
 
 serc = {
     189 : {
@@ -1320,7 +1320,7 @@ serc = {
         2003 : pd.DataFrame([i.split() for i in open('%s/serc/2003/ODECV03' % (fulldir)).readlines()[5:]])[4].str.replace('[N/A]', '').replace('', '0').astype(float).values,
         2004 : pd.DataFrame([i.split() for i in open('%s/serc/2004/ODECV04' % (fulldir)).readlines()[5:]])[4].str.replace('[N/A]', '').replace('', '0').astype(float).values
     },
-    '18195AL' : {
+    195 : {
         1993 : pd.Series(pd.DataFrame([i.split() for i in open('%s/serc/1993/APCO93' % (fulldir)).readlines()[:-1]]).iloc[:,-1].values).str.replace('[^\d]', '').replace('', '0').astype(float).values,
         1994 : pd.DataFrame([i.split() for i in open('%s/serc/1994/APCO94' % (fulldir)).readlines()[:-1]]).iloc[:, 1:].astype(float).values.ravel(),
         1999 : pd.read_excel('%s/serc/1999/SOCO99' % (fulldir))['Alabama'].dropna().values,
@@ -1330,7 +1330,7 @@ serc = {
         2003 : pd.read_excel('%s/serc/2003/SOCO03' % (fulldir)).iloc[:, 2].values,
         2004 : pd.read_excel('%s/serc/2004/SOCO04' % (fulldir), skiprows=1).iloc[:, 1].values
     },
-    '18195GP' : {
+    7140 : {
         1993 : pd.Series(pd.DataFrame([i.split() for i in open('%s/serc/1993/GPCO93' % (fulldir)).readlines()[:-1]]).iloc[:,-1].values).str.replace('[^\d]', '').replace('', '0').astype(float).values,
         1994 : pd.DataFrame([i.split() for i in open('%s/serc/1994/GPCO94' % (fulldir)).readlines()[:-1]]).iloc[:, 1:].astype(float).values.ravel(),
         1999 : pd.read_excel('%s/serc/1999/SOCO99' % (fulldir))['Georgia'].dropna().values,
@@ -1340,7 +1340,7 @@ serc = {
         2003 : pd.read_excel('%s/serc/2003/SOCO03' % (fulldir)).iloc[:, 3].values,
         2004 : pd.read_excel('%s/serc/2004/SOCO04' % (fulldir), skiprows=1).iloc[:, 2].values
     },
-    '18195GU' : {
+    7801 : {
         1993 : pd.Series(pd.DataFrame([i.split() for i in open('%s/serc/1993/GUCO93' % (fulldir)).readlines()[:-1]]).iloc[:,-1].values).str.replace('[^\d]', '').replace('', '0').astype(float).values,
         1994 : pd.DataFrame([i.split() for i in open('%s/serc/1994/GUCO94' % (fulldir)).readlines()[:-1]]).iloc[:, 1:].astype(float).values.ravel(),
         1999 : pd.read_excel('%s/serc/1999/SOCO99' % (fulldir))['Gulf'].dropna().values,
@@ -1350,7 +1350,7 @@ serc = {
         2003 : pd.read_excel('%s/serc/2003/SOCO03' % (fulldir)).iloc[:, 4].values,
         2004 : pd.read_excel('%s/serc/2004/SOCO04' % (fulldir), skiprows=1).iloc[:, 3].values
     },
-    '18195MP' : {
+    12686 : {
         1993 : pd.Series(pd.DataFrame([i.split() for i in open('%s/serc/1993/MPCO93' % (fulldir)).readlines()[:-1]]).iloc[:,-1].values).str.replace('[^\d]', '').replace('', '0').astype(float).values,
         1994 : pd.DataFrame([i.split() for i in open('%s/serc/1994/MPCO94' % (fulldir)).readlines()[:-1]]).iloc[:, 1:].astype(float).values.ravel(),
         1999 : pd.read_excel('%s/serc/1999/SOCO99' % (fulldir))['Mississippi'].dropna().values,
@@ -1360,7 +1360,7 @@ serc = {
         2003 : pd.read_excel('%s/serc/2003/SOCO03' % (fulldir)).iloc[:, 5].values,
         2004 : pd.read_excel('%s/serc/2004/SOCO04' % (fulldir), skiprows=1).iloc[:, 4].values
     },
-    '18195SE' : {
+    16687 : {
         1993 : pd.Series(pd.DataFrame([i.split() for i in open('%s/serc/1993/SECO93' % (fulldir)).readlines()[:-1]]).iloc[:,-1].values).str.replace('[^\d]', '').replace('', '0').astype(float).values,
         1994 : pd.DataFrame([i.split() for i in open('%s/serc/1994/SECO94' % (fulldir)).readlines()[:-1]]).iloc[:, 1:].astype(float).values.ravel(),
         1999 : pd.read_excel('%s/serc/1999/SOCO99' % (fulldir))['Savannah'].dropna().values,
