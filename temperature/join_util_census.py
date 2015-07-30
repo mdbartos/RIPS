@@ -1071,7 +1071,7 @@ dem_ua = pd.concat([dem_ua, multi_d['MPC']['ua']])
 
 ################################################################################
 
-def cat_load_census(idno):
+def cat_load_census(idno, nerc):
     u = util_to_c.loc[idno]
     cT = pop_yrs.loc[u['GEOID'].values].sum()
     cT.index = cT.index.to_datetime()
@@ -1094,9 +1094,9 @@ def cat_load_census(idno):
 
     nonames = {99999 : 'ciso', 99998 : 'tsgtcw', 99997 : 'tsgtnm'}
     if idno in nonames.keys():
-        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s' % (homedir, nonames[idno]), index_col=0, parse_dates=True)
+        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/%s/%s' % (homedir, nerc, nonames[idno]), index_col=0, parse_dates=True)
     else:
-        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s.csv' % (homedir, idno), index_col=0, parse_dates=True)
+        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/%s/%s.csv' % (homedir, nerc, idno), index_col=0, parse_dates=True)
     c_load = c_load.resample('M').interpolate()
 
     cat = pd.concat([cT, c_load, demdata], axis=1)
@@ -1110,16 +1110,16 @@ def plot_curvefit(xdata, ydata):
 def curve_type(x, a, b, c):
     return abs(a*x**2) + b*x + c
 
-def fit_data_no_linreg(idno, plot_output=False):
-    data = cat_load_census(idno)[['load', 'pop', 'lforce_001', 'mHHI_001']].dropna()
+def fit_data_no_linreg(idno, nerc, plot_output=False):
+    data = cat_load_census(idno, nerc)[['load', 'pop', 'lforce_001', 'mHHI_001']].dropna()
     data = data[data.index.year!=2005]
     datasummer = data[np.in1d(data.index.month, [6,7,8])]
 
     nonames = {99999 : 'ciso', 99998 : 'tsgtcw', 99997 : 'tsgtnm'}
     if idno in nonames.keys():
-        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s' % (homedir, nonames[idno]), index_col=0, parse_dates=True)
+        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/%s/%s' % (homedir, nerc, nonames[idno]), index_col=0, parse_dates=True)
     else:
-        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc/%s.csv' % (homedir, idno), index_col=0, parse_dates=True)
+        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/%s/%s.csv' % (homedir, nerc, idno), index_col=0, parse_dates=True)
     c_load = c_load.groupby(c_load.index.date).max()
 
     norm_load = (1000000*c_load['load']/(data['pop'].reindex_like(c_load).interpolate())).dropna()
@@ -1249,14 +1249,26 @@ man_fixes = {
 
 reg_d = {}
 
-readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc' % homedir) if i.endswith('csv')] + [99999, 99998, 99997]
+wecc_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc' % homedir) if i.endswith('csv')] + [99999, 99998, 99997]
+npcc_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/npcc' % homedir) if i.endswith('csv')]
 
-for i in readlist:
+for i in wecc_readlist:
 #    i = int(fn.split('.')[0])
     try:
-        reg_d.update({i : fit_data_no_linreg(i, plot_output=True)})
+        reg_d.update({i : fit_data_no_linreg(i, 'wecc',  plot_output=True)})
     except:
         print(i)
+
+
+for i in npcc_readlist:
+#    i = int(fn.split('.')[0])
+    try:
+        reg_d.update({i : fit_data_no_linreg(i, 'npcc',  plot_output=True)})
+    except:
+        print(i)
+
+#### General
+
 
 
 #### Future projections
