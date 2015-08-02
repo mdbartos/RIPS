@@ -16,18 +16,18 @@ fulldir = homedir + '/' + datadir
 # dir_u = pd.Series(li).str[:-2].order().unique()
 
 ###### NPCC
-# BECO: 1998
+# BECO: 54913 <- 1998
 # BHE: 1179
-# CELC: 2886
+# CELC: 1523 <- 2886
 # CHGE: 3249
 # CMP: 3266
 # COED: 4226
-# COEL: 4089
+# COEL: 4089 -> IGNORE
 # CVPS: 3292
 # EUA: 5618
 # GMP: 7601
 # ISONY: 13501
-# LILC: 11172
+# LILC: 11171 <- 11172
 # MMWE: 11806
 # NEES: 13433
 # NEPOOL: 13435
@@ -41,7 +41,7 @@ fulldir = homedir + '/' + datadir
 # UI: 19497
 
 npcc = {
-    1998 : {
+    54913 : {
         1993 : pd.read_fwf('%s/npcc/1993/BECO93' % (fulldir), header=None, skipfooter=1).loc[:, 2:].values.ravel(),
         1994 : pd.read_csv('%s/npcc/1994/BECO94' % (fulldir), sep =' ', skipinitialspace=True,  header=None, skipfooter=1)[4].values,
         1995 : pd.read_csv('%s/npcc/1995/BECO95' % (fulldir), sep =' ', skipinitialspace=True,  header=None)[4].values,
@@ -62,7 +62,7 @@ npcc = {
             2001 : pd.read_excel('%s/npcc/2001/BHE01' % (fulldir), skiprows=2).iloc[:, 1:24].values.ravel(),
             2003 : pd.read_excel('%s/npcc/2003/BHE03' % (fulldir), skiprows=3).iloc[:, 1:24].values.ravel()
     },
-    2886 : {
+    1523 : {
             1999 : pd.read_csv('%s/npcc/1999/CELC99' % (fulldir), skiprows=3, sep=' ', skipinitialspace=True, header=None)[4].values,
             2000 : pd.read_csv('%s/npcc/2000/CELC00' % (fulldir), skiprows=3, sep=' ', skipinitialspace=True, header=None)[4].values,
             2001 : pd.read_csv('%s/npcc/2001/CELC01' % (fulldir), skiprows=3, sep=' ', skipinitialspace=True, header=None)[4].values,
@@ -131,12 +131,12 @@ npcc = {
             1999 : pd.read_fwf('%s/npcc/1999/EUA99' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel()
     },
     7601 : {
-        1993 : pd.read_csv('%s/npcc/1993/GMP93' % (fulldir), sep=' ', skipinitialspace=True, header=None, skiprows=4)[0].values,
+        1993 : pd.read_csv('%s/npcc/1993/GMP93' % (fulldir), sep=' ', skipinitialspace=True, header=None, skiprows=4)[0].replace('MWH', '0').astype(float).values.ravel(),
         1994 : pd.read_fwf('%s/npcc/1994/GMP94' % (fulldir), header=None)[0].values,
         1995 : pd.read_csv('%s/npcc/1995/GMP95' % (fulldir), sep=' ', skipinitialspace=True, header=None)[0].values,
         1996 : pd.read_csv('%s/npcc/1996/GMP96' % (fulldir), sep='\t', skipinitialspace=True, header=None)[0].values,
         1997 : pd.read_csv('%s/npcc/1997/GMP97' % (fulldir), sep='\t', skipinitialspace=True, header=None)[0].values,
-        1998 : pd.read_csv('%s/npcc/1998/GMP98' % (fulldir), sep='\t', skipinitialspace=True, header=None)[0].values,
+	1998 : pd.read_csv('%s/npcc/1998/GMP98' % (fulldir), sep='\t', skipinitialspace=True, header=None)[0].astype(str).str[:3].astype(float).values,
         1999 : pd.read_csv('%s/npcc/1999/GMP99' % (fulldir), sep=' ', skipinitialspace=True, header=None, skipfooter=1).iloc[:8760, 0].values,
         2002 : pd.read_excel('%s/npcc/2002/GMP02' % (fulldir), skiprows=6, skipfooter=1).iloc[:, 0].values,
         2003 : pd.read_excel('%s/npcc/2003/GMP03' % (fulldir), skiprows=6, skipfooter=1).iloc[:, 0].values,
@@ -147,7 +147,7 @@ npcc = {
         2003 : pd.read_excel('%s/npcc/2003/ISONY03' % (fulldir))['Load'].values,
         2004 : pd.read_excel('%s/npcc/2004/ISONY04' % (fulldir)).loc[:, 'HR1':].values.ravel()
     },
-    11172 : {
+    11171 : {
             1994 : pd.read_fwf('%s/npcc/1994/LILC94' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel(),
             1995 : pd.read_fwf('%s/npcc/1995/LILC95' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel(),
             1997 : pd.read_fwf('%s/npcc/1997/LILC97' % (fulldir), skiprows=4, widths=[8,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].values.ravel(),
@@ -187,7 +187,7 @@ npcc = {
             1999 : pd.read_fwf('%s/npcc/1999/NMPC99' % (fulldir), header=None).iloc[:, 2:14].astype(int).values.ravel(),
             2000 : pd.read_excel('%s/npcc/2000/NMPC00' % (fulldir), sheetname=1, skiprows=10, skipfooter=3).iloc[:, 1:].values.ravel(),
             2002 : pd.read_excel('%s/npcc/2002/NMPC02' % (fulldir), sheetname=1, skiprows=2, header=None).iloc[:, 2:].values.ravel(),
-            2003 : pd.concat([pd.read_excel('%s/npcc/2003/NMPC03' % (fulldir), sheetname=i, skiprows=1, header=None) for i in range(1,13)]).iloc[:, 2:].values.ravel()
+	    2003 : pd.concat([pd.read_excel('%s/npcc/2003/NMPC03' % (fulldir), sheetname=i, skiprows=1, header=None) for i in range(1,13)]).iloc[:, 2:].astype(str).apply(lambda x: x.str[:4]).astype(float).values.ravel()
     },
     13556 : {
             1993 : pd.read_fwf('%s/npcc/1993/NU93' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None, skipfooter=1).iloc[:, 1:].values.ravel(),
@@ -224,7 +224,7 @@ npcc = {
             1999 : pd.read_excel('%s/npcc/1999/NYS99' % (fulldir)).iloc[:, 1:].values.ravel(),
             2000 : pd.read_csv('%s/npcc/2000/NYS00' % (fulldir), sep='\t').iloc[:, -1].values,
             2001 : pd.read_csv('%s/npcc/2001/NYS01' % (fulldir), sep='\t', skiprows=3).dropna(how='all').iloc[:, -1].values,
-            2002 : pd.read_csv('%s/npcc/2002/NYS02' % (fulldir), sep='\t', skiprows=3).iloc[:, -1].values,
+	    2002 : pd.read_csv('%s/npcc/2002/NYS02' % (fulldir), sep=' ', skipinitialspace=True, skiprows=3).iloc[:, 2].values,
             2003 : pd.read_csv('%s/npcc/2003/NYS03' % (fulldir), sep=' ', skipinitialspace=True, skiprows=5, header=None).iloc[:, -1].values,
             2004 : pd.read_csv('%s/npcc/2004/NYS04' % (fulldir), sep=' ', skipinitialspace=True, skiprows=5, header=None).dropna(how='all').iloc[:, -1].values
     },
@@ -547,7 +547,7 @@ for k in frcc.keys():
 # SIGE: 17633
 # TE: 18997
 # WVPA: 40211
-# CINRGY: 3260
+# CINRGY: 3260 -> Now part of 3542
 # FE: 32208
 # MCCP:
 
@@ -609,7 +609,16 @@ ecar = {
     3542 : {
         1993 : pd.read_fwf('%s/ecar/1993/CEI93' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         1994 : pd.read_fwf('%s/ecar/1994/CEI94' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
-        1995 : pd.read_fwf('%s/ecar/1995/CEI95' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
+        1995 : pd.read_fwf('%s/ecar/1995/CEI95' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
+        1996 : pd.read_fwf('%s/ecar/1996/CIN96' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
+        1997 : pd.read_fwf('%s/ecar/1997/CIN97' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
+        1998 : pd.read_fwf('%s/ecar/1998/CIN98' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
+        1999 : pd.read_fwf('%s/ecar/1999/CIN99' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
+        2000 : pd.read_fwf('%s/ecar/2000/CIN00' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
+        2001 : pd.read_fwf('%s/ecar/2001/CIN01' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
+        2002 : pd.read_csv('%s/ecar/2002/CIN02' % (fulldir), header=None)[1].values,
+        2003 : pd.read_fwf('%s/ecar/2003/CIN03' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
+        2004 : pd.read_fwf('%s/ecar/2004/CIN04' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
     },
     4254 : {
         1993 : pd.read_fwf('%s/ecar/1993/CP93' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
@@ -784,17 +793,6 @@ ecar = {
         1994 : pd.read_fwf('%s/ecar/1994/WVPA94' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         2003 : pd.read_fwf('%s/ecar/2003/WVPA03' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         2004 : pd.read_fwf('%s/ecar/2004/WVPA04' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
-    },
-    3260 : {
-        1996 : pd.read_fwf('%s/ecar/1996/CIN96' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
-        1997 : pd.read_fwf('%s/ecar/1997/CIN97' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
-        1998 : pd.read_fwf('%s/ecar/1998/CIN98' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
-        1999 : pd.read_fwf('%s/ecar/1999/CIN99' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
-        2000 : pd.read_fwf('%s/ecar/2000/CIN00' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
-        2001 : pd.read_fwf('%s/ecar/2001/CIN01' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
-        2002 : pd.read_csv('%s/ecar/2002/CIN02' % (fulldir), header=None)[1].values,
-        2003 : pd.read_fwf('%s/ecar/2003/CIN03' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
-        2004 : pd.read_fwf('%s/ecar/2004/CIN04' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
     },
     32208 : {
         1997 : pd.read_fwf('%s/ecar/1997/FE97' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
@@ -1398,7 +1396,7 @@ for k in serc.keys():
 # KCPU: 9996
 # LEPA: 26253
 # LUS: 9096
-# GSU: 7806
+# GSU: 55936 <- 7806
 # MPS: 12699
 # OKGE: 14063
 # OMPA: 14077
@@ -1489,7 +1487,7 @@ spp = {
         2003 : pd.read_csv('%s/spp/2003/LUS03' % (fulldir), skiprows=3, header=None).iloc[:, -1].values,
         2004 : pd.read_csv('%s/spp/2004/LUS04' % (fulldir), skiprows=4, header=None).iloc[:, -1].values
     },
-    7806 : {
+    55936 : {
         1993 : pd.read_csv('%s/spp/1993/GSU93' % (fulldir), engine='python', header=None)[0].values
     },
     12699 : {
@@ -1572,7 +1570,7 @@ for k in spp.keys():
 # DPC: 4716
 # HUC: 9130
 # IES: 9219
-# IPW: 9392
+# IPW: 9417 <- 9392
 # IIGE: 9438
 # LES: 11018
 # MPL: 12647
@@ -1588,7 +1586,7 @@ for k in spp.keys():
 # SMMP: 40580
 # UPA: 19514
 # WPPI: 20858
-# MEC: 9435
+# MEC: 12341 <- 9435
 # CPA: 4322
 # MWPS: 23333
 
@@ -1631,7 +1629,7 @@ mapp = {
         1997 : pd.read_fwf('%s/mapp/1997/IES97' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:-1, 1:].replace('.', '0').astype(float).values.ravel(),
         1998 : pd.read_fwf('%s/mapp/1998/IESC98' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel()
     },
-    9392 : {
+    9417 : {
         1993 : pd.read_fwf('%s/mapp/1993/IPW93' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         1994 : pd.read_fwf('%s/mapp/1994/IPW94' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
         1995 : pd.read_fwf('%s/mapp/1995/IPW95' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].values.ravel(),
@@ -1789,7 +1787,7 @@ mapp = {
         2002 : pd.read_fwf('%s/mapp/2002/WPPI02' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel(),
         2003 : pd.read_fwf('%s/mapp/2003/WPPI03' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel()
     },
-    9435 : {
+    12341 : {
         1995 : pd.read_fwf('%s/mapp/1995/MEC95' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel(),
         1996 : pd.read_fwf('%s/mapp/1996/MEC96' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, 1:].replace('.', '0').astype(float).values.ravel(),
         1997 : pd.read_fwf('%s/mapp/1997/MEC97' % (fulldir), widths=[20,5,5,5,5,5,5,5,5,5,5,5,5,20,5,5,5,5,5,5,5,5,5,5,5,5], header=None).iloc[:, range(1,13)+range(14,26)].dropna().values.ravel(),
@@ -2074,11 +2072,11 @@ for x in unique_u:
     out_df = build_df(x)
     if x in unique_u_ids.keys():
         if str.isdigit(unique_u_ids[x]['code']):
-            out_df.to_csv('%s.csv' % unique_u_ids[x]['code'])
+            out_df.to_csv('./wecc/%s.csv' % unique_u_ids[x]['code'])
         else:
-            out_df.to_csv(x)
+            out_df.to_csv('./wecc/%s.csv' % x)
     else:
-        out_df.to_csv(x)
+        out_df.to_csv('./wecc/%s.csv' % x)
 
 
 
