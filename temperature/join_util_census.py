@@ -112,7 +112,7 @@ util_to_eia = pd.read_csv('%s/github/RIPS_kircheis/RIPS/crosswalk/util_eia_id.cs
 
 #### QUICK FIXES
 
-rid = pd.read_csv('%s/github/RIPS_kircheis/data/eia_form_714/active/form714-database/form714-database/Respondent IDs.csv' % homedir)
+rid = pd.read_csv('%s/github/RIPS_kircheis/data/eia_form_714/active/form714-database_2006_2013/form714-database/Respondent IDs.csv' % homedir)
 
 util_to_eia.loc[2149, 'company_id'] = 2507     #Burbank
 util_to_eia.loc[2046, 'company_id'] = 16868    #Seattle City Lights
@@ -1229,8 +1229,11 @@ def fit_data_no_linreg(idno, nerc, plot_output=False):
         textstr = '$\\alpha=%.2f$\n$\\beta=%.2f$\n$\\gamma=%.2f$\n$n=%s$\n$r2=%.2f$' % (coeffs[0], coeffs[1], coeffs[2],  len(peak), R_2)
         props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
         ax.text(0.05, 0.95, textstr, transform=ax.transAxes, fontsize=14, verticalalignment='top', linespacing=1.25, bbox=props)
-        plt.savefig('%s.png' % (idno), bbox_inches='tight')
+	if not os.path.exists('./%s' % nerc):
+            os.mkdir('./%s' % nerc)
+        plt.savefig('./%s/%s.png' % (nerc, idno), bbox_inches='tight')
         plt.clf()
+	plt.close(fig)
     
     return coeffs, R_2
 
@@ -1252,13 +1255,36 @@ man_fixes = {
         1738 : ('2002', None),
         19610 : ('2001', '2007'),
         28503 : ('1993', '1996'),
-        15143 : ('1998', None)
+        15143 : ('1998', None),
+
+	1692 : ('1994', '1998'),
+	11249 : ('1998', None),
+
+	17583 : ('1998', None),
+	18679 : ('1993', '1998'),
+
+	17632 : ('1993', '2003'),
+	20858 : ('1999', None),
+	20860 : ('1995', None),
+
+	9219 : ('1994', None),
+	9435 : ('1996', None),
+	12658 : ('1993', '2000'),
+
+	4089 : ('1995', None),
+	4226 : ('1993', '2000'),
+	13556 : ('1994', None),
+	14154 : ('1993', '2001'),
+
+	17568 : ('1993', '2003'),
+
+	3265 : ('1993', '2000')
         }
 
 reg_d = {}
 
-wecc_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc' % homedir) if i.endswith('csv')] + [99999, 99998, 99997]
-ecar_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/ecar' % homedir) if i.endswith('csv')]
+wecc_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc' % homedir) if (i.endswith('csv') and i.split('.')[0].isdigit())] + [99999, 99998, 99997]
+ecar_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/ecar' % homedir) if (i.endswith('csv') & (i.split('.')[0].isdigit()))]
 ercot_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/ercot' % homedir) if i.endswith('csv')]
 frcc_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/frcc' % homedir) if i.endswith('csv')]
 maac_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/maac' % homedir) if i.endswith('csv')]
@@ -1275,11 +1301,66 @@ for i in wecc_readlist:
     except:
         print(i)
 
+for i in ecar_readlist:
+#    i = int(fn.split('.')[0])
+    try:
+        reg_d.update({i : fit_data_no_linreg(i, 'ecar',  plot_output=True)})
+    except:
+        print(i)
+
+for i in ercot_readlist:
+#    i = int(fn.split('.')[0])
+    try:
+        reg_d.update({i : fit_data_no_linreg(i, 'ercot',  plot_output=True)})
+    except:
+        print(i)
+
+for i in frcc_readlist:
+#    i = int(fn.split('.')[0])
+    try:
+        reg_d.update({i : fit_data_no_linreg(i, 'frcc',  plot_output=True)})
+    except:
+        print(i)
+
+for i in maac_readlist:
+#    i = int(fn.split('.')[0])
+    try:
+        reg_d.update({i : fit_data_no_linreg(i, 'maac',  plot_output=True)})
+    except:
+        print(i)
+
+for i in main_readlist:
+#    i = int(fn.split('.')[0])
+    try:
+        reg_d.update({i : fit_data_no_linreg(i, 'main',  plot_output=True)})
+    except:
+        print(i)
+
+for i in mapp_readlist:
+#    i = int(fn.split('.')[0])
+    try:
+        reg_d.update({i : fit_data_no_linreg(i, 'mapp',  plot_output=True)})
+    except:
+        print(i)
 
 for i in npcc_readlist:
 #    i = int(fn.split('.')[0])
     try:
         reg_d.update({i : fit_data_no_linreg(i, 'npcc',  plot_output=True)})
+    except:
+        print(i)
+
+for i in serc_readlist:
+#    i = int(fn.split('.')[0])
+    try:
+        reg_d.update({i : fit_data_no_linreg(i, 'serc',  plot_output=True)})
+    except:
+        print(i)
+
+for i in spp_readlist:
+#    i = int(fn.split('.')[0])
+    try:
+        reg_d.update({i : fit_data_no_linreg(i, 'spp',  plot_output=True)})
     except:
         print(i)
 
