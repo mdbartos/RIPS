@@ -269,6 +269,11 @@ npcc[3249][1996][npcc[3249][1996] > 5000] = 0
 npcc[15296][2000][npcc[15296][2000] > 5000] = 0
 npcc[15296][2001][npcc[15296][2001] > 5000] = 0
 npcc[4089][1998] = np.repeat(np.nan, len(npcc[4089][1998]))
+npcc[13511][1996][npcc[13511][1996] < 500] = 0
+npcc[13511][1997][npcc[13511][1997] < 500] = 0
+npcc[13511][1999][npcc[13511][1999] < 500] = 0
+npcc[13511][2000][npcc[13511][2000] < 500] = 0
+npcc[14154][2002][npcc[14154][2002] > 2000] = 0
 
 if not os.path.exists('./npcc'):
     os.mkdir('npcc')
@@ -1371,7 +1376,7 @@ serc = {
     },
     7140 : {
         1993 : pd.Series(pd.DataFrame([i.split() for i in open('%s/serc/1993/GPCO93' % (fulldir)).readlines()[:-1]]).iloc[:,-1].values).str.replace('[^\d]', '').replace('', '0').astype(float).values,
-        1994 : pd.DataFrame([i.split() for i in open('%s/serc/1994/GPCO94' % (fulldir)).readlines()[:-1]]).iloc[:, 1:].astype(float).values.ravel(),
+        1994 : pd.DataFrame([i.split() for i in open('%s/serc/1994/GPCO94' % (fulldir)).readlines()[:-1]]).iloc[:, 1:].astype(float).replace(np.nan, 0).values.ravel(),
         1999 : pd.read_excel('%s/serc/1999/SOCO99' % (fulldir))['Georgia'].dropna().values,
         2000 : pd.read_excel('%s/serc/2000/SOCO00' % (fulldir), skiprows=1).iloc[:, 3].values,
         2001 : pd.read_excel('%s/serc/2001/SOCO01' % (fulldir))['Georgia'].values,
@@ -1426,6 +1431,8 @@ for i in serc[402290].keys():
 serc[189][2001][serc[189][2001] > 2000] = 0
 serc[3408][2002][serc[3408][2002] > 2000] = 0
 serc[3408][2003][serc[3408][2003] > 2000] = 0
+serc[7140][1999][serc[7140][1999] < 0] = 0
+serc[7140][1994][serc[7140][1994] > 20000] = 0
 
 if not os.path.exists('./serc'):
     os.mkdir('serc')
