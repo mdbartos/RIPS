@@ -1,5 +1,5 @@
 import numpy as np
-import pandas as pd
+import pandas as pd    #Require >= 0.16.1
 import geopandas as gpd
 from geopandas import tools
 import datetime
@@ -13,13 +13,11 @@ from scipy.optimize import curve_fit
 homedir = os.path.expanduser('~')
 
 #### IMPORT CENSUS AND UTILITY SHAPEFILES
-utility = gpd.read_file('%s/github/RIPS_kircheis/data/shp/Electric_Retail_Service_Ter.shp' % homedir)
+utility = gpd.read_file('%s/github/RIPS/data/shp/Electric_Retail_Service_Ter.shp' % homedir)
 
-census_shp = '%s/github/RIPS_kircheis/data/shp/census/census_tracts_all/census_tracts_us.shp' % homedir
+census_path = '%s/github/RIPS/data/census/census/' % homedir
 
-census_path = '%s/github/RIPS_kircheis/data/census/' % homedir
-
-acs_path = '%s/github/RIPS_kircheis/data/census/ACS_5y/' % homedir
+acs_path = '%s/github/RIPS/data/census/acs/' % homedir
 
 #### IMPORT SOCIAL EXPLORER POPULATION DATA
 
@@ -34,11 +32,11 @@ c = {
 }
 
 for i in c.keys():
-    if ('census_tract_pop_%s' % i) in os.listdir(census_path):
-        all_pop[i] = pd.read_csv((census_path + 'census_tract_pop_' + i), sep='\t', encoding='iso-8859-1')
+    if ('census_tract_pop_%s.csv' % i) in os.listdir(census_path):
+        all_pop[i] = pd.read_csv((census_path + 'census_tract_pop_' + i + '.csv'), sep='\t', encoding='iso-8859-1')
         all_pop[i]['Geo_FIPS'] = all_pop[i]['Geo_FIPS'].astype(str).str.pad(11, side='left', fillchar='0')
-    if ('census_tract_dem_%s' % i) in os.listdir(census_path):
-        all_dem[i] = pd.read_csv((census_path + 'census_tract_dem_' + i), sep='\t', encoding='iso-8859-1')
+    if ('census_tract_dem_%s.csv' % i) in os.listdir(census_path):
+        all_dem[i] = pd.read_csv((census_path + 'census_tract_dem_' + i + '.csv'), sep='\t', encoding='iso-8859-1')
         all_dem[i]['Geo_FIPS'] = all_dem[i]['Geo_FIPS'].astype(str).str.pad(11, side='left', fillchar='0')
 
 #### OPTIONALLY IMPORT ACS POPULATION DATA
@@ -55,10 +53,10 @@ acs = {
 
 for i in acs.keys():
     if not i in all_pop.keys():
-        all_pop[i] = pd.read_csv((acs_path + 'ACS_' + acs[i]['r'] + '_pop'), sep='\t', encoding='iso-8859-1')
+        all_pop[i] = pd.read_csv((acs_path + 'ACS_' + acs[i]['r'] + '_pop.csv'), sep='\t', encoding='iso-8859-1')
         all_pop[i]['Geo_FIPS'] = all_pop[i]['Geo_FIPS'].astype(str).str.pad(11, side='left', fillchar='0')
     if not i in all_dem.keys():
-        all_dem[i] = pd.read_csv((acs_path + 'ACS_' + acs[i]['r'] + '_dem'), sep='\t', encoding='iso-8859-1')
+        all_dem[i] = pd.read_csv((acs_path + 'ACS_' + acs[i]['r'] + '_dem.csv'), sep='\t', encoding='iso-8859-1')
         all_dem[i]['Geo_FIPS'] = all_dem[i]['Geo_FIPS'].astype(str).str.pad(11, side='left', fillchar='0')
 
 #### PROCESS DATA
@@ -108,11 +106,11 @@ for i in ucols:
 
 ####
 
-util_to_eia = pd.read_csv('%s/github/RIPS_kircheis/RIPS/crosswalk/util_eia_id.csv' % homedir, index_col=0)
+util_to_eia = pd.read_csv('%s/github/RIPS/crosswalk/util_eia_id.csv' % homedir, index_col=0)
 
 #### QUICK FIXES
 
-rid = pd.read_csv('%s/github/RIPS_kircheis/data/eia_form_714/active/form714-database_2006_2013/form714-database/Respondent IDs.csv' % homedir)
+rid = pd.read_csv('%s/github/RIPS/crosswalk/Respondent_IDs.csv' % homedir)
 
 util_to_eia.loc[2149, 'company_id'] = 2507     #Burbank
 util_to_eia.loc[2046, 'company_id'] = 16868    #Seattle City Lights
@@ -193,11 +191,11 @@ util_to_eia.loc[2175, 'company_id'] = 13809     #Northwestern Public Service #No
 
 ####
 
-j90 = pd.read_csv('%s/github/RIPS_kircheis/data/util_join_1990.csv' % homedir, index_col=0).set_index('UNIQUE_ID')['GEOID_1990'].astype(str).str.pad(11, side='left', fillchar='0')
+j90 = pd.read_csv('%s/github/RIPS/crosswalk/util_join_1990.csv' % homedir, index_col=0).set_index('UNIQUE_ID')['GEOID_1990'].astype(str).str.pad(11, side='left', fillchar='0')
 
-j00 = pd.read_csv('%s/github/RIPS_kircheis/data/util_join_2000.csv' % homedir, index_col=0).set_index('UNIQUE_ID')['GEOID_2000'].astype(str).str.pad(11, side='left', fillchar='0')
+j00 = pd.read_csv('%s/github/RIPS/crosswalk/util_join_2000.csv' % homedir, index_col=0).set_index('UNIQUE_ID')['GEOID_2000'].astype(str).str.pad(11, side='left', fillchar='0')
 
-j14 = pd.read_csv('%s/github/RIPS_kircheis/data/util_join_2014.csv' % homedir, index_col=0).set_index('UNIQUE_ID')['GEOID_2014'].astype(str).str.pad(11, side='left', fillchar='0')
+j14 = pd.read_csv('%s/github/RIPS/crosswalk/util_join_2014.csv' % homedir, index_col=0).set_index('UNIQUE_ID')['GEOID_2014'].astype(str).str.pad(11, side='left', fillchar='0')
 
 util_to_c = pd.concat([j90, j00, j14]).drop_duplicates().reset_index()
 util_to_c['company_id'] = util_to_c['UNIQUE_ID'].map(util_to_eia['company_id'])
@@ -205,7 +203,7 @@ util_to_c = util_to_c.dropna().rename(columns={0:'GEOID'}).set_index('company_id
 
 ####
 
-dem_ua = pd.read_csv('%s/github/RIPS_kircheis/data/util_demand_to_met_ua' % homedir)
+dem_ua = pd.read_csv('%s/github/RIPS/crosswalk/util_demand_to_met_ua.csv' % homedir)
 
 # FIX AMEREN ILLINOIS, DTE Detroit
 
@@ -338,6 +336,7 @@ multi_d = {
 multi_d['AEPC']['UNIQUE_ID'] = 9999
 multi_d['AEPC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[[1, 106, 108, 109, 1130, 2111]].dropna().reset_index().set_index('company_id')
 multi_d['AEPC']['census'].index = np.repeat(multi_d['AEPC']['company_id'], len(multi_d['AEPC']['census']))
+multi_d['AEPC']['census'].index.name = 'company_id'
 multi_d['AEPC']['census']['UNIQUE_ID'] = multi_d['AEPC']['UNIQUE_ID']
 multi_d['AEPC']['geom'] = utility[utility['UNIQUE_ID'].isin([1, 106, 108, 109, 1130, 2111])].unary_union
 multi_d['AEPC']['comp_UID'] = [1, 106, 108, 109, 1130, 2111]
@@ -354,6 +353,7 @@ dem_ua = pd.concat([dem_ua, multi_d['AEPC']['ua']])
 multi_d['PRPA']['UNIQUE_ID'] = 9998
 multi_d['PRPA']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Platte River')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['PRPA']['census'].index = np.repeat(multi_d['PRPA']['company_id'], len(multi_d['PRPA']['census']))
+multi_d['PRPA']['census'].index.name = 'company_id'
 multi_d['PRPA']['census']['UNIQUE_ID'] = multi_d['PRPA']['UNIQUE_ID']
 multi_d['PRPA']['geom'] = utility[utility['PLAN_AREA'].str.contains('Platte River')].unary_union
 multi_d['PRPA']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Platte River')]['UNIQUE_ID'].unique().tolist()
@@ -370,6 +370,7 @@ dem_ua = pd.concat([dem_ua, multi_d['PRPA']['ua']])
 multi_d['CISO']['UNIQUE_ID'] = 9997
 multi_d['CISO']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('California Independent System Operator')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['CISO']['census'].index = np.repeat(multi_d['CISO']['company_id'], len(multi_d['CISO']['census']))
+multi_d['CISO']['census'].index.name = 'company_id'
 multi_d['CISO']['census']['UNIQUE_ID'] = multi_d['CISO']['UNIQUE_ID']
 multi_d['CISO']['geom'] = utility[utility['CTRL_AREA'].str.contains('California Independent System Operator')].unary_union
 multi_d['CISO']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('California Independent System Operator')]['UNIQUE_ID'].unique().tolist()
@@ -386,6 +387,7 @@ dem_ua = pd.concat([dem_ua, multi_d['CISO']['ua']])
 multi_d['BPA']['UNIQUE_ID'] = 9996
 multi_d['BPA']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('Bonneville')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['BPA']['census'].index = np.repeat(multi_d['BPA']['company_id'], len(multi_d['BPA']['census']))
+multi_d['BPA']['census'].index.name = 'company_id'
 multi_d['BPA']['census']['UNIQUE_ID'] = multi_d['BPA']['UNIQUE_ID']
 multi_d['BPA']['geom'] = utility[utility['CTRL_AREA'].str.contains('Bonneville')].unary_union
 multi_d['BPA']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('Bonneville')]['UNIQUE_ID'].unique().tolist()
@@ -402,6 +404,7 @@ dem_ua = pd.concat([dem_ua, multi_d['BPA']['ua']])
 multi_d['WALC']['UNIQUE_ID'] = 9995
 multi_d['WALC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('WAPA Desert')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['WALC']['census'].index = np.repeat(multi_d['WALC']['company_id'], len(multi_d['WALC']['census']))
+multi_d['WALC']['census'].index.name = 'company_id'
 multi_d['WALC']['census']['UNIQUE_ID'] = multi_d['WALC']['UNIQUE_ID']
 multi_d['WALC']['geom'] = utility[utility['CTRL_AREA'].str.contains('WAPA Desert')].unary_union
 multi_d['WALC']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('WAPA Desert')]['UNIQUE_ID'].unique().tolist()
@@ -419,6 +422,7 @@ dem_ua = pd.concat([dem_ua, multi_d['WALC']['ua']])
 multi_d['WACM']['UNIQUE_ID'] = 9994
 multi_d['WACM']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('WAPA Rocky')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['WACM']['census'].index = np.repeat(multi_d['WACM']['company_id'], len(multi_d['WACM']['census']))
+multi_d['WACM']['census'].index.name = 'company_id'
 multi_d['WACM']['census']['UNIQUE_ID'] = multi_d['WACM']['UNIQUE_ID']
 multi_d['WACM']['geom'] = utility[utility['CTRL_AREA'].str.contains('WAPA Rocky')].unary_union
 multi_d['WACM']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('WAPA Rocky')]['UNIQUE_ID'].unique().tolist()
@@ -437,6 +441,7 @@ TSGTCW_ID = [1598, 24, 988, 1318, 820, 1222, 1673, 551, 1320, 677, 978, 1562, 17
 multi_d['TSGTCW']['UNIQUE_ID'] = 9993
 multi_d['TSGTCW']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('WAPA Rocky')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['TSGTCW']['census'].index = np.repeat(multi_d['TSGTCW']['company_id'], len(multi_d['TSGTCW']['census']))
+multi_d['TSGTCW']['census'].index.name = 'company_id'
 multi_d['TSGTCW']['census']['UNIQUE_ID'] = multi_d['TSGTCW']['UNIQUE_ID']
 multi_d['TSGTCW']['geom'] = utility[utility['UNIQUE_ID'].isin(TSGTCW_ID)].unary_union
 multi_d['TSGTCW']['comp_UID'] = TSGTCW_ID
@@ -455,6 +460,7 @@ TSGTNM_ID = [311, 308, 315, 532, 317, 319, 318, 2172, 1003, 1147, 309, 321, 1094
 multi_d['TSGTNM']['UNIQUE_ID'] = 9992
 multi_d['TSGTNM']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('WAPA Rocky')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['TSGTNM']['census'].index = np.repeat(multi_d['TSGTNM']['company_id'], len(multi_d['TSGTNM']['census']))
+multi_d['TSGTNM']['census'].index.name = 'company_id'
 multi_d['TSGTNM']['census']['UNIQUE_ID'] = multi_d['TSGTNM']['UNIQUE_ID']
 multi_d['TSGTNM']['geom'] = utility[utility['UNIQUE_ID'].isin(TSGTNM_ID)].unary_union
 multi_d['TSGTNM']['comp_UID'] = TSGTNM_ID
@@ -531,6 +537,7 @@ dem_ua = pd.concat([dem_ua, multi_d['TSGTNM']['ua']])
 multi_d['MMWE']['UNIQUE_ID'] = 9991
 multi_d['MMWE']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Massachusetts Municipal')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['MMWE']['census'].index = np.repeat(multi_d['MMWE']['company_id'], len(multi_d['MMWE']['census']))
+multi_d['MMWE']['census'].index.name = 'company_id'
 multi_d['MMWE']['census']['UNIQUE_ID'] = multi_d['MMWE']['UNIQUE_ID']
 multi_d['MMWE']['geom'] = utility[utility['PLAN_AREA'].str.contains('Massachusetts Municipal')].unary_union
 multi_d['MMWE']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Massachusetts Municipal')]['UNIQUE_ID'].unique().tolist()
@@ -547,6 +554,7 @@ dem_ua = pd.concat([dem_ua, multi_d['MMWE']['ua']])
 multi_d['NEPOOL']['UNIQUE_ID'] = 9990
 multi_d['NEPOOL']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('New England ISO')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['NEPOOL']['census'].index = np.repeat(multi_d['NEPOOL']['company_id'], len(multi_d['NEPOOL']['census']))
+multi_d['NEPOOL']['census'].index.name = 'company_id'
 multi_d['NEPOOL']['census']['UNIQUE_ID'] = multi_d['NEPOOL']['UNIQUE_ID']
 multi_d['NEPOOL']['geom'] = utility[utility['PLAN_AREA'].str.contains('New England ISO')].unary_union
 multi_d['NEPOOL']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('New England ISO')]['UNIQUE_ID'].unique().tolist()
@@ -563,6 +571,7 @@ dem_ua = pd.concat([dem_ua, multi_d['NEPOOL']['ua']])
 multi_d['NYPP']['UNIQUE_ID'] = 9989
 multi_d['NYPP']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('New York ISO')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['NYPP']['census'].index = np.repeat(multi_d['NYPP']['company_id'], len(multi_d['NYPP']['census']))
+multi_d['NYPP']['census'].index.name = 'company_id'
 multi_d['NYPP']['census']['UNIQUE_ID'] = multi_d['NYPP']['UNIQUE_ID']
 multi_d['NYPP']['geom'] = utility[utility['CTRL_AREA'].str.contains('New York ISO')].unary_union
 multi_d['NYPP']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('New York ISO')]['UNIQUE_ID'].unique().tolist()
@@ -579,6 +588,7 @@ dem_ua = pd.concat([dem_ua, multi_d['NYPP']['ua']])
 multi_d['NU']['UNIQUE_ID'] = 9988
 multi_d['NU']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['HOLD_CO'].str.contains('Northeast Util')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['NU']['census'].index = np.repeat(multi_d['NU']['company_id'], len(multi_d['NU']['census']))
+multi_d['NU']['census'].index.name = 'company_id'
 multi_d['NU']['census']['UNIQUE_ID'] = multi_d['NU']['UNIQUE_ID']
 multi_d['NU']['geom'] = utility[utility['HOLD_CO'].str.contains('Northeast Util')].unary_union
 multi_d['NU']['comp_UID'] = utility[utility['HOLD_CO'].str.contains('Northeast Util')]['UNIQUE_ID'].unique().tolist()
@@ -596,6 +606,7 @@ dem_ua = pd.concat([dem_ua, multi_d['NU']['ua']])
 multi_d['SOCO']['UNIQUE_ID'] = 9987
 multi_d['SOCO']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('Southern Co')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['SOCO']['census'].index = np.repeat(multi_d['SOCO']['company_id'], len(multi_d['SOCO']['census']))
+multi_d['SOCO']['census'].index.name = 'company_id'
 multi_d['SOCO']['census']['UNIQUE_ID'] = multi_d['SOCO']['UNIQUE_ID']
 multi_d['SOCO']['geom'] = utility[utility['CTRL_AREA'].str.contains('Southern Co')].unary_union
 multi_d['SOCO']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('Southern Co')]['UNIQUE_ID'].unique().tolist()
@@ -611,6 +622,7 @@ dem_ua = pd.concat([dem_ua, multi_d['SOCO']['ua']])
 multi_d['OTP']['UNIQUE_ID'] = 9986
 multi_d['OTP']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Oglethorp')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['OTP']['census'].index = np.repeat(multi_d['OTP']['company_id'], len(multi_d['OTP']['census']))
+multi_d['OTP']['census'].index.name = 'company_id'
 multi_d['OTP']['census']['UNIQUE_ID'] = multi_d['OTP']['UNIQUE_ID']
 multi_d['OTP']['geom'] = utility[utility['PLAN_AREA'].str.contains('Oglethorp')].unary_union
 multi_d['OTP']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Oglethorp')]['UNIQUE_ID'].unique().tolist()
@@ -626,6 +638,7 @@ dem_ua = pd.concat([dem_ua, multi_d['OTP']['ua']])
 multi_d['CPL']['UNIQUE_ID'] = 9985
 multi_d['CPL']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Progress Energy Carolina')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['CPL']['census'].index = np.repeat(multi_d['CPL']['company_id'], len(multi_d['CPL']['census']))
+multi_d['CPL']['census'].index.name = 'company_id'
 multi_d['CPL']['census']['UNIQUE_ID'] = multi_d['CPL']['UNIQUE_ID']
 multi_d['CPL']['geom'] = utility[utility['PLAN_AREA'].str.contains('Progress Energy Carolina')].unary_union
 multi_d['CPL']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Progress Energy Carolina')]['UNIQUE_ID'].unique().tolist()
@@ -641,6 +654,7 @@ dem_ua = pd.concat([dem_ua, multi_d['CPL']['ua']])
 multi_d['AECC']['UNIQUE_ID'] = 9984
 multi_d['AECC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Associated Electric Coop')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['AECC']['census'].index = np.repeat(multi_d['AECC']['company_id'], len(multi_d['AECC']['census']))
+multi_d['AECC']['census'].index.name = 'company_id'
 multi_d['AECC']['census']['UNIQUE_ID'] = multi_d['AECC']['UNIQUE_ID']
 multi_d['AECC']['geom'] = utility[utility['PLAN_AREA'].str.contains('Associated Electric Coop')].unary_union
 multi_d['AECC']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Associated Electric Coop')]['UNIQUE_ID'].unique().tolist()
@@ -656,6 +670,7 @@ dem_ua = pd.concat([dem_ua, multi_d['AECC']['ua']])
 multi_d['CEPC']['UNIQUE_ID'] = 9983
 multi_d['CEPC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Central Electric Power Coop')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['CEPC']['census'].index = np.repeat(multi_d['CEPC']['company_id'], len(multi_d['CEPC']['census']))
+multi_d['CEPC']['census'].index.name = 'company_id'
 multi_d['CEPC']['census']['UNIQUE_ID'] = multi_d['CEPC']['UNIQUE_ID']
 multi_d['CEPC']['geom'] = utility[utility['PLAN_AREA'].str.contains('Central Electric Power Coop')].unary_union
 multi_d['CEPC']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Central Electric Power Coop')]['UNIQUE_ID'].unique().tolist()
@@ -671,6 +686,7 @@ dem_ua = pd.concat([dem_ua, multi_d['CEPC']['ua']])
 multi_d['SMEA']['UNIQUE_ID'] = 9982
 multi_d['SMEA']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('South Mississippi')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['SMEA']['census'].index = np.repeat(multi_d['SMEA']['company_id'], len(multi_d['SMEA']['census']))
+multi_d['SMEA']['census'].index.name = 'company_id'
 multi_d['SMEA']['census']['UNIQUE_ID'] = multi_d['SMEA']['UNIQUE_ID']
 multi_d['SMEA']['geom'] = utility[utility['PLAN_AREA'].str.contains('South Mississippi')].unary_union
 multi_d['SMEA']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('South Mississippi')]['UNIQUE_ID'].unique().tolist()
@@ -686,6 +702,7 @@ dem_ua = pd.concat([dem_ua, multi_d['SMEA']['ua']])
 multi_d['AEC']['UNIQUE_ID'] = 9981
 multi_d['AEC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('PowerSouth')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['AEC']['census'].index = np.repeat(multi_d['AEC']['company_id'], len(multi_d['AEC']['census']))
+multi_d['AEC']['census'].index.name = 'company_id'
 multi_d['AEC']['census']['UNIQUE_ID'] = multi_d['AEC']['UNIQUE_ID']
 multi_d['AEC']['geom'] = utility[utility['PLAN_AREA'].str.contains('PowerSouth')].unary_union
 multi_d['AEC']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('PowerSouth')]['UNIQUE_ID'].unique().tolist()
@@ -701,6 +718,7 @@ dem_ua = pd.concat([dem_ua, multi_d['AEC']['ua']])
 multi_d['ODEC']['UNIQUE_ID'] = 9980
 multi_d['ODEC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Old Dominion')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['ODEC']['census'].index = np.repeat(multi_d['ODEC']['company_id'], len(multi_d['ODEC']['census']))
+multi_d['ODEC']['census'].index.name = 'company_id'
 multi_d['ODEC']['census']['UNIQUE_ID'] = multi_d['ODEC']['UNIQUE_ID']
 multi_d['ODEC']['geom'] = utility[utility['PLAN_AREA'].str.contains('Old Dominion')].unary_union
 multi_d['ODEC']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Old Dominion')]['UNIQUE_ID'].unique().tolist()
@@ -716,6 +734,7 @@ dem_ua = pd.concat([dem_ua, multi_d['ODEC']['ua']])
 multi_d['ODECD']['UNIQUE_ID'] = 9979
 multi_d['ODECD']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[(utility['PLAN_AREA'].str.contains('Old Dominion')) & (utility['STATE'] != 'VA')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['ODECD']['census'].index = np.repeat(multi_d['ODECD']['company_id'], len(multi_d['ODECD']['census']))
+multi_d['ODECD']['census'].index.name = 'company_id'
 multi_d['ODECD']['census']['UNIQUE_ID'] = multi_d['ODECD']['UNIQUE_ID']
 multi_d['ODECD']['geom'] = utility[(utility['PLAN_AREA'].str.contains('Old Dominion')) & (utility['STATE'] != 'VA')].unary_union
 multi_d['ODECD']['comp_UID'] = utility[(utility['PLAN_AREA'].str.contains('Old Dominion')) & (utility['STATE'] != 'VA')]['UNIQUE_ID'].unique().tolist()
@@ -731,6 +750,7 @@ dem_ua = pd.concat([dem_ua, multi_d['ODECD']['ua']])
 multi_d['ODECV']['UNIQUE_ID'] = 9978
 multi_d['ODECV']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[(utility['PLAN_AREA'].str.contains('Old Dominion')) & (utility['STATE'] == 'VA')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['ODECV']['census'].index = np.repeat(multi_d['ODECV']['company_id'], len(multi_d['ODECV']['census']))
+multi_d['ODECV']['census'].index.name = 'company_id'
 multi_d['ODECV']['census']['UNIQUE_ID'] = multi_d['ODECV']['UNIQUE_ID']
 multi_d['ODECV']['geom'] = utility[(utility['PLAN_AREA'].str.contains('Old Dominion')) & (utility['STATE'] == 'VA')].unary_union
 multi_d['ODECV']['comp_UID'] = utility[(utility['PLAN_AREA'].str.contains('Old Dominion')) & (utility['STATE'] == 'VA')]['UNIQUE_ID'].unique().tolist()
@@ -748,6 +768,7 @@ dem_ua = pd.concat([dem_ua, multi_d['ODECV']['ua']])
 multi_d['EKPC']['UNIQUE_ID'] = 9977
 multi_d['EKPC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('East Kentucky')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['EKPC']['census'].index = np.repeat(multi_d['EKPC']['company_id'], len(multi_d['EKPC']['census']))
+multi_d['EKPC']['census'].index.name = 'company_id'
 multi_d['EKPC']['census']['UNIQUE_ID'] = multi_d['EKPC']['UNIQUE_ID']
 multi_d['EKPC']['geom'] = utility[utility['PLAN_AREA'].str.contains('East Kentucky')].unary_union
 multi_d['EKPC']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('East Kentucky')]['UNIQUE_ID'].unique().tolist()
@@ -763,6 +784,7 @@ dem_ua = pd.concat([dem_ua, multi_d['EKPC']['ua']])
 multi_d['BPI']['UNIQUE_ID'] = 9976
 multi_d['BPI']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Buckeye Power')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['BPI']['census'].index = np.repeat(multi_d['BPI']['company_id'], len(multi_d['BPI']['census']))
+multi_d['BPI']['census'].index.name = 'company_id'
 multi_d['BPI']['census']['UNIQUE_ID'] = multi_d['BPI']['UNIQUE_ID']
 multi_d['BPI']['geom'] = utility[utility['PLAN_AREA'].str.contains('Buckeye Power')].unary_union
 multi_d['BPI']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Buckeye Power')]['UNIQUE_ID'].unique().tolist()
@@ -778,6 +800,7 @@ dem_ua = pd.concat([dem_ua, multi_d['BPI']['ua']])
 multi_d['AMPO']['UNIQUE_ID'] = 9975
 multi_d['AMPO']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('American Municipal Power OH')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['AMPO']['census'].index = np.repeat(multi_d['AMPO']['company_id'], len(multi_d['AMPO']['census']))
+multi_d['AMPO']['census'].index.name = 'company_id'
 multi_d['AMPO']['census']['UNIQUE_ID'] = multi_d['AMPO']['UNIQUE_ID']
 multi_d['AMPO']['geom'] = utility[utility['PLAN_AREA'].str.contains('American Municipal Power OH')].unary_union
 multi_d['AMPO']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('American Municipal Power OH')]['UNIQUE_ID'].unique().tolist()
@@ -793,6 +816,7 @@ dem_ua = pd.concat([dem_ua, multi_d['AMPO']['ua']])
 multi_d['BREC']['UNIQUE_ID'] = 9974
 multi_d['BREC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[[2628, 2629, 2656]].dropna().reset_index().set_index('company_id')
 multi_d['BREC']['census'].index = np.repeat(multi_d['BREC']['company_id'], len(multi_d['BREC']['census']))
+multi_d['BREC']['census'].index.name = 'company_id'
 multi_d['BREC']['census']['UNIQUE_ID'] = multi_d['BREC']['UNIQUE_ID']
 multi_d['BREC']['geom'] = utility[utility['UNIQUE_ID'].isin([2628, 2629, 2656])].unary_union
 multi_d['BREC']['comp_UID'] = [2628, 2629, 2656]
@@ -808,6 +832,7 @@ dem_ua = pd.concat([dem_ua, multi_d['BREC']['ua']])
 multi_d['AEP']['UNIQUE_ID'] = 9973
 multi_d['AEP']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['HOLD_CO'].str.contains('American Electric Power')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['AEP']['census'].index = np.repeat(multi_d['AEP']['company_id'], len(multi_d['AEP']['census']))
+multi_d['AEP']['census'].index.name = 'company_id'
 multi_d['AEP']['census']['UNIQUE_ID'] = multi_d['AEP']['UNIQUE_ID']
 multi_d['AEP']['geom'] = utility[utility['HOLD_CO'].str.contains('American Electric Power')].unary_union
 multi_d['AEP']['comp_UID'] = utility[utility['HOLD_CO'].str.contains('American Electric Power')]['UNIQUE_ID'].unique().tolist()
@@ -823,6 +848,7 @@ dem_ua = pd.concat([dem_ua, multi_d['AEP']['ua']])
 multi_d['FE']['UNIQUE_ID'] = 9972
 multi_d['FE']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['HOLD_CO'].str.contains('FirstEnergy')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['FE']['census'].index = np.repeat(multi_d['FE']['company_id'], len(multi_d['FE']['census']))
+multi_d['FE']['census'].index.name = 'company_id'
 multi_d['FE']['census']['UNIQUE_ID'] = multi_d['FE']['UNIQUE_ID']
 multi_d['FE']['geom'] = utility[utility['HOLD_CO'].str.contains('FirstEnergy')].unary_union
 multi_d['FE']['comp_UID'] = utility[utility['HOLD_CO'].str.contains('FirstEnergy')]['UNIQUE_ID'].unique().tolist()
@@ -838,6 +864,7 @@ dem_ua = pd.concat([dem_ua, multi_d['FE']['ua']])
 multi_d['WPPI']['UNIQUE_ID'] = 9971
 multi_d['WPPI']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('WPPI')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['WPPI']['census'].index = np.repeat(multi_d['WPPI']['company_id'], len(multi_d['WPPI']['census']))
+multi_d['WPPI']['census'].index.name = 'company_id'
 multi_d['WPPI']['census']['UNIQUE_ID'] = multi_d['WPPI']['UNIQUE_ID']
 multi_d['WPPI']['geom'] = utility[utility['PLAN_AREA'].str.contains('WPPI')].unary_union
 multi_d['WPPI']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('WPPI')]['UNIQUE_ID'].unique().tolist()
@@ -853,6 +880,7 @@ dem_ua = pd.concat([dem_ua, multi_d['WPPI']['ua']])
 multi_d['PJM']['UNIQUE_ID'] = 9970
 multi_d['PJM']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['CTRL_AREA'].str.contains('PJM Interconnection')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['PJM']['census'].index = np.repeat(multi_d['PJM']['company_id'], len(multi_d['PJM']['census']))
+multi_d['PJM']['census'].index.name = 'company_id'
 multi_d['PJM']['census']['UNIQUE_ID'] = multi_d['PJM']['UNIQUE_ID']
 multi_d['PJM']['geom'] = utility[utility['CTRL_AREA'].str.contains('PJM Interconnection')].unary_union
 multi_d['PJM']['comp_UID'] = utility[utility['CTRL_AREA'].str.contains('PJM Interconnection')]['UNIQUE_ID'].unique().tolist()
@@ -868,6 +896,7 @@ dem_ua = pd.concat([dem_ua, multi_d['PJM']['ua']])
 multi_d['GPU']['UNIQUE_ID'] = 9969
 multi_d['GPU']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[[2847, 2845, 2812]].dropna().reset_index().set_index('company_id')
 multi_d['GPU']['census'].index = np.repeat(multi_d['GPU']['company_id'], len(multi_d['GPU']['census']))
+multi_d['GPU']['census'].index.name = 'company_id'
 multi_d['GPU']['census']['UNIQUE_ID'] = multi_d['GPU']['UNIQUE_ID']
 multi_d['GPU']['geom'] = utility[utility['UNIQUE_ID'].isin([2847, 2845, 2812])].unary_union
 multi_d['GPU']['comp_UID'] = [2847, 2845, 2812]
@@ -884,6 +913,7 @@ dem_ua = pd.concat([dem_ua, multi_d['GPU']['ua']])
 multi_d['WFEC']['UNIQUE_ID'] = 9968
 multi_d['WFEC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Western Farmer')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['WFEC']['census'].index = np.repeat(multi_d['WFEC']['company_id'], len(multi_d['WFEC']['census']))
+multi_d['WFEC']['census'].index.name = 'company_id'
 multi_d['WFEC']['census']['UNIQUE_ID'] = multi_d['WFEC']['UNIQUE_ID']
 multi_d['WFEC']['geom'] = utility[utility['PLAN_AREA'].str.contains('Western Farmer')].unary_union
 multi_d['WFEC']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Western Farmer')]['UNIQUE_ID'].unique().tolist()
@@ -899,6 +929,7 @@ dem_ua = pd.concat([dem_ua, multi_d['WFEC']['ua']])
 multi_d['ENTR']['UNIQUE_ID'] = 9967
 multi_d['ENTR']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Entergy')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['ENTR']['census'].index = np.repeat(multi_d['ENTR']['company_id'], len(multi_d['ENTR']['census']))
+multi_d['ENTR']['census'].index.name = 'company_id'
 multi_d['ENTR']['census']['UNIQUE_ID'] = multi_d['ENTR']['UNIQUE_ID']
 multi_d['ENTR']['geom'] = utility[utility['PLAN_AREA'].str.contains('Entergy')].unary_union
 multi_d['ENTR']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Entergy')]['UNIQUE_ID'].unique().tolist()
@@ -914,6 +945,7 @@ dem_ua = pd.concat([dem_ua, multi_d['ENTR']['ua']])
 multi_d['OMPA']['UNIQUE_ID'] = 9966
 multi_d['OMPA']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Oklahoma Municipal')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['OMPA']['census'].index = np.repeat(multi_d['OMPA']['company_id'], len(multi_d['OMPA']['census']))
+multi_d['OMPA']['census'].index.name = 'company_id'
 multi_d['OMPA']['census']['UNIQUE_ID'] = multi_d['OMPA']['UNIQUE_ID']
 multi_d['OMPA']['geom'] = utility[utility['PLAN_AREA'].str.contains('Oklahoma Municipal')].unary_union
 multi_d['OMPA']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Oklahoma Municipal')]['UNIQUE_ID'].unique().tolist()
@@ -929,6 +961,7 @@ dem_ua = pd.concat([dem_ua, multi_d['OMPA']['ua']])
 multi_d['GSEC']['UNIQUE_ID'] = 9965
 multi_d['GSEC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Golden Spread')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['GSEC']['census'].index = np.repeat(multi_d['GSEC']['company_id'], len(multi_d['GSEC']['census']))
+multi_d['GSEC']['census'].index.name = 'company_id'
 multi_d['GSEC']['census']['UNIQUE_ID'] = multi_d['GSEC']['UNIQUE_ID']
 multi_d['GSEC']['geom'] = utility[utility['PLAN_AREA'].str.contains('Golden Spread')].unary_union
 multi_d['GSEC']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Golden Spread')]['UNIQUE_ID'].unique().tolist()
@@ -944,6 +977,7 @@ dem_ua = pd.concat([dem_ua, multi_d['GSEC']['ua']])
 multi_d['SEPC']['UNIQUE_ID'] = 9964
 multi_d['SEPC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Sunflower')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['SEPC']['census'].index = np.repeat(multi_d['SEPC']['company_id'], len(multi_d['SEPC']['census']))
+multi_d['SEPC']['census'].index.name = 'company_id'
 multi_d['SEPC']['census']['UNIQUE_ID'] = multi_d['SEPC']['UNIQUE_ID']
 multi_d['SEPC']['geom'] = utility[utility['PLAN_AREA'].str.contains('Sunflower')].unary_union
 multi_d['SEPC']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Sunflower')]['UNIQUE_ID'].unique().tolist()
@@ -959,6 +993,7 @@ dem_ua = pd.concat([dem_ua, multi_d['SEPC']['ua']])
 multi_d['CAJN']['UNIQUE_ID'] = 9963
 multi_d['CAJN']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Louisiana Gen')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['CAJN']['census'].index = np.repeat(multi_d['CAJN']['company_id'], len(multi_d['CAJN']['census']))
+multi_d['CAJN']['census'].index.name = 'company_id'
 multi_d['CAJN']['census']['UNIQUE_ID'] = multi_d['CAJN']['UNIQUE_ID']
 multi_d['CAJN']['geom'] = utility[utility['PLAN_AREA'].str.contains('Louisiana Gen')].unary_union
 multi_d['CAJN']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Louisiana Gen')]['UNIQUE_ID'].unique().tolist()
@@ -974,6 +1009,7 @@ dem_ua = pd.concat([dem_ua, multi_d['CAJN']['ua']])
 multi_d['CSWS']['UNIQUE_ID'] = 9962
 multi_d['CSWS']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('American Electric Power West')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['CSWS']['census'].index = np.repeat(multi_d['CSWS']['company_id'], len(multi_d['CSWS']['census']))
+multi_d['CSWS']['census'].index.name = 'company_id'
 multi_d['CSWS']['census']['UNIQUE_ID'] = multi_d['CSWS']['UNIQUE_ID']
 multi_d['CSWS']['geom'] = utility[utility['PLAN_AREA'].str.contains('American Electric Power West')].unary_union
 multi_d['CSWS']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('American Electric Power West')]['UNIQUE_ID'].unique().tolist()
@@ -989,6 +1025,7 @@ dem_ua = pd.concat([dem_ua, multi_d['CSWS']['ua']])
 multi_d['LEPA']['UNIQUE_ID'] = 9961
 multi_d['LEPA']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Louisiana Energy')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['LEPA']['census'].index = np.repeat(multi_d['LEPA']['company_id'], len(multi_d['LEPA']['census']))
+multi_d['LEPA']['census'].index.name = 'company_id'
 multi_d['LEPA']['census']['UNIQUE_ID'] = multi_d['LEPA']['UNIQUE_ID']
 multi_d['LEPA']['geom'] = utility[utility['PLAN_AREA'].str.contains('Louisiana Energy')].unary_union
 multi_d['LEPA']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Louisiana Energy')]['UNIQUE_ID'].unique().tolist()
@@ -1005,6 +1042,7 @@ dem_ua = pd.concat([dem_ua, multi_d['LEPA']['ua']])
 multi_d['FMPA']['UNIQUE_ID'] = 9960
 multi_d['FMPA']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Florida Municipal Power Agency')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['FMPA']['census'].index = np.repeat(multi_d['FMPA']['company_id'], len(multi_d['FMPA']['census']))
+multi_d['FMPA']['census'].index.name = 'company_id'
 multi_d['FMPA']['census']['UNIQUE_ID'] = multi_d['FMPA']['UNIQUE_ID']
 multi_d['FMPA']['geom'] = utility[utility['PLAN_AREA'].str.contains('Florida Municipal Power Agency')].unary_union
 multi_d['FMPA']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Florida Municipal Power Agency')]['UNIQUE_ID'].unique().tolist()
@@ -1021,6 +1059,7 @@ dem_ua = pd.concat([dem_ua, multi_d['FMPA']['ua']])
 multi_d['SECI']['UNIQUE_ID'] = 9959
 multi_d['SECI']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Seminole')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['SECI']['census'].index = np.repeat(multi_d['SECI']['company_id'], len(multi_d['SECI']['census']))
+multi_d['SECI']['census'].index.name = 'company_id'
 multi_d['SECI']['census']['UNIQUE_ID'] = multi_d['SECI']['UNIQUE_ID']
 multi_d['SECI']['geom'] = utility[utility['PLAN_AREA'].str.contains('Seminole')].unary_union
 multi_d['SECI']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Seminole')]['UNIQUE_ID'].unique().tolist()
@@ -1069,6 +1108,7 @@ dem_ua = pd.concat([dem_ua, multi_d['SECI']['ua']])
 multi_d['TXLA']['UNIQUE_ID'] = 9958
 multi_d['TXLA']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Tex La')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['TXLA']['census'].index = np.repeat(multi_d['TXLA']['company_id'], len(multi_d['TXLA']['census']))
+multi_d['TXLA']['census'].index.name = 'company_id'
 multi_d['TXLA']['census']['UNIQUE_ID'] = multi_d['TXLA']['UNIQUE_ID']
 multi_d['TXLA']['geom'] = utility[utility['PLAN_AREA'].str.contains('Tex La')].unary_union
 multi_d['TXLA']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Tex La')]['UNIQUE_ID'].unique().tolist()
@@ -1085,6 +1125,7 @@ dem_ua = pd.concat([dem_ua, multi_d['TXLA']['ua']])
 multi_d['MPC']['UNIQUE_ID'] = 9957
 multi_d['MPC']['census'] = util_to_c.reset_index().set_index('UNIQUE_ID').loc[utility[utility['PLAN_AREA'].str.contains('Minnkota Power')]['UNIQUE_ID'].values.astype(int)].dropna().reset_index().set_index('company_id')
 multi_d['MPC']['census'].index = np.repeat(multi_d['MPC']['company_id'], len(multi_d['MPC']['census']))
+multi_d['MPC']['census'].index.name = 'company_id'
 multi_d['MPC']['census']['UNIQUE_ID'] = multi_d['MPC']['UNIQUE_ID']
 multi_d['MPC']['geom'] = utility[utility['PLAN_AREA'].str.contains('Minnkota Power')].unary_union
 multi_d['MPC']['comp_UID'] = utility[utility['PLAN_AREA'].str.contains('Minnkota Power')]['UNIQUE_ID'].unique().tolist()
@@ -1130,9 +1171,9 @@ def cat_load_census(idno, nerc):
 
     nonames = {99999 : 'ciso', 99998 : 'tsgtcw', 99997 : 'tsgtnm'}
     if idno in nonames.keys():
-        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/%s/%s.csv' % (homedir, nerc, nonames[idno]), index_col=0, parse_dates=True)
+        c_load = pd.read_csv('%s/github/RIPS/data/hourly_load/%s/%s.csv' % (homedir, nerc, nonames[idno]), index_col=0, parse_dates=True)
     else:
-        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/%s/%s.csv' % (homedir, nerc, idno), index_col=0, parse_dates=True)
+        c_load = pd.read_csv('%s/github/RIPS/data/hourly_load/%s/%s.csv' % (homedir, nerc, idno), index_col=0, parse_dates=True)
     c_load = c_load.resample('M').interpolate()
 
     cat = pd.concat([cT, c_load, demdata], axis=1)
@@ -1153,9 +1194,9 @@ def fit_data_no_linreg(idno, nerc, plot_output=False):
 
     nonames = {99999 : 'ciso', 99998 : 'tsgtcw', 99997 : 'tsgtnm'}
     if idno in nonames.keys():
-        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/%s/%s.csv' % (homedir, nerc, nonames[idno]), index_col=0, parse_dates=True)
+        c_load = pd.read_csv('%s/github/RIPS/data/hourly_load/%s/%s.csv' % (homedir, nerc, nonames[idno]), index_col=0, parse_dates=True)
     else:
-        c_load = pd.read_csv('%s/github/RIPS_kircheis/RIPS/data/hourly_load/%s/%s.csv' % (homedir, nerc, idno), index_col=0, parse_dates=True)
+        c_load = pd.read_csv('%s/github/RIPS/data/hourly_load/%s/%s.csv' % (homedir, nerc, idno), index_col=0, parse_dates=True)
     c_load = c_load.groupby(c_load.index.date).max()
 
     norm_load = (1000000*c_load['load']/(data['pop'].reindex_like(c_load).interpolate())).dropna()
@@ -1331,16 +1372,16 @@ man_fixes = {
 
 reg_d = {}
 
-wecc_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/wecc' % homedir) if (i.endswith('csv') and i.split('.')[0].isdigit())] + [99999, 99998, 99997]
-ecar_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/ecar' % homedir) if (i.endswith('csv') & (i.split('.')[0].isdigit()))]
-ercot_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/ercot' % homedir) if i.endswith('csv')]
-frcc_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/frcc' % homedir) if i.endswith('csv')]
-maac_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/maac' % homedir) if i.endswith('csv')]
-main_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/main' % homedir) if i.endswith('csv')]
-mapp_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/mapp' % homedir) if i.endswith('csv')]
-npcc_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/npcc' % homedir) if i.endswith('csv')]
-serc_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/serc' % homedir) if i.endswith('csv')]
-spp_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS_kircheis/RIPS/data/hourly_load/spp' % homedir) if i.endswith('csv')]
+wecc_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS/data/hourly_load/wecc' % homedir) if (i.endswith('csv') and i.split('.')[0].isdigit())] + [99999, 99998, 99997]
+ecar_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS/data/hourly_load/ecar' % homedir) if (i.endswith('csv') & (i.split('.')[0].isdigit()))]
+ercot_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS/data/hourly_load/ercot' % homedir) if i.endswith('csv')]
+frcc_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS/data/hourly_load/frcc' % homedir) if i.endswith('csv')]
+maac_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS/data/hourly_load/maac' % homedir) if i.endswith('csv')]
+main_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS/data/hourly_load/main' % homedir) if i.endswith('csv')]
+mapp_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS/data/hourly_load/mapp' % homedir) if i.endswith('csv')]
+npcc_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS/data/hourly_load/npcc' % homedir) if i.endswith('csv')]
+serc_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS/data/hourly_load/serc' % homedir) if i.endswith('csv')]
+spp_readlist = [int(i.split('.')[0]) for i in os.listdir('%s/github/RIPS/data/hourly_load/spp' % homedir) if i.endswith('csv')]
 
 for i in wecc_readlist:
     try:
@@ -1438,6 +1479,8 @@ captured_util.crs = utility.crs
 
 import netCDF4
 
+idno = reg_df[reg_df['r2'] >= 0.5].index.tolist()
+projection_dir = '%s/temp_regression/projection' % (homedir)
 
 def project_reg_vect(yr, idno):
 
@@ -1453,6 +1496,7 @@ def project_reg_vect(yr, idno):
     latlonix['lonix'] = latlonix['lonix'].astype(int)
     latlonix['lat'] = latlonix['lat'].astype(str)
     latlonix['lon'] = latlonix['lon'].astype(str)
+    latlonix.reset_index(drop=True, inplace=True)
 
     cat = np.ma.filled(nc[yr].variables['tasmax'][:,:,:], np.iinfo(np.int32).min)[:, latlonix['latix'].values, latlonix['lonix'].values]
     cat[cat == cat.min()] = np.nan
@@ -1460,6 +1504,7 @@ def project_reg_vect(yr, idno):
     outdf = pd.DataFrame()
 
     for code_n in idno:
+#        print code_n
         dem_util = dem_ua.set_index('eia_code').sort_index().loc[code_n]
         data_name = pd.Series(dem_util['grid_cell'])
         util_ll = data_name.str.split('_').str[1:].apply(pd.Series)
@@ -1480,19 +1525,18 @@ def project_reg_vect(yr, idno):
     return outdf
 
 
-idno = [int(i.split('.')[0]) for i in os.listdir('%s/Dropbox/NSF WSC AZ WEN Team Share/Electricity Demand/plots' % homedir)]
-
-
 def call_reg(model, scen, directory):
     call_reg.nc = {}
     curdir = '%s/%s/%s' % (directory, model, scen)
     for fn in os.listdir(curdir):
         call_reg.nc.update({ int(fn.split('_')[-1].split('-')[0][:4]) : netCDF4.Dataset('%s/%s' % (curdir, fn))})
     for y in call_reg.nc.keys():
-        project_reg_vect(y, idno).to_csv('%s-%s-%s' % (model, scen, y))
+        project_reg_vect(y, idno).to_csv('%s/%s-%s-%s' % (projection_dir, model, scen, y))
         call_reg.nc[y].close()
 
 default_dir = '%s/CMIP5' % homedir
+
+# Write to ./projection
 
 for subdir in os.listdir(default_dir):
     scendir = '%s/%s' % (default_dir, subdir)
@@ -1520,7 +1564,7 @@ def util_hist_temp(idno):
 
     out_df = pd.DataFrame()
 
-    dem_ua = pd.read_csv('%s/github/RIPS_kircheis/data/util_demand_to_met_ua' % homedir)
+#    dem_ua = pd.read_csv('%s/github/RIPS_kircheis/data/util_demand_to_met_ua' % homedir)
 
     for code_n in idno:
         dem_util = dem_ua.set_index('eia_code').sort_index().loc[code_n]
@@ -1590,19 +1634,24 @@ def apply_demand_reg(idno, temp_df):
 
 #Create output files of regression in directory ./regress
 
+hist_util_temps = util_hist_temp(idno)
+hist_util_temps.to_csv(historical_dir)
+
 dirlist = pd.Series([k.split('rcp') for k in os.listdir(projection_dir)]).apply(pd.Series)
 dirlist[0] = dirlist[0].str[:-1]
 dirlist[1] = 'rcp' + dirlist[1].str.split('-').str[0]
+
+regress_dir = '%s/temp_regression/regress' % (homedir)
 
 for i in dirlist.index.values:
     model = dirlist.loc[i, 0]
     proj = dirlist.loc[i, 1]
     temp_df = combine_scenario(model, proj, historical_dir, projection_dir)
     reg_results = pd.DataFrame()
-    for j in reg_d.keys():
+    for j in idno:
         result = apply_demand_reg(j, temp_df)
         reg_results[j] = result
-    reg_results.to_csv('demand_%s_%s' % (model, proj))
+    reg_results.to_csv('%s/demand_%s_%s' % (regress_dir, model, proj))
 
 
 # Combine output files in a pandas panel
